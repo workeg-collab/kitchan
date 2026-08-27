@@ -84,13 +84,13 @@ export const SAMPLE_PROJECT_KITCHEN: ProjectData = {
 export const SAMPLE_PROJECT_DRESSING: ProjectData = {
   metadata: {
     id: 'proj-dressing-01',
-    name: 'غرفة ملابس ودريسنج روم ماستر (Walk-in)',
+    name: 'غرفة ملابس ودريسنج روم ماستر حرف L (L-Shaped Walk-in Suite)',
     projectType: 'dressing',
     materialSystem: 'wood',
     clientName: 'د / سارة القاضي',
     designerName: 'استوديو كيتشن كاد برو',
-    date: '2026-08-27',
-    notes: 'دريسنج روم مفتوح مع جزيرة إكسسوارات وساعات، أرفف أحذية مائلة، ووحدات تعليق مزدوج مع إضاءة بروفايل ليد.',
+    date: '2026-08-28',
+    notes: 'دريسنج روم ماستر بتصميم متصل حرف L مع وحدة ركنة زاوية 90°، ماسورة تعليق مزدوج، برج أحذية مائل، وجزيرة إكسسوارات وساعات وسطح زجاج.',
     unit: 'cm',
   },
   room: {
@@ -110,9 +110,11 @@ export const SAMPLE_PROJECT_DRESSING: ProjectData = {
   cabinets: [
     { id: 'WD01', name: 'وحدة تعليق طويل للفساتين والعبايات', category: 'wardrobe', type: 'wardrobe-walkin-open', projectType: 'dressing', width: 1000, height: 2600, depth: 550, x: 0, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true, hangingRailCount: 1 },
     { id: 'WD02', name: 'وحدة تعليق مزدوج (قمصان وبدل)', category: 'closet-internals', type: 'wardrobe-hanging-double', projectType: 'dressing', width: 900, height: 2600, depth: 550, x: 1000, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true, hangingRailCount: 2 },
-    { id: 'WD03', name: 'برج أدراج ومطبق ملابس', category: 'closet-internals', type: 'wardrobe-shelves-drawers', projectType: 'dressing', width: 800, height: 2600, depth: 550, x: 1900, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 4, doorCount: 0, drawerCount: 4, doorHinge: 'none', doorType: 'open' },
-    { id: 'WD04', name: 'وحدة أرفف أحذية مائلة مخصصة', category: 'accessories', type: 'wardrobe-shoe-rack', projectType: 'dressing', width: 800, height: 2600, depth: 400, x: 2700, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 8, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasShoeShelves: true },
-    { id: 'WD05', name: 'جزيرة دريسنج مع درج إكسسوارات وساعات', category: 'accessories', type: 'wardrobe-jewelry-vanity', projectType: 'dressing', width: 1200, height: 900, depth: 700, x: 1300, y: 1500, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 6, doorHinge: 'none', doorType: 'open', hasJewelryDrawer: true },
+    { id: 'WD03', name: 'برج أدراج ومطبق ملابس', category: 'closet-internals', type: 'wardrobe-shelves-drawers', projectType: 'dressing', width: 900, height: 2600, depth: 550, x: 1900, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 4, doorCount: 0, drawerCount: 4, doorHinge: 'none', doorType: 'open' },
+    { id: 'WD04', name: 'دولاب دريسنج ركنة حرف L مفتوح ماستر', category: 'wardrobe', type: 'wardrobe-corner-open', projectType: 'dressing', width: 1000, height: 2600, depth: 1000, x: 2800, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 4, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true, hangingRailCount: 2 },
+    { id: 'WD05', name: 'فيترينة أرفف أحذية مائلة مع حاجز ستانلس وإضاءة', category: 'accessories', type: 'wardrobe-shoe-rack', projectType: 'dressing', width: 800, height: 2600, depth: 450, x: 3800, y: 1000, z: 0, rotation: 90, wallId: 'wall-b', shelfCount: 8, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasShoeShelves: true, hasIntegratedLed: true },
+    { id: 'WD06', name: 'وحدة حامل بناطيل وسلال غسيل سحابة', category: 'accessories', type: 'wardrobe-trouser-rack', projectType: 'dressing', width: 800, height: 2600, depth: 550, x: 3800, y: 1800, z: 0, rotation: 90, wallId: 'wall-b', shelfCount: 3, doorCount: 0, drawerCount: 2, doorHinge: 'none', doorType: 'open', hasTrouserRack: true },
+    { id: 'WD07', name: 'جزيرة دريسنج مركزية مع درج إكسسوارات وساعات وسطح زجاج', category: 'accessories', type: 'wardrobe-jewelry-vanity', projectType: 'dressing', width: 1200, height: 900, depth: 700, x: 1000, y: 1400, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 6, doorHinge: 'none', doorType: 'open', hasJewelryDrawer: true },
   ],
   appliances: [],
   architecturalElements: DRESSING_ARCH_ELEMENTS,

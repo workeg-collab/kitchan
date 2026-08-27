@@ -106,8 +106,8 @@ export const LeftSidebar: React.FC = () => {
 
   return (
     <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full select-none z-20 shadow-xs font-sans">
-      {/* Catalog Navigation Tabs */}
-      <div className="grid grid-cols-4 p-2 gap-1 border-b border-slate-100 bg-slate-50 text-[11px] font-bold text-slate-600">
+      {/* Dynamic Module-Aware Catalog Navigation Tabs */}
+      <div className="grid grid-cols-3 p-2 gap-1 border-b border-slate-100 bg-slate-50 text-[11px] font-bold text-slate-600">
         <button
           onClick={() => setActiveCatalogTab('main')}
           className={`flex flex-col items-center justify-center py-2 rounded-xl transition ${
@@ -115,28 +115,32 @@ export const LeftSidebar: React.FC = () => {
           }`}
         >
           <Box size={16} className="mb-0.5" />
-          <span>الوحدات</span>
+          <span>
+            {projectType === 'dressing' ? 'الدواليب والركنات' : projectType === 'bedroom' ? 'السرائر والكومود' : projectType === 'library' ? 'المكتبات والشاشات' : 'الوحدات'}
+          </span>
         </button>
 
-        <button
-          onClick={() => setActiveCatalogTab('appliances')}
-          className={`flex flex-col items-center justify-center py-2 rounded-xl transition ${
-            activeCatalogTab === 'appliances' ? 'bg-amber-600 text-white shadow-xs' : 'hover:bg-slate-200/60 text-slate-700'
-          }`}
-        >
-          <Tv size={16} className="mb-0.5" />
-          <span>الأجهزة</span>
-        </button>
-
-        <button
-          onClick={() => setActiveCatalogTab('architecture')}
-          className={`flex flex-col items-center justify-center py-2 rounded-xl transition ${
-            activeCatalogTab === 'architecture' ? 'bg-emerald-600 text-white shadow-xs' : 'hover:bg-slate-200/60 text-slate-700'
-          }`}
-        >
-          <DoorClosed size={16} className="mb-0.5" />
-          <span>الفتحات</span>
-        </button>
+        {projectType === 'kitchen' ? (
+          <button
+            onClick={() => setActiveCatalogTab('appliances')}
+            className={`flex flex-col items-center justify-center py-2 rounded-xl transition ${
+              activeCatalogTab === 'appliances' ? 'bg-amber-600 text-white shadow-xs' : 'hover:bg-slate-200/60 text-slate-700'
+            }`}
+          >
+            <Tv size={16} className="mb-0.5" />
+            <span>الأجهزة</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => setActiveCatalogTab('architecture')}
+            className={`flex flex-col items-center justify-center py-2 rounded-xl transition ${
+              activeCatalogTab === 'architecture' ? 'bg-emerald-600 text-white shadow-xs' : 'hover:bg-slate-200/60 text-slate-700'
+            }`}
+          >
+            <DoorClosed size={16} className="mb-0.5" />
+            <span>الفتحات والأبواب</span>
+          </button>
+        )}
 
         <button
           onClick={() => setActiveCatalogTab('finishes')}
@@ -145,7 +149,7 @@ export const LeftSidebar: React.FC = () => {
           }`}
         >
           <Palette size={16} className="mb-0.5" />
-          <span>الخامات</span>
+          <span>الخامات والألوان</span>
         </button>
       </div>
 
@@ -158,7 +162,7 @@ export const LeftSidebar: React.FC = () => {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
               <input
                 type="text"
-                placeholder={`بحث في كتالوج الـ ${projectType}...`}
+                placeholder={`بحث في كتالوج الـ ${projectType === 'dressing' ? 'دريسينج' : projectType === 'bedroom' ? 'غرف النوم' : projectType === 'library' ? 'المكتبات' : 'مطابخ'}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 font-sans"
@@ -215,7 +219,13 @@ export const LeftSidebar: React.FC = () => {
                   onClick={() => setSelectedCategoryFilter('wardrobe')}
                   className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'wardrobe' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                 >
-                  دواليب
+                  ركنات وزوايا L
+                </button>
+                <button
+                  onClick={() => setSelectedCategoryFilter('closet-internals')}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'closet-internals' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                >
+                  تعليق ومطابق
                 </button>
                 <button
                   onClick={() => setSelectedCategoryFilter('accessories')}
