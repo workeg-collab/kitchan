@@ -36,7 +36,7 @@ export const App: React.FC = () => {
     isSettingsModalOpen,
     setIsSettingsModalOpen
   } = useUIStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, currentUser } = useAuthStore();
   const { isAdminModalOpen, setIsAdminModalOpen } = useSubscriptionStore();
 
   // If not authenticated, show login screen
@@ -50,10 +50,12 @@ export const App: React.FC = () => {
       <div className="w-screen h-screen overflow-hidden bg-slate-900 font-sans">
         <ProjectDashboard />
         <UserManagementModal />
-        <AdminSubscriptionDashboard
-          isOpen={isAdminModalOpen}
-          onClose={() => setIsAdminModalOpen(false)}
-        />
+        {currentUser?.role === 'admin' && (
+          <AdminSubscriptionDashboard
+            isOpen={isAdminModalOpen}
+            onClose={() => setIsAdminModalOpen(false)}
+          />
+        )}
         <SettingsModal
           isOpen={isSettingsModalOpen}
           onClose={() => setIsSettingsModalOpen(false)}
@@ -106,10 +108,12 @@ export const App: React.FC = () => {
         isOpen={isManufacturingSystemModalOpen}
         onClose={() => setIsManufacturingSystemModalOpen(false)}
       />
-      <AdminSubscriptionDashboard
-        isOpen={isAdminModalOpen}
-        onClose={() => setIsAdminModalOpen(false)}
-      />
+      {currentUser?.role === 'admin' && (
+        <AdminSubscriptionDashboard
+          isOpen={isAdminModalOpen}
+          onClose={() => setIsAdminModalOpen(false)}
+        />
+      )}
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}

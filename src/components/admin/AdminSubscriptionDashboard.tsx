@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSubscriptionStore } from '../../store/useSubscriptionStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { CompanyTenant, SubscriptionPlan } from '../../types/subscription';
 import { 
   Building2, 
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export const AdminSubscriptionDashboard: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  const { currentUser } = useAuthStore();
   const { 
     tenants, 
     fetchTenants, 
@@ -48,13 +50,15 @@ export const AdminSubscriptionDashboard: React.FC<{ isOpen: boolean; onClose: ()
   const [durationMonths, setDurationMonths] = useState(12);
   const [notes, setNotes] = useState('');
 
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isAdmin) {
       fetchTenants();
     }
-  }, [isOpen]);
+  }, [isOpen, isAdmin]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !isAdmin) return null;
 
   const handleCreateCompany = async (e: React.FormEvent) => {
     e.preventDefault();

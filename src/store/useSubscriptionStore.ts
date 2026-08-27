@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { CompanyTenant, SubscriptionPlan, SubscriptionStatus } from '../types/subscription';
 import { dbService } from '../services/dbService';
+import { useAuthStore } from './useAuthStore';
 
 interface SubscriptionState {
   tenants: CompanyTenant[];
@@ -27,12 +28,22 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   isAdminModalOpen: false,
 
   fetchTenants: async () => {
+    const currentUser = useAuthStore.getState().currentUser;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+    if (!isAdmin) {
+      set({ tenants: [], isLoading: false });
+      return;
+    }
     set({ isLoading: true });
     const tenants = await dbService.getAllTenants();
     set({ tenants, isLoading: false });
   },
 
   createTenant: async (tenantData) => {
+    const currentUser = useAuthStore.getState().currentUser;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+    if (!isAdmin) throw new Error('Unauthorized');
+
     const id = `tenant-${Date.now()}`;
     const newTenant: CompanyTenant = {
       ...tenantData,
@@ -45,6 +56,10 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   updateTenant: async (id, data) => {
+    const currentUser = useAuthStore.getState().currentUser;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+    if (!isAdmin) return;
+
     const tenant = get().tenants.find((t) => t.id === id);
     if (!tenant) return;
     const updated = { ...tenant, ...data };
@@ -53,6 +68,10 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   renewSubscription: async (id, plan, durationMonths) => {
+    const currentUser = useAuthStore.getState().currentUser;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+    if (!isAdmin) return;
+
     const tenant = get().tenants.find((t) => t.id === id);
     if (!tenant) return;
 
@@ -72,6 +91,10 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   toggleTenantStatus: async (id) => {
+    const currentUser = useAuthStore.getState().currentUser;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+    if (!isAdmin) return;
+
     const tenant = get().tenants.find((t) => t.id === id);
     if (!tenant) return;
     const newStatus: SubscriptionStatus = tenant.status === 'active' ? 'suspended' : 'active';
@@ -80,12 +103,21 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   deleteTenant: async (id) => {
+    const currentUser = useAuthStore.getState().currentUser;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+    if (!isAdmin) return;
+
     await dbService.deleteTenant(id);
     await get().fetchTenants();
   },
 
   setActiveTenant: (activeTenant) => set({ activeTenant }),
-  setIsAdminModalOpen: (isAdminModalOpen) => set({ isAdminModalOpen }),
+  setIsAdminModalOpen: (isAdminModalOpen) => {
+    const currentUser = useAuthStore.getState().currentUser;
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.username.toLowerCase() === 'admin';
+    if (isAdminModalOpen && !isAdmin) return;
+    set({ isAdminModalOpen });
+  },
 
   checkSubscriptionValid: (tenant: CompanyTenant) => {
     if (tenant.status === 'suspended') {

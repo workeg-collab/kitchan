@@ -139,6 +139,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     addUser: (userData) => {
+      const current = get().currentUser;
+      const isAdmin = current?.role === 'admin' || current?.username.toLowerCase() === 'admin';
+      if (!isAdmin) {
+        return { success: false, error: 'غير مصرح لك بإضافة مستخدمين' };
+      }
+
       const cleanUser = userData.username.trim();
       if (!cleanUser || !userData.password) {
         return { success: false, error: 'يرجى إدخال اسم المستخدم وكلمة المرور' };
@@ -168,6 +174,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     deleteUser: (id) => {
+      const current = get().currentUser;
+      const isAdmin = current?.role === 'admin' || current?.username.toLowerCase() === 'admin';
+      if (!isAdmin) {
+        return { success: false, error: 'غير مصرح لك بحذف المستخدمين' };
+      }
+
       const user = get().users.find((u) => u.id === id);
       if (!user) return { success: false, error: 'المستخدم غير موجود' };
       if (user.username.toLowerCase() === 'admin') {
