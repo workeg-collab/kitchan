@@ -209,7 +209,10 @@ export const Canvas2D: React.FC = () => {
           draggingItem.rotation,
           snapToWallEnabled ? room.walls : [],
           snapToCabinetEnabled ? otherCabs : [],
-          snapToGridEnabled ? gridSize : 1
+          snapToGridEnabled ? gridSize : 1,
+          75,
+          room.width,
+          room.length
         );
         targetX = snap.x;
         targetY = snap.y;

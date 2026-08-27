@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArchitecturalElement } from '../../types';
+import { getItemBoundingBox } from '../../utils/cadGeometry';
 
 interface ArchElements3DProps {
   elements: ArchitecturalElement[];
@@ -19,8 +20,10 @@ export const ArchElements3D: React.FC<ArchElements3DProps> = ({
         const W = width / 1000;
         const H = height / 1000;
         const D = depth / 1000;
-        const posX = (x + width / 2) / 1000;
-        const posZ = (y + depth / 2) / 1000;
+
+        const bbox = getItemBoundingBox(x, y, width, depth, rotation);
+        const posX = bbox.centerX / 1000;
+        const posZ = bbox.centerY / 1000;
         const posY = (z + height / 2) / 1000;
         const rotRad = (-rotation * Math.PI) / 180;
         const isSelected = selectedId === id;

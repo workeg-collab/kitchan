@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CabinetItem, MaterialFinishes, CountertopConfig, PlinthConfig } from '../../types';
+import { getItemBoundingBox } from '../../utils/cadGeometry';
 
 interface Cabinet3DProps {
   cabinet: CabinetItem;
@@ -29,9 +30,11 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
   const W = cabinet.width / 1000;
   const H = cabinet.height / 1000;
   const D = cabinet.depth / 1000;
-  const X = (cabinet.x + cabinet.width / 2) / 1000;
+
+  const bbox = getItemBoundingBox(cabinet.x, cabinet.y, cabinet.width, cabinet.depth, cabinet.rotation);
+  const X = bbox.centerX / 1000;
   const Y = (cabinet.z + cabinet.height / 2) / 1000;
-  const Z = (cabinet.y + cabinet.depth / 2) / 1000;
+  const Z = bbox.centerY / 1000;
 
   const isBed = cabinet.category === 'bed' || cabinet.type.startsWith('bed-');
   const isNightstand = cabinet.category === 'nightstand';

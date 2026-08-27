@@ -13,6 +13,66 @@ export function snapToGrid(val: number, gridSize: number = 50): number {
   return Math.round(val / gridSize) * gridSize;
 }
 
+export interface BoundingBox2D {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  widthSpan: number;
+  heightSpan: number;
+  centerX: number;
+  centerY: number;
+}
+
+/**
+ * Calculates the exact 2D bounding box and center for any object given its anchor (x, y)
+ * and its SVG rotation around (0, 0).
+ */
+export function getItemBoundingBox(
+  x: number,
+  y: number,
+  width: number,
+  depth: number,
+  rotation: number = 0
+): BoundingBox2D {
+  const normRot = ((rotation % 360) + 360) % 360;
+  let minX = x;
+  let maxX = x + width;
+  let minY = y;
+  let maxY = y + depth;
+
+  if (normRot === 90) {
+    // Rotated 90° clockwise: +X goes to +Y, +Y goes to -X
+    minX = x - depth;
+    maxX = x;
+    minY = y;
+    maxY = y + width;
+  } else if (normRot === 180) {
+    // Rotated 180°: +X goes to -X, +Y goes to -Y
+    minX = x - width;
+    maxX = x;
+    minY = y - depth;
+    maxY = y;
+  } else if (normRot === 270) {
+    // Rotated 270°: +X goes to -Y, +Y goes to +X
+    minX = x;
+    maxX = x + depth;
+    minY = y - width;
+    maxY = y;
+  }
+
+  return {
+    minX,
+    maxX,
+    minY,
+    maxY,
+    widthSpan: maxX - minX,
+    heightSpan: maxY - minY,
+    centerX: (minX + maxX) / 2,
+    centerY: (minY + maxY) / 2,
+  };
+}
+
 export function getRotatedDimensions(width: number, depth: number, rotation: number): { w: number; d: number } {
   const norm = ((rotation % 360) + 360) % 360;
   if (norm === 90 || norm === 270) {
@@ -21,6 +81,10 @@ export function getRotatedDimensions(width: number, depth: number, rotation: num
   return { w: width, d: depth };
 }
 
+/**
+ * Smart Wall Snapping & Boundary Clamping
+ * Ensures cabinets and appliances snap flush against walls and NEVER penetrate or stick out outside the walls.
+ */
 export function calculateSnap(
   currentX: number,
   currentY: number,
@@ -30,7 +94,9 @@ export function calculateSnap(
   walls: Wall[],
   otherCabinets: CabinetItem[],
   gridSize: number = 50,
-  snapThreshold: number = 60
+  snapThreshold: number = 75,
+  roomWidth: number = 4000,
+  roomLength: number = 3000
 ): SnapResult {
   let snapX = snapToGrid(currentX, gridSize);
   let snapY = snapToGrid(currentY, gridSize);
@@ -38,79 +104,102 @@ export function calculateSnap(
   let snappedCab: string | undefined;
   const guideLines: { x1: number; y1: number; x2: number; y2: number; label?: string }[] = [];
 
-  const { w, d } = getRotatedDimensions(width, depth, rotation);
+  const normRot = ((rotation % 360) + 360) % 360;
 
-  // 1. Wall Snapping (Check proximity to 4 main walls)
-  for (const wall of walls) {
-    // Wall A (Top / Back wall at y = 0)
-    if (wall.startY === 0 && wall.endY === 0) {
-      if (Math.abs(currentY) < snapThreshold) {
-        snapY = 0;
-        snappedWall = wall.id;
+  // 1. Magnetic Flush Snapping to the 4 Walls
+  // -------------------------------------------------------------
+  // Wall A (Top Wall, y = 0)
+  if (normRot === 0) {
+    if (Math.abs(snapY) < snapThreshold) {
+      snapY = 0;
+      snappedWall = 'wall-a';
+      guideLines.push({ x1: 0, y1: 0, x2: roomWidth, y2: 0, label: 'جدار أ (الخلفي)' });
+    }
+  }
+
+  // Wall B (Right Wall, x = roomWidth)
+  if (normRot === 90) {
+    if (Math.abs(snapX - roomWidth) < snapThreshold) {
+      snapX = roomWidth;
+      snappedWall = 'wall-b';
+      guideLines.push({ x1: roomWidth, y1: 0, x2: roomWidth, y2: roomLength, label: 'جدار ب (الأيمن)' });
+    }
+  }
+
+  // Wall C (Bottom Wall, y = roomLength)
+  if (normRot === 180) {
+    if (Math.abs(snapY - roomLength) < snapThreshold) {
+      snapY = roomLength;
+      snappedWall = 'wall-c';
+      guideLines.push({ x1: 0, y1: roomLength, x2: roomWidth, y2: roomLength, label: 'جدار ج (الأمامي)' });
+    }
+  }
+
+  // Wall D (Left Wall, x = 0)
+  if (normRot === 270) {
+    if (Math.abs(snapX) < snapThreshold) {
+      snapX = 0;
+      snappedWall = 'wall-d';
+      guideLines.push({ x1: 0, y1: 0, x2: 0, y2: roomLength, label: 'جدار د (الأيسر)' });
+    }
+  }
+
+  // 2. Adjacent Cabinet-to-Cabinet Snapping (Side-by-side)
+  // -------------------------------------------------------------
+  for (const cab of otherCabinets) {
+    const cabRot = ((cab.rotation % 360) + 360) % 360;
+
+    // Same wall alignment (along Top Wall A, rot = 0)
+    if (normRot === 0 && cabRot === 0 && Math.abs(snapY - cab.y) < 30) {
+      snapY = cab.y;
+      // To the right of existing cabinet
+      if (Math.abs(snapX - (cab.x + cab.width)) < snapThreshold) {
+        snapX = cab.x + cab.width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: snapX, y1: 0, x2: snapX, y2: depth + 100, label: 'محاذاة كابينة' });
+      }
+      // To the left of existing cabinet
+      else if (Math.abs((snapX + width) - cab.x) < snapThreshold) {
+        snapX = cab.x - width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: snapX + width, y1: 0, x2: snapX + width, y2: depth + 100, label: 'محاذاة كابينة' });
       }
     }
-    // Wall B (Right wall at x = roomWidth)
-    if (wall.startX === wall.endX && wall.startX > 0) {
-      if (Math.abs(currentX + w - wall.startX) < snapThreshold) {
-        snapX = wall.startX - w;
-        snappedWall = wall.id;
+
+    // Same wall alignment (along Right Wall B, rot = 90)
+    if (normRot === 90 && cabRot === 90 && Math.abs(snapX - cab.x) < 30) {
+      snapX = cab.x;
+      // Below existing cabinet
+      if (Math.abs(snapY - (cab.y + cab.width)) < snapThreshold) {
+        snapY = cab.y + cab.width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: roomWidth - depth - 100, y1: snapY, x2: roomWidth, y2: snapY, label: 'محاذاة كابينة' });
       }
-    }
-    // Wall C (Bottom wall at y = roomLength)
-    if (wall.startY === wall.endY && wall.startY > 0) {
-      if (Math.abs(currentY + d - wall.startY) < snapThreshold) {
-        snapY = wall.startY - d;
-        snappedWall = wall.id;
-      }
-    }
-    // Wall D (Left wall at x = 0)
-    if (wall.startX === 0 && wall.endX === 0) {
-      if (Math.abs(currentX) < snapThreshold) {
-        snapX = 0;
-        snappedWall = wall.id;
+      // Above existing cabinet
+      else if (Math.abs((snapY + width) - cab.y) < snapThreshold) {
+        snapY = cab.y - width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: roomWidth - depth - 100, y1: snapY + width, x2: roomWidth, y2: snapY + width, label: 'محاذاة كابينة' });
       }
     }
   }
 
-  // 2. Cabinet-to-Cabinet Snapping (Side-by-side flush attachment)
-  for (const cab of otherCabinets) {
-    const cabDim = getRotatedDimensions(cab.width, cab.depth, cab.rotation);
-    
-    // Check if side-by-side along X (same Y alignment)
-    if (Math.abs(snapY - cab.y) < 30) {
-      // Left of cab
-      if (Math.abs(currentX + w - cab.x) < snapThreshold) {
-        snapX = cab.x - w;
-        snapY = cab.y;
-        snappedCab = cab.id;
-        guideLines.push({ x1: snapX + w, y1: snapY - 100, x2: snapX + w, y2: snapY + d + 100, label: 'Flush' });
-      }
-      // Right of cab
-      if (Math.abs(currentX - (cab.x + cabDim.w)) < snapThreshold) {
-        snapX = cab.x + cabDim.w;
-        snapY = cab.y;
-        snappedCab = cab.id;
-        guideLines.push({ x1: snapX, y1: snapY - 100, x2: snapX, y2: snapY + d + 100, label: 'Flush' });
-      }
-    }
+  // 3. STRICT ROOM BOUNDARY CLAMPING
+  // -------------------------------------------------------------
+  // Prevent ANY part of the item from sticking outside the room boundaries [0, roomWidth] x [0, roomLength]
+  const bbox = getItemBoundingBox(snapX, snapY, width, depth, rotation);
 
-    // Check if side-by-side along Y (same X alignment)
-    if (Math.abs(snapX - cab.x) < 30) {
-      // Above cab
-      if (Math.abs(currentY + d - cab.y) < snapThreshold) {
-        snapY = cab.y - d;
-        snapX = cab.x;
-        snappedCab = cab.id;
-        guideLines.push({ x1: snapX - 100, y1: snapY + d, x2: snapX + w + 100, y2: snapY + d, label: 'Flush' });
-      }
-      // Below cab
-      if (Math.abs(currentY - (cab.y + cabDim.d)) < snapThreshold) {
-        snapY = cab.y + cabDim.d;
-        snapX = cab.x;
-        snappedCab = cab.id;
-        guideLines.push({ x1: snapX - 100, y1: snapY, x2: snapX + w + 100, y2: snapY, label: 'Flush' });
-      }
-    }
+  if (bbox.minX < 0) {
+    snapX += (0 - bbox.minX);
+  }
+  if (bbox.maxX > roomWidth) {
+    snapX -= (bbox.maxX - roomWidth);
+  }
+  if (bbox.minY < 0) {
+    snapY += (0 - bbox.minY);
+  }
+  if (bbox.maxY > roomLength) {
+    snapY -= (bbox.maxY - roomLength);
   }
 
   return {
@@ -129,7 +218,6 @@ export function calculateAisleClearance(
 ): { x1: number; y1: number; x2: number; y2: number; distance: number; label: string }[] {
   const aisles: { x1: number; y1: number; x2: number; y2: number; distance: number; label: string }[] = [];
 
-  // Look for facing base cabinets
   const baseCabs = cabinets.filter(c => c.category === 'base' || c.category === 'tall' || c.category === 'corner');
   
   for (let i = 0; i < baseCabs.length; i++) {
@@ -140,13 +228,12 @@ export function calculateAisleClearance(
       // Opposite facing along Y axis
       if (c1.rotation === 0 && c2.rotation === 180) {
         const c1Bottom = c1.y + c1.depth;
-        const c2Top = c2.y;
+        const c2Top = c2.y - c2.depth;
         const dist = c2Top - c1Bottom;
 
         if (dist > 300 && dist < 2500) {
-          // Check overlap in X
-          const overlapStart = Math.max(c1.x, c2.x);
-          const overlapEnd = Math.min(c1.x + c1.width, c2.x + c2.width);
+          const overlapStart = Math.max(c1.x, c2.x - c2.width);
+          const overlapEnd = Math.min(c1.x + c1.width, c2.x);
           if (overlapEnd > overlapStart) {
             const midX = (overlapStart + overlapEnd) / 2;
             aisles.push({
@@ -154,8 +241,8 @@ export function calculateAisleClearance(
               y1: c1Bottom,
               x2: midX,
               y2: c2Top,
-              distance: dist,
-              label: `Aisle: ${Math.round(dist)} mm`,
+              distance: Math.round(dist),
+              label: `${Math.round(dist)} mm`,
             });
           }
         }
@@ -164,17 +251,4 @@ export function calculateAisleClearance(
   }
 
   return aisles;
-}
-
-export function getWallCabinets(wallId: string, cabinets: CabinetItem[]): CabinetItem[] {
-  return cabinets.filter(c => c.wallId === wallId || inferCabinetWall(c) === wallId);
-}
-
-export function inferCabinetWall(cab: CabinetItem): string {
-  if (cab.wallId) return cab.wallId;
-  if (cab.rotation === 0) return 'wall-a';
-  if (cab.rotation === 90) return 'wall-b';
-  if (cab.rotation === 180) return 'wall-c';
-  if (cab.rotation === 270) return 'wall-d';
-  return 'wall-a';
 }
