@@ -5,7 +5,7 @@ import { dbService } from '../../services/dbService';
 import { Lock, User, Eye, EyeOff, ShieldCheck, CheckCircle2, AlertCircle, Building2 } from 'lucide-react';
 
 export const LoginScreen: React.FC = () => {
-  const { login } = useAuthStore();
+  const { login, loginAsTenant } = useAuthStore();
   const { setActiveTenant, checkSubscriptionValid } = useSubscriptionStore();
 
   const [username, setUsername] = useState('');
@@ -14,14 +14,31 @@ export const LoginScreen: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Auto-fill and auto-login from URL parameters if present (e.g. from WhatsApp link: ?u=...&p=...)
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const u = params.get('u') || params.get('user') || params.get('username');
+    const p = params.get('p') || params.get('pass') || params.get('password');
+    if (u) setUsername(u);
+    if (p) setPassword(p);
+    if (u && p) {
+      performLogin(u, p);
+    }
+  }, []);
+
+  const performLogin = async (inputUser: string, inputPass: string) => {
     setErrorMessage('');
     setIsLoading(true);
 
     try {
-      const cleanUser = username.trim().toLowerCase();
-      const cleanPass = password.trim();
+      const cleanUser = inputUser.trim().toLowerCase();
+      const cleanPass = inputPass.trim();
+
+      if (!cleanUser || !cleanPass) {
+        setErrorMessage('يرجى إدخال اسم المستخدم وكلمة المرور');
+        setIsLoading(false);
+        return;
+      }
 
       // 1. Check if it is a Subscribed Company Tenant in database
       const tenant = await dbService.findTenantByUsername(cleanUser);
@@ -36,11 +53,16 @@ export const LoginScreen: React.FC = () => {
 
           // Valid Company Login
           setActiveTenant(tenant);
-          login(cleanUser, cleanPass);
+          loginAsTenant({
+            id: tenant.id,
+            username: tenant.username,
+            companyName: tenant.companyName,
+            createdAt: tenant.createdAt,
+          });
           setIsLoading(false);
           return;
         } else {
-          setErrorMessage('كلمة المرور غير صحيحة لحساب الشركة');
+          setErrorMessage('كلمة المرور غير صحيحة لحساب المشترك');
           setIsLoading(false);
           return;
         }
@@ -59,6 +81,11 @@ export const LoginScreen: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    performLogin(username, password);
   };
 
   return (

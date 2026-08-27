@@ -16,6 +16,7 @@ interface AuthState {
   isUserModalOpen: boolean;
 
   login: (username: string, password: string) => { success: boolean; error?: string };
+  loginAsTenant: (tenant: { id: string; username: string; companyName: string; createdAt: string }) => void;
   logout: () => void;
   addUser: (user: Omit<UserAccount, 'id' | 'createdAt'>) => { success: boolean; error?: string };
   deleteUser: (id: string) => { success: boolean; error?: string };
@@ -58,8 +59,19 @@ function loadSession(users: UserAccount[]): UserAccount | null {
     const saved = localStorage.getItem(SESSION_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      const matched = users.find(u => u.id === parsed.id && u.username === parsed.username);
+      // Check if it matches a local user or a tenant session
+      const matched = users.find(u => u.id === parsed.id && u.username.toLowerCase() === parsed.username.toLowerCase());
       if (matched) return matched;
+      if (parsed.id && parsed.username) {
+        return {
+          id: parsed.id,
+          username: parsed.username,
+          password: '',
+          name: parsed.name || parsed.username,
+          role: parsed.role || 'designer',
+          createdAt: parsed.createdAt || new Date().toISOString(),
+        };
+      }
     }
   } catch (e) {
     console.error('Failed to load session:', e);
@@ -78,13 +90,20 @@ export const useAuthStore = create<AuthState>((set, get) => {
     isUserModalOpen: false,
 
     login: (username, password) => {
-      const cleanUser = username.trim();
+      const cleanUser = username.trim().toLowerCase();
+      const cleanPass = password.trim();
       const matched = get().users.find(
-        (u) => u.username.toLowerCase() === cleanUser.toLowerCase() && u.password === password
+        (u) => u.username.toLowerCase() === cleanUser && u.password === cleanPass
       );
 
       if (matched) {
-        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ id: matched.id, username: matched.username }));
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ 
+          id: matched.id, 
+          username: matched.username,
+          name: matched.name,
+          role: matched.role,
+          createdAt: matched.createdAt
+        }));
         set({ currentUser: matched, isAuthenticated: true });
         return { success: true };
       }
@@ -92,8 +111,30 @@ export const useAuthStore = create<AuthState>((set, get) => {
       return { success: false, error: 'اسم المستخدم أو كلمة المرور غير صحيحة' };
     },
 
+    loginAsTenant: (tenant) => {
+      const userObj: UserAccount = {
+        id: tenant.id,
+        username: tenant.username,
+        password: '',
+        name: tenant.companyName || tenant.username,
+        role: 'designer',
+        createdAt: tenant.createdAt || new Date().toISOString().split('T')[0],
+      };
+
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+        id: userObj.id,
+        username: userObj.username,
+        name: userObj.name,
+        role: userObj.role,
+        createdAt: userObj.createdAt,
+      }));
+
+      set({ currentUser: userObj, isAuthenticated: true });
+    },
+
     logout: () => {
       localStorage.removeItem(SESSION_STORAGE_KEY);
+      localStorage.removeItem('fc_active_tenant_session');
       set({ currentUser: null, isAuthenticated: false, isUserModalOpen: false });
     },
 

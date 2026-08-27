@@ -65,7 +65,13 @@ export const AdminSubscriptionDashboard: React.FC<{ isOpen: boolean; onClose: ()
 
     const startDate = new Date();
     const expiryDate = new Date();
-    expiryDate.setMonth(expiryDate.getMonth() + durationMonths);
+    if (plan === 'trial') {
+      expiryDate.setDate(expiryDate.getDate() + 14);
+    } else if (plan === 'lifetime') {
+      expiryDate.setFullYear(expiryDate.getFullYear() + 20);
+    } else {
+      expiryDate.setMonth(expiryDate.getMonth() + durationMonths);
+    }
 
     await createTenant({
       companyName: companyName.trim(),
@@ -238,8 +244,12 @@ export const AdminSubscriptionDashboard: React.FC<{ isOpen: boolean; onClose: ()
                       </td>
 
                       <td className="px-4 py-3.5">
-                        <span className="px-2.5 py-1 bg-slate-100 text-slate-800 rounded-lg text-[11px] font-bold uppercase font-mono">
-                          {t.plan === 'yearly' ? 'سنوي (Yearly)' : t.plan === 'monthly' ? 'شهري (Monthly)' : 'مدى الحياة'}
+                        <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase font-mono ${
+                          t.plan === 'trial' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+                          t.plan === 'yearly' ? 'bg-blue-100 text-blue-800' :
+                          t.plan === 'monthly' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                        }`}>
+                          {t.plan === 'trial' ? 'تجريبي (14 يوم)' : t.plan === 'yearly' ? 'سنوي (Yearly)' : t.plan === 'monthly' ? 'شهري (Monthly)' : 'مدى الحياة'}
                         </span>
                       </td>
 
@@ -263,10 +273,26 @@ export const AdminSubscriptionDashboard: React.FC<{ isOpen: boolean; onClose: ()
 
                       <td className="px-4 py-3.5 text-center">
                         <div className="flex items-center justify-center gap-1.5">
+                          {/* Copy WhatsApp Activation Link & Message */}
+                          <button
+                            onClick={() => {
+                              const origin = window.location.origin;
+                              const directUrl = `${origin}/?u=${encodeURIComponent(t.username)}&p=${encodeURIComponent(t.password)}`;
+                              const msg = `مرحباً بك م/ ${t.contactPerson || t.companyName}،\nتم تفعيل حسابكم في منصة فرنتشر كاد برو (${t.plan === 'trial' ? 'نسخة تجريبية 14 يوم' : 'اشتراك مفعل'}):\n• اسم المستخدم: ${t.username}\n• كلمة المرور: ${t.password}\n• رابط الدخول المباشر والفوري:\n${directUrl}`;
+                              navigator.clipboard.writeText(msg);
+                              alert(`✅ تم نسخ رسالة التفعيل ورابط الدخول المباشر بنجاح!\n\nيمكنك الآن لصقها في واتساب وإرسالها للعميل فوراً.`);
+                            }}
+                            className="flex items-center gap-1 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition shadow-xs"
+                            title="نسخ رسالة التفعيل مع رابط دخول فوري للواتساب"
+                          >
+                            <Phone size={11} />
+                            <span>نسخ للواتساب</span>
+                          </button>
+
                           {/* Renew +1 Year */}
                           <button
                             onClick={() => renewSubscription(t.id, 'yearly', 12)}
-                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold transition border border-blue-200"
+                            className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold transition border border-blue-200"
                             title="تجديد لمدة سنة"
                           >
                             +1 سنة
@@ -274,7 +300,7 @@ export const AdminSubscriptionDashboard: React.FC<{ isOpen: boolean; onClose: ()
                           {/* Renew +1 Month */}
                           <button
                             onClick={() => renewSubscription(t.id, 'monthly', 1)}
-                            className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition border border-amber-200"
+                            className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition border border-amber-200"
                             title="تجديد لمدة شهر"
                           >
                             +1 شهر
