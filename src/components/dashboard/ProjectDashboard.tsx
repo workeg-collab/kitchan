@@ -2,6 +2,7 @@ import React from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useSubscriptionStore } from '../../store/useSubscriptionStore';
 import { ProjectType } from '../../types';
 import { 
   SAMPLE_PROJECT_KITCHEN, 
@@ -15,13 +16,15 @@ import {
   BedDouble, 
   BookOpen, 
   LogOut,
-  Users
+  Users,
+  Building2
 } from 'lucide-react';
 
 export const ProjectDashboard: React.FC = () => {
   const { loadSampleProject } = useProjectStore();
   const { setActiveTab } = useUIStore();
   const { currentUser, logout, setIsUserModalOpen } = useAuthStore();
+  const { setIsAdminModalOpen } = useSubscriptionStore();
 
   const modules: {
     id: ProjectType;
@@ -100,10 +103,21 @@ export const ProjectDashboard: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          {currentUser?.role === 'admin' && (
+            <button
+              onClick={() => setIsAdminModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-500/20 border border-blue-400/40"
+              title="لوحة تحكم الاشتراكات والشركات"
+            >
+              <Building2 size={14} />
+              <span>إدارة الاشتراكات والشركات</span>
+            </button>
+          )}
+
           <button
             onClick={() => setIsUserModalOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/30 rounded-xl text-xs font-bold transition shadow-md"
-            title="إدارة المستخدمين"
+            title="إدارة الحساب"
           >
             <Users size={14} />
             <span>{currentUser?.username || 'admin'}</span>

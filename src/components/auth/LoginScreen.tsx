@@ -1,27 +1,64 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../store/useAuthStore';
-import { Lock, User, Eye, EyeOff, ShieldCheck, Box, Compass, Scissors, Layers, CheckCircle2 } from 'lucide-react';
+import { useSubscriptionStore } from '../../store/useSubscriptionStore';
+import { dbService } from '../../services/dbService';
+import { Lock, User, Eye, EyeOff, ShieldCheck, CheckCircle2, AlertCircle, Building2 } from 'lucide-react';
 
 export const LoginScreen: React.FC = () => {
   const { login } = useAuthStore();
+  const { setActiveTenant, checkSubscriptionValid } = useSubscriptionStore();
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      const result = login(username, password);
+    try {
+      const cleanUser = username.trim().toLowerCase();
+      const cleanPass = password.trim();
+
+      // 1. Check if it is a Subscribed Company Tenant in database
+      const tenant = await dbService.findTenantByUsername(cleanUser);
+      if (tenant) {
+        if (tenant.password === cleanPass) {
+          const validity = checkSubscriptionValid(tenant);
+          if (!validity.isValid) {
+            setErrorMessage(validity.reason || 'عفواً، انتهت فترة الاشتراك المحددة لشركتكم. يرجى التواصل مع الإدارة للتجديد.');
+            setIsLoading(false);
+            return;
+          }
+
+          // Valid Company Login
+          setActiveTenant(tenant);
+          login(cleanUser, cleanPass);
+          setIsLoading(false);
+          return;
+        } else {
+          setErrorMessage('كلمة المرور غير صحيحة لحساب الشركة');
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // 2. Check Admin / Standard Users
+      const result = login(cleanUser, cleanPass);
       if (!result.success) {
         setErrorMessage(result.error || 'اسم المستخدم أو كلمة المرور غير صحيحة');
-        setIsLoading(false);
+      } else {
+        setActiveTenant(null); // Admin / Local user
       }
-    }, 200);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('حدث خطأ أثناء الاتصال بقاعدة البيانات');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -35,13 +72,13 @@ export const LoginScreen: React.FC = () => {
 
       {/* Split-Screen Main Card */}
       <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden relative z-10 grid grid-cols-1 md:grid-cols-2 animate-in fade-in zoom-in-95 duration-200">
-        {/* RIGHT SIDE: Modern Kitchen Visual Showcase */}
+        {/* RIGHT SIDE: Modern Interior Showcase */}
         <div className="relative bg-slate-900 text-white p-8 flex flex-col justify-between overflow-hidden min-h-[380px] md:min-h-[540px]">
-          {/* High-Resolution Modern Luxury Kitchen Image with Subtle Overlay */}
+          {/* High-Resolution Luxury Kitchen & Dressing Image */}
           <div 
-            className="absolute inset-0 bg-cover bg-center opacity-60 scale-105 transition duration-700 hover:scale-100"
+            className="absolute inset-0 bg-cover bg-center opacity-65 scale-105 transition duration-700 hover:scale-100"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80')`
+              backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80')`
             }}
           />
           {/* Gradient Overlay for Text Readability */}
@@ -50,41 +87,41 @@ export const LoginScreen: React.FC = () => {
           {/* Top Brand Tag */}
           <div className="relative z-10 flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <span className="font-mono font-black text-white text-base tracking-tighter">KC</span>
+              <span className="font-mono font-black text-white text-base tracking-tighter">FC</span>
             </div>
             <div>
               <div className="text-base font-bold tracking-tight text-white">
-                كيتشن كاد <span className="text-blue-400 font-extrabold">برو</span>
+                فرنتشر كاد <span className="text-blue-400 font-extrabold">برو</span>
               </div>
-              <div className="text-[11px] text-slate-300 font-medium">KitchenCAD Manufacturing Engine</div>
+              <div className="text-[11px] text-slate-300 font-medium">نظام التصميم والتصنيع السحابي B2B</div>
             </div>
           </div>
 
           {/* Center Graphic Highlights */}
           <div className="relative z-10 my-auto py-6">
             <span className="inline-block px-3 py-1 bg-blue-500/20 border border-blue-400/40 text-blue-300 text-[11px] font-bold rounded-full mb-3 backdrop-blur-md">
-              الجيل الأحدث لتصميم وتصنيع المطابخ
+              منظومة الاشتراكات السحابية لمصانع وشركات الأثاث
             </span>
             <h2 className="text-2xl lg:text-3xl font-extrabold text-white leading-snug">
               صمم بالدقة الهندسية، شاهد مجسمك 3D، واستخرج جداول التقطيع والتسعير
             </h2>
             <p className="text-xs text-slate-300 mt-2.5 leading-relaxed">
-              منظومة متكاملة لمهندسي الديكور وورش تصنيع المطابخ الحديثة بالمقاسات والمليمتر.
+              دعم كامل للمطابخ، الدريسينج، غرف النوم، والمكتبات مع حماية وتخزين المشاريع في قاعدة بيانات دائمة.
             </p>
 
             {/* Quick Feature Bullets */}
             <div className="grid grid-cols-2 gap-2.5 mt-6 text-xs font-semibold text-slate-200">
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
                 <CheckCircle2 size={15} className="text-blue-400 shrink-0" />
-                <span>مساقط 2D و 3D تفاعلية</span>
+                <span>اشتراكات شهرية وسنوية</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
                 <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
-                <span>حساب الأمتار والتسعير</span>
+                <span>حفظ سحابي دائم للمشاريع</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
                 <CheckCircle2 size={15} className="text-amber-400 shrink-0" />
-                <span>جداول تقطيع الألواح</span>
+                <span>جداول تقطيع الألواح والأعواد</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
                 <CheckCircle2 size={15} className="text-purple-400 shrink-0" />
@@ -95,8 +132,8 @@ export const LoginScreen: React.FC = () => {
 
           {/* Footer Version */}
           <div className="relative z-10 text-[11px] text-slate-400 font-mono flex justify-between items-center border-t border-white/10 pt-3">
-            <span>نسخة الويب السحابية v2.4</span>
-            <span>نظام آمن ومحمي</span>
+            <span>FurnitureCAD Cloud v2.5</span>
+            <span>بيانات مشفرة ومؤمنة</span>
           </div>
         </div>
 
@@ -105,15 +142,15 @@ export const LoginScreen: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-2xl font-bold text-slate-900 tracking-tight">تسجيل الدخول</h3>
             <p className="text-xs text-slate-500 mt-1">
-              يرجى إدخال اسم المستخدم وكلمة المرور للمتابعة
+              أدخل اسم المستخدم وكلمة المرور الخاصة بشركتكم أو حسابك
             </p>
           </div>
 
           {/* Error Alert */}
           {errorMessage && (
-            <div className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 animate-shake">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />
-              <span>{errorMessage}</span>
+            <div className="mb-5 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-start gap-2.5 animate-shake">
+              <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+              <div className="leading-relaxed">{errorMessage}</div>
             </div>
           )}
 
@@ -132,7 +169,7 @@ export const LoginScreen: React.FC = () => {
                   autoFocus
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="أدخل اسم المستخدم"
+                  placeholder="اسم المستخدم أو كود الشركة"
                   className="w-full pr-10 pl-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 transition"
                 />
               </div>
@@ -174,14 +211,14 @@ export const LoginScreen: React.FC = () => {
               ) : (
                 <>
                   <ShieldCheck size={16} />
-                  <span>دخول إلى ساحة التصميم</span>
+                  <span>دخول إلى ساحة العمل</span>
                 </>
               )}
             </button>
           </form>
 
           <p className="text-[11px] text-slate-400 text-center mt-6">
-            منظومة كيتشن كاد برو &copy; 2026 جميع الحقوق محفوظة
+            منظومة فرنتشر كاد برو &copy; 2026 جميع الحقوق محفوظة
           </p>
         </div>
       </div>

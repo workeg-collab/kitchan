@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUIStore } from './store/useUIStore';
 import { useAuthStore } from './store/useAuthStore';
+import { useSubscriptionStore } from './store/useSubscriptionStore';
 import { LoginScreen } from './components/auth/LoginScreen';
 import { TopNavbar } from './components/layout/TopNavbar';
 import { StatusBar } from './components/layout/StatusBar';
@@ -21,6 +22,7 @@ import { TemplateModal } from './components/modals/TemplateModal';
 import { ExportModal } from './components/modals/ExportModal';
 import { UserManagementModal } from './components/modals/UserManagementModal';
 import { ManufacturingSystemModal } from './components/modals/ManufacturingSystemModal';
+import { AdminSubscriptionDashboard } from './components/admin/AdminSubscriptionDashboard';
 
 export const App: React.FC = () => {
   const { 
@@ -29,6 +31,7 @@ export const App: React.FC = () => {
     setIsManufacturingSystemModalOpen 
   } = useUIStore();
   const { isAuthenticated } = useAuthStore();
+  const { isAdminModalOpen, setIsAdminModalOpen } = useSubscriptionStore();
 
   // If not authenticated, show login screen
   if (!isAuthenticated) {
@@ -41,6 +44,10 @@ export const App: React.FC = () => {
       <div className="w-screen h-screen overflow-hidden bg-slate-900 font-sans">
         <ProjectDashboard />
         <UserManagementModal />
+        <AdminSubscriptionDashboard
+          isOpen={isAdminModalOpen}
+          onClose={() => setIsAdminModalOpen(false)}
+        />
       </div>
     );
   }
@@ -84,6 +91,10 @@ export const App: React.FC = () => {
       <ManufacturingSystemModal
         isOpen={isManufacturingSystemModalOpen}
         onClose={() => setIsManufacturingSystemModalOpen(false)}
+      />
+      <AdminSubscriptionDashboard
+        isOpen={isAdminModalOpen}
+        onClose={() => setIsAdminModalOpen(false)}
       />
     </div>
   );

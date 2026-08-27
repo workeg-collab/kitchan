@@ -23,6 +23,7 @@ import {
   DEFAULT_PRICING_SETTINGS
 } from '../constants/standards';
 import { SAMPLE_PROJECT_MODERN_L } from '../constants/sampleProjects';
+import { dbService } from '../services/dbService';
 
 interface ProjectState {
   project: ProjectData;

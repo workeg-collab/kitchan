@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useSubscriptionStore } from '../../store/useSubscriptionStore';
 import { ActiveTab, ProjectType } from '../../types';
 import { TRANSLATIONS } from '../../utils/i18n';
 import { 
@@ -26,12 +27,14 @@ import {
   BedDouble,
   BookOpen,
   LayoutDashboard,
-  Settings2
+  Settings2,
+  Building2
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
   const { project, updateMetadata, undo, redo, canUndo, canRedo } = useProjectStore();
   const { currentUser, setIsUserModalOpen, logout } = useAuthStore();
+  const { setIsAdminModalOpen } = useSubscriptionStore();
   const {
     activeTab,
     setActiveTab,
@@ -195,6 +198,18 @@ export const TopNavbar: React.FC = () => {
           <Settings2 size={14} className="text-blue-600" />
           <span className="hidden xl:inline">أنظمة التصنيع</span>
         </button>
+
+        {/* Super Admin Subscription Dashboard */}
+        {currentUser?.role === 'admin' && (
+          <button
+            onClick={() => setIsAdminModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg text-xs font-bold transition shadow-xs"
+            title="لوحة تحكم الاشتراكات والشركات"
+          >
+            <Building2 size={14} />
+            <span className="hidden xl:inline">الاشتراكات والشركات</span>
+          </button>
+        )}
 
         {/* User Management */}
         <button
