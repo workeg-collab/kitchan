@@ -6,7 +6,7 @@ import { TRANSLATIONS } from '../../utils/i18n';
 import { X, PencilRuler, Check, LayoutGrid, RotateCcw } from 'lucide-react';
 
 export const RoomSketcherModal: React.FC = () => {
-  const { project, updateRoomDimensions, updateRoom } = useProjectStore();
+  const { project, updateRoomDimensions } = useProjectStore();
   const { isRoomSketcherOpen, setIsRoomSketcherOpen, unit, language } = useUIStore();
   const t = TRANSLATIONS[language];
 

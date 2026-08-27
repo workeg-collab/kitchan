@@ -703,19 +703,29 @@ export const Canvas2D: React.FC = () => {
                 <span className="text-[10px] text-slate-400 font-bold">W:</span>
                 <input
                   type="number"
-                  min={100}
+                  min={1}
                   value={convertMmToUnit(selectedElement.width, unit)}
-                  onChange={(e) => updateElement(selectedElement.id, { width: Math.max(100, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateElement(selectedElement.id, { width: Math.max(1, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-emerald-600 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">D:</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={convertMmToUnit(selectedElement.depth, unit)}
+                  onChange={(e) => updateElement(selectedElement.id, { depth: Math.max(1, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-slate-800 focus:bg-white focus:outline-none text-center"
                 />
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[10px] text-slate-400 font-bold">H:</span>
                 <input
                   type="number"
-                  min={100}
+                  min={1}
                   value={convertMmToUnit(selectedElement.height, unit)}
-                  onChange={(e) => updateElement(selectedElement.id, { height: Math.max(100, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateElement(selectedElement.id, { height: Math.max(1, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-slate-800 focus:bg-white focus:outline-none text-center"
                 />
               </div>

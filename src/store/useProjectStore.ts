@@ -5,55 +5,60 @@ import {
   ApplianceItem, 
   ArchitecturalElement, 
   Wall, 
-  RoomConfig, 
   CountertopConfig, 
   PlinthConfig, 
   BacksplashConfig, 
   MaterialFinishes, 
-  ManufacturingSettings,
-  PricingSettings
+  ManufacturingSettings, 
+  PricingSettings,
+  ProjectType,
+  MaterialSystemType
 } from '../types';
+import { 
+  DEFAULT_MANUFACTURING_SETTINGS, 
+  DEFAULT_COUNTERTOP_CONFIG, 
+  DEFAULT_PLINTH_CONFIG, 
+  DEFAULT_BACKSPLASH_CONFIG, 
+  DEFAULT_MATERIAL_FINISHES,
+  DEFAULT_PRICING_SETTINGS
+} from '../constants/standards';
 import { SAMPLE_PROJECT_MODERN_L } from '../constants/sampleProjects';
-import { DEFAULT_MANUFACTURING_SETTINGS, DEFAULT_COUNTERTOP_CONFIG, DEFAULT_PLINTH_CONFIG, DEFAULT_BACKSPLASH_CONFIG, DEFAULT_MATERIAL_FINISHES, DEFAULT_PRICING_SETTINGS } from '../constants/standards';
 
 interface ProjectState {
   project: ProjectData;
   history: ProjectData[];
   future: ProjectData[];
-
-  // Selection
-  selectedId: string | null;
-  selectedType: 'cabinet' | 'appliance' | 'element' | 'wall' | null;
-  setSelected: (id: string | null, type: 'cabinet' | 'appliance' | 'element' | 'wall' | null) => void;
-  clearSelection: () => void;
-
-  // History Actions
-  pushHistory: () => void;
-  undo: () => void;
-  redo: () => void;
   canUndo: boolean;
   canRedo: boolean;
 
-  // Project Management
+  // Selected Object in 2D / 3D Canvas
+  selectedId: string | null;
+  selectedType: 'cabinet' | 'appliance' | 'element' | null;
+
+  // Actions
+  setSelected: (id: string | null, type: 'cabinet' | 'appliance' | 'element' | null) => void;
+  clearSelection: () => void;
+
+  pushHistory: () => void;
+  undo: () => void;
+  redo: () => void;
+
   setProject: (project: ProjectData) => void;
   updateMetadata: (meta: Partial<ProjectData['metadata']>) => void;
   resetProject: () => void;
   loadSampleProject: (template?: ProjectData) => void;
 
-  // Room & Walls
+  // Room
   updateRoomDimensions: (width: number, length: number, ceilingHeight: number, wallThickness?: number) => void;
-  updateRoom: (room: Partial<RoomConfig>) => void;
-  updateWall: (wallId: string, data: Partial<Wall>) => void;
 
-  // Cabinet Actions
+  // Cabinets CRUD
   addCabinet: (cabinet: Omit<CabinetItem, 'id'> & { id?: string }) => CabinetItem;
   updateCabinet: (id: string, data: Partial<CabinetItem>) => void;
   removeCabinet: (id: string) => void;
   duplicateCabinet: (id: string) => CabinetItem | null;
   rotateCabinet: (id: string, angleDelta?: number) => void;
-  toggleCabinetOpen: (id: string) => void;
 
-  // Appliance Actions
+  // Appliances CRUD
   addAppliance: (appliance: Omit<ApplianceItem, 'id'> & { id?: string }) => ApplianceItem;
   updateAppliance: (id: string, data: Partial<ApplianceItem>) => void;
   removeAppliance: (id: string) => void;
@@ -88,6 +93,9 @@ function loadInitialProject(): ProjectData {
       const parsed = JSON.parse(saved);
       if (parsed && parsed.metadata && parsed.room && parsed.cabinets) {
         if (!parsed.pricing) parsed.pricing = DEFAULT_PRICING_SETTINGS;
+        if (!parsed.architecturalElements || parsed.architecturalElements.length === 0) {
+          parsed.architecturalElements = parsed.room.elements || [];
+        }
         return parsed;
       }
     }
@@ -162,6 +170,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   setProject: (project) => {
     get().pushHistory();
     if (!project.pricing) project.pricing = DEFAULT_PRICING_SETTINGS;
+    if (!project.architecturalElements || project.architecturalElements.length === 0) {
+      project.architecturalElements = project.room.elements || [];
+    }
+    project.room.elements = project.architecturalElements;
     set({ project });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   },
@@ -221,8 +233,15 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
   loadSampleProject: (template = SAMPLE_PROJECT_MODERN_L) => {
     get().pushHistory();
-    set({ project: JSON.parse(JSON.stringify(template)), selectedId: null, selectedType: null });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(template));
+    const cloned = JSON.parse(JSON.stringify(template));
+    if (!cloned.architecturalElements || cloned.architecturalElements.length === 0) {
+      cloned.architecturalElements = cloned.room?.elements || [];
+    }
+    if (cloned.room) {
+      cloned.room.elements = cloned.architecturalElements;
+    }
+    set({ project: cloned, selectedId: null, selectedType: null });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cloned));
   },
 
   updateRoomDimensions: (width, length, ceilingHeight, wallThickness = 150) => {
@@ -251,74 +270,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     });
   },
 
-  updateRoom: (roomPartial) => {
-    set((state) => {
-      const updated = {
-        ...state.project,
-        room: { ...state.project.room, ...roomPartial },
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return { project: updated };
-    });
-  },
-
-  updateWall: (wallId, data) => {
-    get().pushHistory();
-    set((state) => {
-      const updatedWalls = state.project.room.walls.map((w) => (w.id === wallId ? { ...w, ...data } : w));
-      const updated = {
-        ...state.project,
-        room: { ...state.project.room, walls: updatedWalls },
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return { project: updated };
-    });
-  },
-
-  getNextCabinetId: (category) => {
-    const { cabinets } = get().project;
-    let prefix = 'B';
-    if (category === 'wall') prefix = 'W';
-    else if (category === 'tall') prefix = 'T';
-    else if (category === 'corner') prefix = 'C';
-    else if (category === 'custom') prefix = 'U';
-
-    const existingNums = cabinets
-      .filter((c) => c.id.startsWith(prefix))
-      .map((c) => parseInt(c.id.replace(prefix, ''), 10))
-      .filter((n) => !isNaN(n));
-
-    const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
-    return `${prefix}${nextNum.toString().padStart(2, '0')}`;
-  },
-
-  getNextApplianceId: () => {
-    const { appliances } = get().project;
-    const existingNums = appliances
-      .filter((a) => a.id.startsWith('A'))
-      .map((a) => parseInt(a.id.replace('A', ''), 10))
-      .filter((n) => !isNaN(n));
-    const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
-    return `A${nextNum.toString().padStart(2, '0')}`;
-  },
-
-  getNextElementId: (type) => {
-    const { architecturalElements } = get().project;
-    let prefix = 'EL';
-    if (type === 'door') prefix = 'DR';
-    else if (type === 'window') prefix = 'WN';
-    else if (type === 'column') prefix = 'COL';
-    else if (type === 'beam') prefix = 'BM';
-    else if (type === 'pipe') prefix = 'PIP';
-
-    const existingNums = architecturalElements
-      .filter((e) => e.id.startsWith(prefix))
-      .map((e) => parseInt(e.id.replace(prefix, ''), 10))
-      .filter((n) => !isNaN(n));
-    const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
-    return `${prefix}${nextNum.toString().padStart(2, '0')}`;
-  },
-
+  // --- Cabinets CRUD ---
   addCabinet: (cabData) => {
     get().pushHistory();
     const id = cabData.id || get().getNextCabinetId(cabData.category);
@@ -361,39 +313,35 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
 
   duplicateCabinet: (id) => {
-    const { cabinets } = get().project;
-    const target = cabinets.find((c) => c.id === id);
-    if (!target) return null;
-
+    const cabinet = get().project.cabinets.find((c) => c.id === id);
+    if (!cabinet) return null;
     get().pushHistory();
-    const newId = get().getNextCabinetId(target.category);
-    const cloned: CabinetItem = {
-      ...target,
+
+    const newId = get().getNextCabinetId(cabinet.category);
+    const duplicated: CabinetItem = {
+      ...cabinet,
       id: newId,
-      name: `${target.name} (نسخة)`,
-      x: target.x + 100,
-      y: target.y + 100,
+      name: `${cabinet.name} (نسخة)`,
+      x: cabinet.x + 100,
+      y: cabinet.y + 50,
     };
 
     set((state) => {
-      const updatedCabinets = [...state.project.cabinets, cloned];
-      const updated = { ...state.project, cabinets: updatedCabinets };
+      const updated = { ...state.project, cabinets: [...state.project.cabinets, duplicated] };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated, selectedId: newId, selectedType: 'cabinet' };
     });
 
-    return cloned;
+    return duplicated;
   },
 
   rotateCabinet: (id, angleDelta = 90) => {
     get().pushHistory();
     set((state) => {
       const updatedCabinets = state.project.cabinets.map((c) => {
-        if (c.id === id) {
-          const newRot = (c.rotation + angleDelta + 360) % 360;
-          return { ...c, rotation: newRot };
-        }
-        return c;
+        if (c.id !== id) return c;
+        const newRot = (c.rotation + angleDelta) % 360;
+        return { ...c, rotation: newRot };
       });
       const updated = { ...state.project, cabinets: updatedCabinets };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -401,14 +349,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     });
   },
 
-  toggleCabinetOpen: (id) => {
-    set((state) => {
-      const updatedCabinets = state.project.cabinets.map((c) => (c.id === id ? { ...c, isOpen: !c.isOpen } : c));
-      const updated = { ...state.project, cabinets: updatedCabinets };
-      return { project: updated };
-    });
-  },
-
+  // --- Appliances CRUD ---
   addAppliance: (appData) => {
     get().pushHistory();
     const id = appData.id || get().getNextApplianceId();
@@ -451,39 +392,35 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
 
   duplicateAppliance: (id) => {
-    const { appliances } = get().project;
-    const target = appliances.find((a) => a.id === id);
-    if (!target) return null;
-
+    const app = get().project.appliances.find((a) => a.id === id);
+    if (!app) return null;
     get().pushHistory();
+
     const newId = get().getNextApplianceId();
-    const cloned: ApplianceItem = {
-      ...target,
+    const duplicated: ApplianceItem = {
+      ...app,
       id: newId,
-      name: `${target.name} (نسخة)`,
-      x: target.x + 100,
-      y: target.y + 100,
+      name: `${app.name} (نسخة)`,
+      x: app.x + 100,
+      y: app.y + 50,
     };
 
     set((state) => {
-      const updatedAppliances = [...state.project.appliances, cloned];
-      const updated = { ...state.project, appliances: updatedAppliances };
+      const updated = { ...state.project, appliances: [...state.project.appliances, duplicated] };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated, selectedId: newId, selectedType: 'appliance' };
     });
 
-    return cloned;
+    return duplicated;
   },
 
   rotateAppliance: (id, angleDelta = 90) => {
     get().pushHistory();
     set((state) => {
       const updatedAppliances = state.project.appliances.map((a) => {
-        if (a.id === id) {
-          const newRot = (a.rotation + angleDelta + 360) % 360;
-          return { ...a, rotation: newRot };
-        }
-        return a;
+        if (a.id !== id) return a;
+        const newRot = (a.rotation + angleDelta) % 360;
+        return { ...a, rotation: newRot };
       });
       const updated = { ...state.project, appliances: updatedAppliances };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -491,6 +428,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     });
   },
 
+  // --- Architectural Elements (Doors, Windows, Columns, Beams, Pipes) ---
   addElement: (elData) => {
     get().pushHistory();
     const id = elData.id || get().getNextElementId(elData.type);
@@ -501,7 +439,14 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
     set((state) => {
       const updatedElements = [...state.project.architecturalElements, newEl];
-      const updated = { ...state.project, architecturalElements: updatedElements };
+      const updated = { 
+        ...state.project, 
+        architecturalElements: updatedElements,
+        room: {
+          ...state.project.room,
+          elements: updatedElements
+        }
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated, selectedId: id, selectedType: 'element' };
     });
@@ -512,7 +457,14 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   updateElement: (id, data) => {
     set((state) => {
       const updatedElements = state.project.architecturalElements.map((e) => (e.id === id ? { ...e, ...data } : e));
-      const updated = { ...state.project, architecturalElements: updatedElements };
+      const updated = { 
+        ...state.project, 
+        architecturalElements: updatedElements,
+        room: {
+          ...state.project.room,
+          elements: updatedElements
+        }
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated };
     });
@@ -522,7 +474,14 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     get().pushHistory();
     set((state) => {
       const updatedElements = state.project.architecturalElements.filter((e) => e.id !== id);
-      const updated = { ...state.project, architecturalElements: updatedElements };
+      const updated = { 
+        ...state.project, 
+        architecturalElements: updatedElements,
+        room: {
+          ...state.project.room,
+          elements: updatedElements
+        }
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return {
         project: updated,
@@ -589,10 +548,45 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
   updateProjectPricing: (data) => {
     set((state) => {
-      const updatedPricing = { ...state.project.pricing, ...data };
-      const updated = { ...state.project, pricing: updatedPricing };
+      const updated = {
+        ...state.project,
+        pricing: { ...state.project.pricing, ...data },
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated };
     });
+  },
+
+  getNextCabinetId: (category) => {
+    const cabs = get().project.cabinets;
+    let prefix = 'B';
+    if (category === 'wall') prefix = 'W';
+    if (category === 'tall') prefix = 'T';
+    if (category === 'corner') prefix = 'C';
+    if (category === 'wardrobe' || category === 'closet-internals') prefix = 'WD';
+    if (category === 'bed' || category === 'nightstand' || category === 'dresser') prefix = 'BD';
+    if (category === 'library-full' || category === 'bookshelf' || category === 'tv-media') prefix = 'LIB';
+
+    const matching = cabs.filter((c) => c.id.startsWith(prefix));
+    const nextNum = matching.length + 1;
+    return `${prefix}${nextNum.toString().padStart(2, '0')}`;
+  },
+
+  getNextApplianceId: () => {
+    const apps = get().project.appliances;
+    return `A${(apps.length + 1).toString().padStart(2, '0')}`;
+  },
+
+  getNextElementId: (type) => {
+    const els = get().project.architecturalElements;
+    let prefix = 'E';
+    if (type === 'door') prefix = 'DR';
+    if (type === 'window') prefix = 'WN';
+    if (type === 'column') prefix = 'COL';
+    if (type === 'beam') prefix = 'BM';
+    if (type === 'pipe') prefix = 'PIP';
+
+    const matching = els.filter((e) => e.id.startsWith(prefix));
+    return `${prefix}${(matching.length + 1).toString().padStart(2, '0')}`;
   },
 }));

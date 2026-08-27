@@ -1,4 +1,4 @@
-import { ProjectData } from '../types';
+import { ProjectData, ArchitecturalElement } from '../types';
 import { 
   DEFAULT_MANUFACTURING_SETTINGS, 
   DEFAULT_COUNTERTOP_CONFIG, 
@@ -7,6 +7,27 @@ import {
   DEFAULT_MATERIAL_FINISHES,
   DEFAULT_PRICING_SETTINGS
 } from './standards';
+
+const KITCHEN_ARCH_ELEMENTS: ArchitecturalElement[] = [
+  { id: 'win-01', name: 'نافذة المطبخ فوق الحوض', type: 'window', x: 1800, y: 0, z: 950, width: 1200, height: 1100, depth: 150, rotation: 0, wallId: 'wall-a' },
+  { id: 'door-01', name: 'باب التراس', type: 'door', x: 3500, y: 3600, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
+  { id: 'col-01', name: 'عمود خرساني ركن المطبخ', type: 'column', x: 0, y: 3200, z: 0, width: 300, height: 2600, depth: 400, rotation: 0, wallId: 'wall-d' },
+];
+
+const DRESSING_ARCH_ELEMENTS: ArchitecturalElement[] = [
+  { id: 'door-dr', name: 'باب الدريسنج الزجاجي', type: 'door', x: 1500, y: 3200, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
+  { id: 'col-dr', name: 'عمود خرساني بارز', type: 'column', x: 3400, y: 0, z: 0, width: 250, height: 2700, depth: 250, rotation: 0, wallId: 'wall-a' },
+];
+
+const BEDROOM_ARCH_ELEMENTS: ArchitecturalElement[] = [
+  { id: 'win-bd', name: 'نافذة غرفة النوم البانورامية', type: 'window', x: 2800, y: 0, z: 950, width: 1200, height: 1200, depth: 150, rotation: 0, wallId: 'wall-a' },
+  { id: 'door-bd', name: 'باب غرفة النوم', type: 'door', x: 400, y: 4200, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
+];
+
+const LIBRARY_ARCH_ELEMENTS: ArchitecturalElement[] = [
+  { id: 'door-lib', name: 'باب الصالون والمكتبة', type: 'door', x: 500, y: 3800, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
+  { id: 'col-lib', name: 'عمود خرساني ديكوري', type: 'column', x: 0, y: 0, z: 0, width: 200, height: 2800, depth: 400, rotation: 0, wallId: 'wall-a' },
+];
 
 // 1. KITCHEN TEMPLATE
 export const SAMPLE_PROJECT_KITCHEN: ProjectData = {
@@ -33,10 +54,7 @@ export const SAMPLE_PROJECT_KITCHEN: ProjectData = {
       { id: 'wall-c', name: 'الجدار ج (الأمامي)', startX: 4200, startY: 3600, endX: 0, endY: 3600, thickness: 150, height: 2600 },
       { id: 'wall-d', name: 'الجدار د (الأيسر)', startX: 0, startY: 3600, endX: 0, endY: 0, thickness: 150, height: 2600 },
     ],
-    elements: [
-      { id: 'win-01', name: 'نافذة المطبخ فوق الحوض', type: 'window', x: 1800, y: 0, z: 950, width: 1200, height: 1100, depth: 150, rotation: 0, wallId: 'wall-a' },
-      { id: 'door-01', name: 'باب التراس', type: 'door', x: 3500, y: 3600, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
-    ],
+    elements: KITCHEN_ARCH_ELEMENTS,
   },
   cabinets: [
     { id: 'T01', name: 'دولاب ثلاجة مدمجة', category: 'tall', type: 'tall-fridge-housing', projectType: 'kitchen', width: 600, height: 2050, depth: 580, x: 0, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 2, drawerCount: 0, doorHinge: 'right' },
@@ -53,7 +71,7 @@ export const SAMPLE_PROJECT_KITCHEN: ProjectData = {
     { id: 'A02', name: 'مسطح طهي بلت إن', type: 'cooktop-induction', width: 800, height: 50, depth: 520, x: 4200 - 500, y: 950, z: 850, rotation: 90, wallId: 'wall-b' },
     { id: 'A03', name: 'فرن بلت إن كهربائي', type: 'oven-builtin', width: 595, height: 595, depth: 560, x: 600, y: 10, z: 880, rotation: 0, wallId: 'wall-a', finish: 'black' },
   ],
-  architecturalElements: [],
+  architecturalElements: KITCHEN_ARCH_ELEMENTS,
   countertop: DEFAULT_COUNTERTOP_CONFIG,
   plinth: DEFAULT_PLINTH_CONFIG,
   backsplash: DEFAULT_BACKSPLASH_CONFIG,
@@ -87,9 +105,7 @@ export const SAMPLE_PROJECT_DRESSING: ProjectData = {
       { id: 'wall-c', name: 'الجدار ج (الأمامي)', startX: 3800, startY: 3200, endX: 0, endY: 3200, thickness: 150, height: 2700 },
       { id: 'wall-d', name: 'الجدار د (الأيسر)', startX: 0, startY: 3200, endX: 0, endY: 0, thickness: 150, height: 2700 },
     ],
-    elements: [
-      { id: 'door-dr', name: 'باب الدريسنج الزجاجي', type: 'door', x: 1500, y: 3200, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
-    ],
+    elements: DRESSING_ARCH_ELEMENTS,
   },
   cabinets: [
     { id: 'WD01', name: 'وحدة تعليق طويل للفساتين والعبايات', category: 'wardrobe', type: 'wardrobe-walkin-open', projectType: 'dressing', width: 1000, height: 2600, depth: 550, x: 0, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true, hangingRailCount: 1 },
@@ -99,7 +115,7 @@ export const SAMPLE_PROJECT_DRESSING: ProjectData = {
     { id: 'WD05', name: 'جزيرة دريسنج مع درج إكسسوارات وساعات', category: 'accessories', type: 'wardrobe-jewelry-vanity', projectType: 'dressing', width: 1200, height: 900, depth: 700, x: 1300, y: 1500, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 6, doorHinge: 'none', doorType: 'open', hasJewelryDrawer: true },
   ],
   appliances: [],
-  architecturalElements: [],
+  architecturalElements: DRESSING_ARCH_ELEMENTS,
   countertop: { ...DEFAULT_COUNTERTOP_CONFIG, enabled: false },
   plinth: { ...DEFAULT_PLINTH_CONFIG, height: 60 },
   backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, enabled: false },
@@ -133,10 +149,7 @@ export const SAMPLE_PROJECT_BEDROOM: ProjectData = {
       { id: 'wall-c', name: 'الجدار ج (الأمامي - التلفزيون)', startX: 4800, startY: 4200, endX: 0, endY: 4200, thickness: 150, height: 2800 },
       { id: 'wall-d', name: 'الجدار د (الأيسر - المدخل)', startX: 0, startY: 4200, endX: 0, endY: 0, thickness: 150, height: 2800 },
     ],
-    elements: [
-      { id: 'win-bd', name: 'نافذة غرفة النوم البانورامية', type: 'window', x: 2800, y: 0, z: 950, width: 1200, height: 1200, depth: 150, rotation: 0, wallId: 'wall-a' },
-      { id: 'door-bd', name: 'باب غرفة النوم', type: 'door', x: 400, y: 4200, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
-    ],
+    elements: BEDROOM_ARCH_ELEMENTS,
   },
   cabinets: [
     { id: 'BD01', name: 'سرير كينج ماستر (180×200 سم)', category: 'bed', type: 'bed-king', projectType: 'bedroom', width: 1900, height: 1100, depth: 2150, x: 900, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 0, doorHinge: 'none', mattressWidth: 1800, mattressLength: 2000, headboardHeight: 1100, headboardThickness: 100 },
@@ -149,7 +162,7 @@ export const SAMPLE_PROJECT_BEDROOM: ProjectData = {
   appliances: [
     { id: 'TV01', name: 'شاشة تلفزيون 55 بوصة', type: 'tv-screen', width: 1250, height: 720, depth: 60, x: 1675, y: 4200 - 50, z: 950, rotation: 180, wallId: 'wall-c' }
   ],
-  architecturalElements: [],
+  architecturalElements: BEDROOM_ARCH_ELEMENTS,
   countertop: { ...DEFAULT_COUNTERTOP_CONFIG, enabled: false },
   plinth: { ...DEFAULT_PLINTH_CONFIG, enabled: false },
   backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, enabled: false },
@@ -183,9 +196,7 @@ export const SAMPLE_PROJECT_LIBRARY: ProjectData = {
       { id: 'wall-c', name: 'الجدار ج (الأمامي - منطقة الجلوس)', startX: 5000, startY: 3800, endX: 0, endY: 3800, thickness: 150, height: 2800 },
       { id: 'wall-d', name: 'الجدار د (الأيسر)', startX: 0, startY: 3800, endX: 0, endY: 0, thickness: 150, height: 2800 },
     ],
-    elements: [
-      { id: 'door-lib', name: 'باب الصالون', type: 'door', x: 500, y: 3800, z: 0, width: 900, height: 2100, depth: 150, rotation: 180, wallId: 'wall-c', openingDirection: 'inward-left' },
-    ],
+    elements: LIBRARY_ARCH_ELEMENTS,
   },
   cabinets: [
     { id: 'LIB01', name: 'فيترينة عرض تحف بضلف زجاج وفريم ألومنيوم', category: 'display', type: 'library-display-glass', projectType: 'library', width: 900, height: 2600, depth: 400, x: 200, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 5, doorCount: 2, drawerCount: 0, doorHinge: 'double', hasGlassDoors: true, hasIntegratedLed: true },
@@ -195,7 +206,7 @@ export const SAMPLE_PROJECT_LIBRARY: ProjectData = {
   appliances: [
     { id: 'TV02', name: 'شاشة تلفزيون 65 بوصة 4K OLED', type: 'tv-screen', width: 1450, height: 830, depth: 50, x: 1775, y: 50, z: 850, rotation: 0, wallId: 'wall-a' }
   ],
-  architecturalElements: [],
+  architecturalElements: LIBRARY_ARCH_ELEMENTS,
   countertop: { ...DEFAULT_COUNTERTOP_CONFIG, enabled: false },
   plinth: { ...DEFAULT_PLINTH_CONFIG, height: 50 },
   backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, enabled: false },

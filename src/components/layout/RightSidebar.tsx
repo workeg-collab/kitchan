@@ -13,13 +13,11 @@ import {
   Layers, 
   Settings, 
   AlertTriangle, 
-  Shirt, 
-  BedDouble, 
-  Tv, 
-  Sparkles,
   DoorClosed,
   AppWindow,
-  Info
+  Square,
+  MinusSquare,
+  CircleDot
 } from 'lucide-react';
 
 export const RightSidebar: React.FC = () => {
@@ -67,18 +65,22 @@ export const RightSidebar: React.FC = () => {
     }
   }
 
-  const elementWarnings: string[] = [];
-  if (selectedElement) {
-    if (selectedElement.type === 'door' && selectedElement.height < 1900) {
-      elementWarnings.push(`ارتفاع الباب (${selectedElement.height} مم) أقل من الارتفاع القياسي للمرور (2000 - 2200 مم).`);
+  const getElementTypeName = (type: string) => {
+    switch (type) {
+      case 'column':
+        return { name: 'عمود خرساني', icon: <Square size={16} /> };
+      case 'beam':
+        return { name: 'كمرة خرسانية ساقطة', icon: <MinusSquare size={16} /> };
+      case 'pipe':
+        return { name: 'ماسورة صواعد وتغذية', icon: <CircleDot size={16} /> };
+      case 'door':
+        return { name: 'باب معماري', icon: <DoorClosed size={16} /> };
+      case 'window':
+        return { name: 'نافذة معمارية', icon: <AppWindow size={16} /> };
+      default:
+        return { name: 'عنصر معماري', icon: <Square size={16} /> };
     }
-    if (selectedElement.type === 'door' && selectedElement.width < 600) {
-      elementWarnings.push(`عرض فتحة الباب (${selectedElement.width} مم) ضيق جداً للمرور المريح.`);
-    }
-    if (selectedElement.type === 'window' && selectedElement.z < 500) {
-      elementWarnings.push(`جلسة النافذة (${selectedElement.z} مم) منخفضة جداً بالنسبة للأرضية.`);
-    }
-  }
+  };
 
   return (
     <aside className="w-84 bg-white border-l border-slate-200 flex flex-col h-full select-none z-20 overflow-y-auto shadow-sm font-sans">
@@ -160,9 +162,9 @@ export const RightSidebar: React.FC = () => {
                 <label className="text-[10px] text-slate-500 font-mono">{t.width} (W)</label>
                 <input
                   type="number"
-                  min={50}
+                  min={10}
                   value={convertMmToUnit(selectedCabinet.width, unit)}
-                  onChange={(e) => updateCabinet(selectedCabinet.id, { width: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateCabinet(selectedCabinet.id, { width: Math.max(10, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -171,9 +173,9 @@ export const RightSidebar: React.FC = () => {
                 <label className="text-[10px] text-slate-500 font-mono">{t.height} (H)</label>
                 <input
                   type="number"
-                  min={50}
+                  min={10}
                   value={convertMmToUnit(selectedCabinet.height, unit)}
-                  onChange={(e) => updateCabinet(selectedCabinet.id, { height: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateCabinet(selectedCabinet.id, { height: Math.max(10, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -182,9 +184,9 @@ export const RightSidebar: React.FC = () => {
                 <label className="text-[10px] text-slate-500 font-mono">{t.depth} (D)</label>
                 <input
                   type="number"
-                  min={50}
+                  min={10}
                   value={convertMmToUnit(selectedCabinet.depth, unit)}
-                  onChange={(e) => updateCabinet(selectedCabinet.id, { depth: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateCabinet(selectedCabinet.id, { depth: Math.max(10, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -311,7 +313,6 @@ export const RightSidebar: React.FC = () => {
               </div>
             </div>
 
-            {/* Vertical Dividers for Libraries & Wardrobes */}
             <div>
               <label className="text-[10px] text-slate-500 font-mono">عدد القواطع الرأسية (Vertical Dividers)</label>
               <input
@@ -332,7 +333,6 @@ export const RightSidebar: React.FC = () => {
       {/* ========================================================================= */}
       {selectedAppliance && (
         <div className="p-4 space-y-5">
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <span className="text-[10px] font-mono font-bold uppercase bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200">
@@ -353,7 +353,6 @@ export const RightSidebar: React.FC = () => {
             </button>
           </div>
 
-          {/* Quick Action Bar */}
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => rotateAppliance(selectedAppliance.id, 90)}
@@ -390,9 +389,9 @@ export const RightSidebar: React.FC = () => {
                 <label className="text-[10px] text-slate-500 font-mono">العرض (W)</label>
                 <input
                   type="number"
-                  min={50}
+                  min={10}
                   value={convertMmToUnit(selectedAppliance.width, unit)}
-                  onChange={(e) => updateAppliance(selectedAppliance.id, { width: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateAppliance(selectedAppliance.id, { width: Math.max(10, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900"
                 />
               </div>
@@ -401,9 +400,9 @@ export const RightSidebar: React.FC = () => {
                 <label className="text-[10px] text-slate-500 font-mono">الارتفاع (H)</label>
                 <input
                   type="number"
-                  min={50}
+                  min={10}
                   value={convertMmToUnit(selectedAppliance.height, unit)}
-                  onChange={(e) => updateAppliance(selectedAppliance.id, { height: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateAppliance(selectedAppliance.id, { height: Math.max(10, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900"
                 />
               </div>
@@ -412,9 +411,9 @@ export const RightSidebar: React.FC = () => {
                 <label className="text-[10px] text-slate-500 font-mono">العمق (D)</label>
                 <input
                   type="number"
-                  min={50}
+                  min={10}
                   value={convertMmToUnit(selectedAppliance.depth, unit)}
-                  onChange={(e) => updateAppliance(selectedAppliance.id, { depth: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  onChange={(e) => updateAppliance(selectedAppliance.id, { depth: Math.max(10, convertUnitToMm(Number(e.target.value), unit)) })}
                   className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900"
                 />
               </div>
@@ -462,25 +461,30 @@ export const RightSidebar: React.FC = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 3. ARCHITECTURAL DOORS & WINDOWS CUSTOM DIMENSION INSPECTOR                */}
+      {/* 3. ARCHITECTURAL ELEMENTS (COLUMNS, DOORS, WINDOWS, BEAMS, PIPES)          */}
       {/* ========================================================================= */}
       {selectedElement && (
         <div className="p-4 space-y-5">
-          {/* Header */}
+          {/* Header with Type info */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
-                {selectedElement.type === 'door' ? <DoorClosed size={16} /> : <AppWindow size={16} />}
+              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl shadow-xs">
+                {getElementTypeName(selectedElement.type).icon}
               </div>
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">
-                  {selectedElement.id}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-mono font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">
+                    {selectedElement.id}
+                  </span>
+                  <span className="text-[11px] font-bold text-emerald-700">
+                    {getElementTypeName(selectedElement.type).name}
+                  </span>
+                </div>
                 <input
                   type="text"
                   value={selectedElement.name}
                   onChange={(e) => updateElement(selectedElement.id, { name: e.target.value })}
-                  className="text-xs font-bold text-slate-900 mt-0.5 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500 rounded px-1 w-full"
+                  className="text-xs font-bold text-slate-900 mt-1 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500 rounded px-1 w-full"
                 />
               </div>
             </div>
@@ -492,81 +496,86 @@ export const RightSidebar: React.FC = () => {
             </button>
           </div>
 
-          {/* Soft Warning Alerts */}
-          {elementWarnings.map((warn, idx) => (
-            <div key={idx} className="p-3 bg-amber-50 border border-amber-300 rounded-2xl text-amber-900 text-xs flex items-start gap-2">
-              <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <strong className="font-bold block">ملاحظة معمارية:</strong>
-                <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">{warn}</p>
-              </div>
-            </div>
-          ))}
-
-          {/* Quick Action Bar */}
+          {/* Action Bar */}
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => updateElement(selectedElement.id, { rotation: (selectedElement.rotation + 90) % 360 })}
-              className="flex items-center justify-center gap-1.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold border border-slate-200 transition"
+              className="flex items-center justify-center gap-1.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 transition"
             >
               <RotateCw size={14} className="text-emerald-600" />
-              <span>{t.rotate}</span>
+              <span>تدوير 90°</span>
             </button>
             <button
               onClick={() => removeElement(selectedElement.id)}
-              className="flex items-center justify-center gap-1.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-semibold border border-red-200 transition"
+              className="flex items-center justify-center gap-1.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold border border-red-200 transition"
             >
               <Trash2 size={14} />
-              <span>{t.delete}</span>
+              <span>حذف العنصر</span>
             </button>
           </div>
 
-          {/* Custom Dimensions (Width, Height, Depth / Frame Thickness) */}
+          {/* Custom Exact Dimensions (W, H, D / Thickness) */}
+          <div className="space-y-3 bg-emerald-50/30 p-3.5 rounded-2xl border border-emerald-100">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+                <Maximize size={14} className="text-emerald-600" />
+                المقاسات المعمارية الصافية ({unit})
+              </h4>
+              <span className="text-[10px] text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded font-bold">تعديل حر</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="text-[10px] text-slate-600 font-bold font-mono">
+                  {selectedElement.type === 'column' ? 'عرض العمود (X)' : 'العرض (W)'}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={convertMmToUnit(selectedElement.width, unit)}
+                  onChange={(e) => updateElement(selectedElement.id, { width: Math.max(1, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-full mt-1 px-2.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] text-slate-600 font-bold font-mono">
+                  {selectedElement.type === 'column' ? 'سمك/عمق العمود' : 'العمق/الحلق (D)'}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={convertMmToUnit(selectedElement.depth, unit)}
+                  onChange={(e) => updateElement(selectedElement.id, { depth: Math.max(1, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-full mt-1 px-2.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] text-slate-600 font-bold font-mono">
+                  {selectedElement.type === 'column' ? 'ارتفاع العمود (Z)' : 'الارتفاع (H)'}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={convertMmToUnit(selectedElement.height, unit)}
+                  onChange={(e) => updateElement(selectedElement.id, { height: Math.max(1, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-full mt-1 px-2.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Coordinates & Elevations */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 font-mono">
-              <Maximize size={14} className="text-emerald-600" />
-              الأبعاد المعمارية الصافية ({unit})
+              <Sliders size={14} className="text-blue-600" />
+              الموقع على الجدار والارتفاع ({unit})
             </h4>
 
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label className="text-[10px] text-slate-500 font-mono">العرض (W)</label>
-                <input
-                  type="number"
-                  min={100}
-                  value={convertMmToUnit(selectedElement.width, unit)}
-                  onChange={(e) => updateElement(selectedElement.id, { width: Math.max(100, convertUnitToMm(Number(e.target.value), unit)) })}
-                  className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] text-slate-500 font-mono">الارتفاع (H)</label>
-                <input
-                  type="number"
-                  min={100}
-                  value={convertMmToUnit(selectedElement.height, unit)}
-                  onChange={(e) => updateElement(selectedElement.id, { height: Math.max(100, convertUnitToMm(Number(e.target.value), unit)) })}
-                  className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] text-slate-500 font-mono">سماكة الحلق (D)</label>
-                <input
-                  type="number"
-                  min={50}
-                  value={convertMmToUnit(selectedElement.depth, unit)}
-                  onChange={(e) => updateElement(selectedElement.id, { depth: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
-                  className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900"
-                />
-              </div>
-            </div>
-
-            {/* Position on Wall and Sill Height Z */}
-            <div className="grid grid-cols-3 gap-2 pt-1">
-              <div>
-                <label className="text-[10px] text-slate-500 font-mono">الموقع X</label>
+                <label className="text-[10px] text-slate-500 font-mono">الموقع الأفقي X</label>
                 <input
                   type="number"
                   value={convertMmToUnit(selectedElement.x, unit)}
@@ -575,7 +584,7 @@ export const RightSidebar: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500 font-mono">الموقع Y</label>
+                <label className="text-[10px] text-slate-500 font-mono">الموقع الرأسي Y</label>
                 <input
                   type="number"
                   value={convertMmToUnit(selectedElement.y, unit)}
@@ -584,7 +593,9 @@ export const RightSidebar: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500 font-mono">ارتفاع الجلسة Z</label>
+                <label className="text-[10px] text-slate-500 font-mono">
+                  {selectedElement.type === 'window' ? 'ارتفاع الجلسة Z' : 'الارتفاع عن الأرض Z'}
+                </label>
                 <input
                   type="number"
                   value={convertMmToUnit(selectedElement.z, unit)}
@@ -601,7 +612,7 @@ export const RightSidebar: React.FC = () => {
                 <select
                   value={selectedElement.openingDirection || 'inward-left'}
                   onChange={(e) => updateElement(selectedElement.id, { openingDirection: e.target.value as any })}
-                  className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900"
+                  className="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 font-bold"
                 >
                   <option value="inward-left">فتح للداخل - يسار</option>
                   <option value="inward-right">فتح للداخل - يمين</option>
