@@ -32,6 +32,8 @@ export const Canvas2D: React.FC = () => {
     selectedType,
     setSelected,
     clearSelection,
+    addCabinet,
+    addAppliance,
     updateCabinet,
     updateAppliance,
     updateElement,
@@ -248,6 +250,107 @@ export const Canvas2D: React.FC = () => {
     ? { x: selectedElement.x, y: selectedElement.y, w: selectedElement.width, d: selectedElement.depth, rot: selectedElement.rotation }
     : null;
 
+  // Global Keyboard Shortcuts in 2D Planner
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedId) return;
+
+      const step = e.shiftKey ? 100 : e.altKey ? 10 : 50;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (selectedCabinet) updateCabinet(selectedId, { x: Math.max(0, selectedCabinet.x - step) });
+        if (selectedAppliance) updateAppliance(selectedId, { x: Math.max(0, selectedAppliance.x - step) });
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (selectedCabinet) updateCabinet(selectedId, { x: Math.min(room.width, selectedCabinet.x + step) });
+        if (selectedAppliance) updateAppliance(selectedId, { x: Math.min(room.width, selectedAppliance.x + step) });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (selectedCabinet) updateCabinet(selectedId, { y: Math.max(0, selectedCabinet.y - step) });
+        if (selectedAppliance) updateAppliance(selectedId, { y: Math.max(0, selectedAppliance.y - step) });
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (selectedCabinet) updateCabinet(selectedId, { y: Math.min(room.length, selectedCabinet.y + step) });
+        if (selectedAppliance) updateAppliance(selectedId, { y: Math.min(room.length, selectedAppliance.y + step) });
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        if (selectedType === 'cabinet') rotateCabinet(selectedId, 90);
+        if (selectedType === 'appliance') rotateAppliance(selectedId, 90);
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedType === 'cabinet') removeCabinet(selectedId);
+        if (selectedType === 'appliance') removeAppliance(selectedId);
+        if (selectedType === 'element') removeElement(selectedId);
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')) {
+        e.preventDefault();
+        if (selectedType === 'cabinet') duplicateCabinet(selectedId);
+        if (selectedType === 'appliance') duplicateAppliance(selectedId);
+      } else if (e.key === 'Escape') {
+        clearSelection();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedId, selectedType, selectedCabinet, selectedAppliance, room.width, room.length]);
+
+  // Handle Drag & Drop from Catalog into 2D Canvas
+  const handleDrop2D = (e: React.DragEvent) => {
+    e.preventDefault();
+    try {
+      const dataStr = e.dataTransfer.getData('application/json');
+      if (!dataStr) return;
+      const data = JSON.parse(dataStr);
+      const svgCoords = clientToSVG(e.clientX, e.clientY);
+
+      if (data.type === 'cabinet' && data.template) {
+        const template = data.template;
+        const w = data.width || template.defaultWidth;
+        const d = template.defaultDepth;
+
+        const snap = calculateSnap(
+          svgCoords.x - w / 2,
+          svgCoords.y - d / 2,
+          w,
+          d,
+          0,
+          room.walls,
+          cabinets,
+          gridSize,
+          75,
+          room.width,
+          room.length
+        );
+
+        addCabinet({
+          name: template.name,
+          category: template.category,
+          type: template.type,
+          projectType: project.metadata.projectType,
+          width: w,
+          height: template.defaultHeight,
+          depth: d,
+          x: snap.x,
+          y: snap.y,
+          z: template.defaultZ,
+          rotation: 0,
+          wallId: snap.snappedToWall || 'wall-a',
+          doorCount: template.doorCount,
+          drawerCount: template.drawerCount,
+          shelfCount: template.shelfCount,
+          doorHinge: template.doorHinge || 'right',
+          doorType: template.doorType,
+          hasSinkCutout: template.hasSinkCutout,
+          hasApplianceCavity: template.hasApplianceCavity,
+          flipUpDoor: template.flipUpDoor,
+          isCeilingUnit: template.isCeilingUnit,
+        });
+      }
+    } catch (err) {
+      console.warn('2D drop error:', err);
+    }
+  };
+
   const aisleClearances = showAisleClearance ? calculateAisleClearance(cabinets, room.width, room.length) : [];
 
   return (
@@ -257,6 +360,8 @@ export const Canvas2D: React.FC = () => {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleDrop2D}
     >
       {/* 2D Floating Toolbar (Light Mode) */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 p-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-lg">
@@ -330,40 +435,74 @@ export const Canvas2D: React.FC = () => {
       {/* Floating Selection Quick Toolbar */}
       {selectedItemPos && selectedId && (
         <div
-          className="absolute z-20 flex items-center gap-1 p-1 bg-white border border-blue-400 rounded-xl shadow-xl"
+          className="absolute z-30 flex items-center gap-1.5 p-1.5 bg-slate-900/95 text-white backdrop-blur-md border border-slate-700 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-150"
           style={{
-            left: `${pan2D.x + selectedItemPos.x * zoom2D}px`,
-            top: `${Math.max(16, pan2D.y + selectedItemPos.y * zoom2D - 45)}px`,
+            left: `${Math.max(16, Math.min(window.innerWidth - 380, pan2D.x + selectedItemPos.x * zoom2D))}px`,
+            top: `${Math.max(16, pan2D.y + selectedItemPos.y * zoom2D - 52)}px`,
           }}
         >
+          {/* Item Label Badge */}
+          <div className="px-2.5 py-1 bg-slate-800 rounded-xl text-xs font-bold text-amber-400 font-mono border border-slate-700">
+            {selectedCabinet ? selectedCabinet.id : selectedAppliance?.id}
+          </div>
+
+          {/* Rotate 90 deg */}
           <button
             onClick={() => {
               if (selectedType === 'cabinet') rotateCabinet(selectedId, 90);
               else if (selectedType === 'appliance') rotateAppliance(selectedId, 90);
             }}
-            className="p-1.5 text-slate-700 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
-            title={t.rotate}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-blue-600 rounded-xl text-xs font-bold transition text-slate-200 hover:text-white"
+            title="تدوير 90 درجة (R)"
           >
-            <RotateCw size={15} />
+            <RotateCw size={14} />
+            <span>تدوير</span>
           </button>
+
+          {/* Quick Width Buttons */}
+          {selectedCabinet && (
+            <div className="flex items-center bg-slate-800 rounded-xl p-0.5 border border-slate-700">
+              <button
+                onClick={() => updateCabinet(selectedCabinet.id, { width: Math.max(200, selectedCabinet.width - 50) })}
+                className="px-1.5 py-1 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-300 transition"
+                title="إنقاص العرض 5 سم"
+              >
+                -5
+              </button>
+              <span className="text-[11px] font-bold text-amber-400 px-1 font-mono">
+                {formatDimension(selectedCabinet.width, unit)}
+              </span>
+              <button
+                onClick={() => updateCabinet(selectedCabinet.id, { width: Math.min(2400, selectedCabinet.width + 50) })}
+                className="px-1.5 py-1 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-300 transition"
+                title="زيادة العرض 5 سم"
+              >
+                +5
+              </button>
+            </div>
+          )}
+
+          {/* Duplicate */}
           <button
             onClick={() => {
               if (selectedType === 'cabinet') duplicateCabinet(selectedId);
               else if (selectedType === 'appliance') duplicateAppliance(selectedId);
             }}
-            className="p-1.5 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition"
-            title={t.duplicate}
+            className="p-1.5 bg-slate-800 hover:bg-emerald-600 text-slate-300 hover:text-white rounded-xl transition"
+            title="تكرار القطعة (Ctrl+D)"
           >
             <Copy size={15} />
           </button>
+
+          {/* Delete */}
           <button
             onClick={() => {
               if (selectedType === 'cabinet') removeCabinet(selectedId);
               else if (selectedType === 'appliance') removeAppliance(selectedId);
               else if (selectedType === 'element') removeElement(selectedId);
             }}
-            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
-            title={t.delete}
+            className="p-1.5 bg-slate-800 hover:bg-red-600 text-red-400 hover:text-white rounded-xl transition"
+            title="حذف القطعة (Del)"
           >
             <Trash2 size={15} />
           </button>

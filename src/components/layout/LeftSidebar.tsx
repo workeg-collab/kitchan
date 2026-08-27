@@ -265,11 +265,19 @@ export const LeftSidebar: React.FC = () => {
             {filteredItems.map((template: any, idx: number) => (
               <div
                 key={idx}
-                className="bg-white border border-slate-200 rounded-2xl p-3 hover:border-blue-400 hover:shadow-md transition"
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('application/json', JSON.stringify({ type: 'cabinet', template }));
+                  e.dataTransfer.effectAllowed = 'copy';
+                }}
+                className="bg-white border border-slate-200 rounded-2xl p-3 hover:border-blue-400 hover:shadow-md transition cursor-grab active:cursor-grabbing group"
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">{template.name}</h4>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-400 group-hover:text-blue-500 transition text-xs">⋮⋮</span>
+                      <h4 className="text-xs font-bold text-slate-900">{template.name}</h4>
+                    </div>
                     <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">{template.description}</p>
                   </div>
                   {template.tag && (
@@ -292,6 +300,7 @@ export const LeftSidebar: React.FC = () => {
                         key={sw}
                         onClick={() => handleAddItem(template, sw)}
                         className="px-2 py-0.5 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 rounded-md text-[10px] font-mono transition"
+                        title={`إضافة بعرض ${formatDimension(sw, unit)}`}
                       >
                         {formatDimension(sw, unit, false)}
                       </button>
@@ -300,10 +309,11 @@ export const LeftSidebar: React.FC = () => {
 
                   <button
                     onClick={() => handleAddItem(template)}
-                    className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition ml-2 shadow-xs"
-                    title="إضافة الوحدة للمخطط"
+                    className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition ml-2 shadow-xs flex items-center gap-1"
+                    title="إضافة فورية للرسم (أو اسحب القطعة وأفلتها)"
                   >
                     <Plus size={14} />
+                    <span className="text-[10px] font-bold px-0.5">إضافة</span>
                   </button>
                 </div>
               </div>
