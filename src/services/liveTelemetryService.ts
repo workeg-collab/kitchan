@@ -32,11 +32,12 @@ export interface LiveSubscriberSession {
 
 const TELEMETRY_CHANNEL = 'fc_live_telemetry_channel_v1';
 const SESSIONS_STORAGE_PREFIX = 'fc_live_session_';
-const ONLINE_THRESHOLD_MS = 15000; // 15 seconds without ping = offline
+const ONLINE_THRESHOLD_MS = 25000; // 25 seconds
 
 class LiveTelemetryService {
   private channel: BroadcastChannel | null = null;
   private heartbeatInterval: any = null;
+  private cloudSessionsCache: LiveSubscriberSession[] = [];
 
   constructor() {
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -48,14 +49,14 @@ class LiveTelemetryService {
     }
   }
 
-  // --- SUBSCRIBER TELEMETRY TRANSMITTER (SILENT / STEALTH) ---
+  // --- SUBSCRIBER TELEMETRY TRANSMITTER (SILENT / STEALTH / CLOUD SYNC) ---
 
   public startTransmitter(getSessionData: () => Partial<LiveSubscriberSession> | null) {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
     }
 
-    const sendPing = () => {
+    const sendPing = async () => {
       try {
         const raw = getSessionData();
         if (!raw || !raw.tenantId || raw.tenantId === 'admin') return;
@@ -79,26 +80,45 @@ class LiveTelemetryService {
           snapshotCabinets: raw.snapshotCabinets || [],
         };
 
-        // 1. Broadcast over channel
+        // 1. Broadcast over local BroadcastChannel
         if (this.channel) {
-          this.channel.postMessage({ type: 'HEARTBEAT', payload: session });
+          try {
+            this.channel.postMessage({ type: 'HEARTBEAT', payload: session });
+          } catch {
+            // Ignore
+          }
         }
 
         // 2. Persist in local storage
-        localStorage.setItem(`${SESSIONS_STORAGE_PREFIX}${session.tenantId}`, JSON.stringify(session));
+        try {
+          localStorage.setItem(`${SESSIONS_STORAGE_PREFIX}${session.tenantId}`, JSON.stringify(session));
+        } catch {
+          // Ignore
+        }
+
+        // 3. Send stealth HTTP Ping to Cloud API for Cross-Device Tracking
+        try {
+          await fetch('/api/telemetry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(session),
+          });
+        } catch {
+          // Silent catch
+        }
       } catch {
-        // Silent error handling
+        // Silent catch
       }
     };
 
     // Immediate initial ping
     sendPing();
 
-    // Regular stealth heartbeat every 3 seconds
-    this.heartbeatInterval = setInterval(sendPing, 3000);
+    // Regular stealth heartbeat every 2.5 seconds
+    this.heartbeatInterval = setInterval(sendPing, 2500);
   }
 
-  public stopTransmitter(tenantId?: string) {
+  public async stopTransmitter(tenantId?: string) {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
@@ -119,10 +139,18 @@ class LiveTelemetryService {
       } catch {
         // Ignore
       }
+
+      try {
+        await fetch(`/api/telemetry?tenantId=${encodeURIComponent(tenantId)}`, {
+          method: 'DELETE',
+        });
+      } catch {
+        // Ignore
+      }
     }
   }
 
-  // Record a stealth action event (e.g. "أضاف وحدة سفلية 60 سم", "غيّر الارتفاع")
+  // Record a stealth action event
   public recordAction(tenantId: string, action: string) {
     try {
       if (!tenantId || tenantId === 'admin') return;
@@ -136,18 +164,32 @@ class LiveTelemetryService {
         if (this.channel) {
           this.channel.postMessage({ type: 'HEARTBEAT', payload: session });
         }
+        // Send to cloud
+        fetch('/api/telemetry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(session),
+        }).catch(() => {});
       }
     } catch {
       // Ignore
     }
   }
 
-  // --- ADMIN TELEMETRY RECEIVER & LIVE MONITOR ---
+  // --- ADMIN TELEMETRY RECEIVER & LIVE CLOUD MONITOR ---
 
   public getActiveSessions(): LiveSubscriberSession[] {
-    const sessions: LiveSubscriberSession[] = [];
+    const sessionMap = new Map<string, LiveSubscriberSession>();
     const now = Date.now();
 
+    // 1. Add Cloud API sessions
+    for (const s of this.cloudSessionsCache) {
+      const isFresh = now - s.lastPing < ONLINE_THRESHOLD_MS;
+      s.isOnline = isFresh;
+      sessionMap.set(s.tenantId.toLowerCase(), s);
+    }
+
+    // 2. Add local storage sessions (if newer or local)
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -157,7 +199,10 @@ class LiveTelemetryService {
             const parsed: LiveSubscriberSession = JSON.parse(raw);
             const isFresh = now - parsed.lastPing < ONLINE_THRESHOLD_MS;
             parsed.isOnline = isFresh;
-            sessions.push(parsed);
+            const existing = sessionMap.get(parsed.tenantId.toLowerCase());
+            if (!existing || parsed.lastPing > existing.lastPing) {
+              sessionMap.set(parsed.tenantId.toLowerCase(), parsed);
+            }
           }
         }
       }
@@ -165,37 +210,48 @@ class LiveTelemetryService {
       // Ignore
     }
 
-    return sessions.sort((a, b) => b.lastPing - a.lastPing);
+    const list = Array.from(sessionMap.values());
+    return list.sort((a, b) => b.lastPing - a.lastPing);
   }
 
   public subscribeToSessions(callback: (sessions: LiveSubscriberSession[]) => void): () => void {
-    const handleUpdate = () => {
+    const fetchCloud = async () => {
+      try {
+        const res = await fetch('/api/telemetry');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.sessions)) {
+            this.cloudSessionsCache = data.sessions;
+          }
+        }
+      } catch {
+        // Fall back to local
+      }
       callback(this.getActiveSessions());
     };
 
-    // Listen on BroadcastChannel
+    // Listen on local BroadcastChannel
     const messageListener = () => {
-      handleUpdate();
+      callback(this.getActiveSessions());
     };
 
     if (this.channel) {
       this.channel.addEventListener('message', messageListener);
     }
 
-    // Also listen to storage events
-    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('storage', messageListener);
 
     // Initial query
-    handleUpdate();
+    fetchCloud();
 
-    // Auto-refresh timer to mark inactive sessions
-    const timer = setInterval(handleUpdate, 3000);
+    // Fast polling every 2 seconds for cloud updates across all devices globally
+    const timer = setInterval(fetchCloud, 2000);
 
     return () => {
       if (this.channel) {
         this.channel.removeEventListener('message', messageListener);
       }
-      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('storage', messageListener);
       clearInterval(timer);
     };
   }
