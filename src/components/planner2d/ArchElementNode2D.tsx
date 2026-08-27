@@ -24,6 +24,8 @@ export const ArchElementNode2D: React.FC<ArchElementNode2DProps> = ({
   let strokeColor = '#10b981'; // emerald-500
   if (isSelected) strokeColor = '#38bdf8';
 
+  const isWallOpening = type === 'door' || type === 'window';
+
   return (
     <g
       transform={`translate(${x}, ${y}) rotate(${rotation}, 0, 0)`}
@@ -31,65 +33,85 @@ export const ArchElementNode2D: React.FC<ArchElementNode2DProps> = ({
       onMouseDown={onMouseDown}
       className="cursor-move group"
     >
-      {/* DOOR: Leaf + 90 degree swing arc */}
+      {/* 1. DOOR EMBEDDED INSIDE WALL (الباب يدخل داخل سماكة الحائط مع قوس فتح داخلي) */}
       {type === 'door' && (
         <g stroke={strokeColor} fill="none">
-          {/* Wall cutout background to clear wall */}
-          <rect x="0" y="-5" width={width} height={depth + 10} fill="#0f172a" stroke="none" />
-          {/* Door Frame */}
-          <line x1="0" y1="0" x2="0" y2={depth} strokeWidth="3" />
-          <line x1={width} y1="0" x2={width} y2={depth} strokeWidth="3" />
-          {/* Door Leaf (open at 90 deg) */}
-          <line x1="0" y1={depth} x2="0" y2={depth + width} strokeWidth="2.5" />
-          {/* Swing Arc */}
+          {/* Wall Cutout (Clears the wall thickness) */}
+          <rect x="0" y={-depth} width={width} height={depth} fill="#f1f5f9" stroke="none" />
+          
+          {/* Outer Wall Cutout Ticks / Jambs */}
+          <line x1="0" y1={-depth} x2="0" y2="0" stroke="#475569" strokeWidth="3" />
+          <line x1={width} y1={-depth} x2={width} y2="0" stroke="#475569" strokeWidth="3" />
+          <line x1="0" y1={-depth} x2={width} y2={-depth} stroke="#94a3b8" strokeWidth="1" strokeDasharray="3,3" />
+
+          {/* Door Threshold at inner wall line */}
+          <line x1="0" y1="0" x2={width} y2="0" stroke="#94a3b8" strokeWidth="1.5" />
+
+          {/* Door Leaf swinging into room from inner wall face */}
+          <line x1="0" y1="0" x2="0" y2={width} stroke="#10b981" strokeWidth="3" />
+
+          {/* 90-degree Swing Arc */}
           <path
-            d={`M 0,${depth + width} A ${width} ${width} 0 0 0 ${width},${depth}`}
-            strokeWidth="1.2"
-            strokeDasharray="3,3"
-            opacity="0.7"
+            d={`M 0,${width} A ${width} ${width} 0 0 0 ${width},0`}
+            stroke="#10b981"
+            strokeWidth="1.4"
+            strokeDasharray="4,3"
+            opacity="0.8"
           />
-          {/* Label */}
+
+          {/* Label inside Wall Pocket */}
           <text
             x={width / 2}
-            y={depth / 2}
+            y={-depth / 2}
             dominantBaseline="central"
             textAnchor="middle"
             fill="#10b981"
             fontSize="10"
             fontWeight="bold"
+            fontFamily="sans-serif"
           >
-            DOOR {formatDimension(width, unit)}
+            باب {formatDimension(width, unit)}
           </text>
         </g>
       )}
 
-      {/* WINDOW: Double glass line & Sill */}
+      {/* 2. WINDOW EMBEDDED INSIDE WALL (الشباك يدخل داخل سماكة الحائط مع زجاج وسيل) */}
       {type === 'window' && (
         <g stroke={strokeColor}>
-          <rect x="0" y="-5" width={width} height={depth + 10} fill="#0f172a" stroke="none" />
-          {/* Outer Wall Boundaries */}
-          <line x1="0" y1="0" x2="0" y2={depth} strokeWidth="3" />
-          <line x1={width} y1="0" x2={width} y2={depth} strokeWidth="3" />
-          {/* Glass lines */}
-          <line x1="0" y1={depth * 0.35} x2={width} y2={depth * 0.35} strokeWidth="1.5" stroke="#38bdf8" />
-          <line x1="0" y1={depth * 0.65} x2={width} y2={depth * 0.65} strokeWidth="1.5" stroke="#38bdf8" />
-          {/* Sill */}
-          <line x1="-10" y1={depth} x2={width + 10} y2={depth} strokeWidth="2" stroke="#e2e8f0" />
+          {/* Wall Cutout (Clears the wall thickness) */}
+          <rect x="0" y={-depth} width={width} height={depth} fill="#f1f5f9" stroke="none" />
+
+          {/* Window Jambs */}
+          <line x1="0" y1={-depth} x2="0" y2="0" stroke="#475569" strokeWidth="3" />
+          <line x1={width} y1={-depth} x2={width} y2="0" stroke="#475569" strokeWidth="3" />
+
+          {/* Outer Wall Boundary */}
+          <line x1="0" y1={-depth} x2={width} y2={-depth} stroke="#64748b" strokeWidth="2" />
+
+          {/* Double Glass Panes inside the wall aperture */}
+          <line x1="0" y1={-depth * 0.6} x2={width} y2={-depth * 0.6} strokeWidth="1.8" stroke="#38bdf8" />
+          <line x1="0" y1={-depth * 0.4} x2={width} y2={-depth * 0.4} strokeWidth="1.8" stroke="#38bdf8" />
+
+          {/* Interior Window Sill / Marble Edge */}
+          <line x1="-12" y1="0" x2={width + 12} y2="0" strokeWidth="3" stroke="#0284c7" />
+
+          {/* Label */}
           <text
             x={width / 2}
-            y={depth / 2}
+            y={-depth / 2}
             dominantBaseline="central"
             textAnchor="middle"
-            fill="#38bdf8"
+            fill="#0284c7"
             fontSize="9"
             fontWeight="bold"
+            fontFamily="sans-serif"
           >
-            WIN {formatDimension(width, unit)}
+            شباك {formatDimension(width, unit)}
           </text>
         </g>
       )}
 
-      {/* COLUMN: Cross-hatched structural pillar */}
+      {/* 3. COLUMN: Cross-hatched structural pillar */}
       {type === 'column' && (
         <g stroke={strokeColor}>
           <rect x="0" y="0" width={width} height={depth} fill="#334155" strokeWidth="2" />
@@ -103,13 +125,32 @@ export const ArchElementNode2D: React.FC<ArchElementNode2DProps> = ({
             fill="#ffffff"
             fontSize="9"
             fontWeight="bold"
+            fontFamily="sans-serif"
           >
-            COL
+            عمود
           </text>
         </g>
       )}
 
-      {/* PIPE: Circular plumbing / gas riser */}
+      {/* 4. BEAM: Drop Beam */}
+      {type === 'beam' && (
+        <g stroke="#eab308" fill="#713f12" opacity="0.85">
+          <rect x="0" y="0" width={width} height={depth} strokeWidth="1.5" strokeDasharray="4,2" />
+          <text
+            x={width / 2}
+            y={depth / 2}
+            dominantBaseline="central"
+            textAnchor="middle"
+            fill="#fde047"
+            fontSize="9"
+            fontWeight="bold"
+          >
+            كمرة ساقطة
+          </text>
+        </g>
+      )}
+
+      {/* 5. PIPE: Circular plumbing / gas riser */}
       {type === 'pipe' && (
         <g stroke="#ec4899" fill="#831843" opacity="0.9">
           <circle cx={width / 2} cy={depth / 2} r={Math.min(width, depth) / 2} strokeWidth="2" />
@@ -120,30 +161,29 @@ export const ArchElementNode2D: React.FC<ArchElementNode2DProps> = ({
             y={depth + 14}
             dominantBaseline="central"
             textAnchor="middle"
-            fill="#f472b6"
+            fill="#ec4899"
             fontSize="9"
             fontWeight="bold"
           >
-            PIPE ⌀{formatDimension(width, unit)}
+            ماسورة
           </text>
         </g>
       )}
 
-      {/* BEAM: Overhead beam with dashed borders */}
-      {type === 'beam' && (
-        <g stroke="#f59e0b" strokeDasharray="4,4" fill="none">
-          <rect x="0" y="0" width={width} height={depth} strokeWidth="1.5" />
-          <text
-            x={width / 2}
-            y={depth / 2}
-            dominantBaseline="central"
-            textAnchor="middle"
-            fill="#f59e0b"
-            fontSize="9"
-            fontWeight="bold"
-          >
-            BEAM (H:{formatDimension(height, unit)})
-          </text>
+      {/* Selection Glow Box */}
+      {isSelected && (
+        <g className="pointer-events-none">
+          <rect
+            x="-4"
+            y={isWallOpening ? -depth - 4 : -4}
+            width={width + 8}
+            height={isWallOpening ? depth + 8 : depth + 8}
+            fill="none"
+            stroke="#38bdf8"
+            strokeWidth="1.5"
+            strokeDasharray="4,4"
+            rx="4"
+          />
         </g>
       )}
     </g>
