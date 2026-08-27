@@ -24,6 +24,7 @@ import { ExportModal } from './components/modals/ExportModal';
 import { UserManagementModal } from './components/modals/UserManagementModal';
 import { ManufacturingSystemModal } from './components/modals/ManufacturingSystemModal';
 import { AdminSubscriptionDashboard } from './components/admin/AdminSubscriptionDashboard';
+import { SettingsModal } from './components/modals/SettingsModal';
 
 export const App: React.FC = () => {
   const { 
@@ -31,7 +32,9 @@ export const App: React.FC = () => {
     isManufacturingSystemModalOpen, 
     setIsManufacturingSystemModalOpen,
     isCustomKitchenModalOpen,
-    setIsCustomKitchenModalOpen
+    setIsCustomKitchenModalOpen,
+    isSettingsModalOpen,
+    setIsSettingsModalOpen
   } = useUIStore();
   const { isAuthenticated } = useAuthStore();
   const { isAdminModalOpen, setIsAdminModalOpen } = useSubscriptionStore();
@@ -50,6 +53,10 @@ export const App: React.FC = () => {
         <AdminSubscriptionDashboard
           isOpen={isAdminModalOpen}
           onClose={() => setIsAdminModalOpen(false)}
+        />
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
         />
       </div>
     );
@@ -102,6 +109,10 @@ export const App: React.FC = () => {
       <AdminSubscriptionDashboard
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}
+      />
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
       />
     </div>
   );

@@ -5,12 +5,12 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useSubscriptionStore } from '../../store/useSubscriptionStore';
 import { ActiveTab, ProjectType } from '../../types';
 import { TRANSLATIONS } from '../../utils/i18n';
+import { FileMenu } from './FileMenu';
 import { 
   Compass, 
   Box, 
   Layers, 
   FileText, 
-  FileSpreadsheet, 
   Scissors, 
   Calculator, 
   RotateCcw, 
@@ -19,19 +19,20 @@ import {
   PencilRuler, 
   Languages, 
   Check, 
-  LayoutTemplate,
-  Users,
-  LogOut,
-  CookingPot,
-  Shirt,
-  BedDouble,
-  BookOpen,
-  LayoutDashboard,
-  Settings2,
-  Building2,
+  Users, 
+  LogOut, 
+  CookingPot, 
+  Shirt, 
+  BedDouble, 
+  BookOpen, 
+  LayoutDashboard, 
+  Settings2, 
+  Building2, 
   Sparkles,
-  Sliders
+  Settings,
+  Save
 } from 'lucide-react';
+import { dbService } from '../../services/dbService';
 
 export const TopNavbar: React.FC = () => {
   const { project, updateMetadata, undo, redo, canUndo, canRedo } = useProjectStore();
@@ -46,13 +47,13 @@ export const TopNavbar: React.FC = () => {
     toggleUnit,
     setIsExportModalOpen,
     setIsRoomSketcherOpen,
-    setIsManufacturingSystemModalOpen,
     setIsCustomKitchenModalOpen,
-    setIsTemplateModalOpen,
+    setIsSettingsModalOpen,
   } = useUIStore();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [projectTitle, setProjectTitle] = useState(project.metadata.name);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const t = TRANSLATIONS[language];
   const projectType = project.metadata.projectType || 'kitchen';
@@ -62,60 +63,69 @@ export const TopNavbar: React.FC = () => {
     setIsEditingTitle(false);
   };
 
+  const handleQuickSave = async () => {
+    try {
+      const tenantId = currentUser?.username || 'admin';
+      await dbService.saveProjectForTenant(tenantId, project);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const getModuleBadge = (type: ProjectType) => {
     switch (type) {
       case 'kitchen':
-        return { label: 'تصميم المطابخ', icon: <CookingPot size={13} />, color: 'bg-blue-50 text-blue-700 border-blue-200' };
+        return { label: 'مطابخ', icon: <CookingPot size={13} />, color: 'bg-blue-50 text-blue-700 border-blue-200' };
       case 'dressing':
-        return { label: 'الدريسينج روم', icon: <Shirt size={13} />, color: 'bg-amber-50 text-amber-700 border-amber-200' };
+        return { label: 'دريسينج', icon: <Shirt size={13} />, color: 'bg-amber-50 text-amber-700 border-amber-200' };
       case 'bedroom':
-        return { label: 'أثاث غرف النوم', icon: <BedDouble size={13} />, color: 'bg-purple-50 text-purple-700 border-purple-200' };
+        return { label: 'غرف نوم', icon: <BedDouble size={13} />, color: 'bg-purple-50 text-purple-700 border-purple-200' };
       case 'library':
-        return { label: 'المكتبات ووحدات الشاشة', icon: <BookOpen size={13} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+        return { label: 'مكتبات', icon: <BookOpen size={13} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
       default:
-        return { label: 'تصميم المطابخ', icon: <CookingPot size={13} />, color: 'bg-blue-50 text-blue-700 border-blue-200' };
+        return { label: 'مطابخ', icon: <CookingPot size={13} />, color: 'bg-blue-50 text-blue-700 border-blue-200' };
     }
   };
 
   const moduleInfo = getModuleBadge(projectType);
 
-  const designTabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
+  const mainTabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: '2d-plan', label: t.plan2D, icon: <Compass size={14} /> },
     { id: '3d-view', label: t.view3D, icon: <Box size={14} /> },
     { id: 'elevations', label: t.elevations, icon: <Layers size={14} /> },
     { id: 'technical-drawings', label: t.blueprint, icon: <FileText size={14} /> },
-  ];
-
-  const factoryTabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'manufacturing-bom', label: 'تقطيع الألواح والأعواد', icon: <Scissors size={14} /> },
-    { id: 'cabinet-schedule', label: t.schedule, icon: <FileSpreadsheet size={14} /> },
-    { id: 'pricing-calculator', label: t.pricingCalculator, icon: <Calculator size={14} /> },
+    { id: 'manufacturing-bom', label: 'التقطيع والتسعير', icon: <Scissors size={14} /> },
   ];
 
   return (
     <header className="h-14 bg-white border-b border-slate-200 px-3 md:px-4 flex items-center justify-between z-30 shadow-xs select-none font-sans">
-      {/* Brand & Project Info */}
-      <div className="flex items-center gap-2.5">
+      {/* LEFT SECTION: Brand, File Menu & Project Name */}
+      <div className="flex items-center gap-2">
         {/* Back to Projects Dashboard */}
         <button
           onClick={() => setActiveTab('dashboard')}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200 shadow-xs"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200"
           title="العودة لصفحة الأقسام والمشاريع"
         >
           <LayoutDashboard size={14} className="text-blue-600" />
-          <span className="hidden sm:inline">لوحة المشاريع</span>
+          <span className="hidden md:inline">المشاريع</span>
         </button>
 
-        <div className="h-4 w-[1px] bg-slate-200" />
+        {/* 1. THE FILE MENU (ملف) */}
+        <FileMenu />
+
+        <div className="h-4 w-[1px] bg-slate-200 hidden sm:block" />
 
         {/* Current Module Badge */}
-        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border shadow-xs ${moduleInfo.color}`}>
+        <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border shadow-xs ${moduleInfo.color}`}>
           {moduleInfo.icon}
-          <span className="hidden sm:inline">{moduleInfo.label}</span>
+          <span>{moduleInfo.label}</span>
         </div>
 
         {/* Editable Title */}
-        <div className="flex items-center gap-1.5 ml-1">
+        <div className="flex items-center gap-1.5">
           {isEditingTitle ? (
             <div className="flex items-center gap-1">
               <input
@@ -134,7 +144,7 @@ export const TopNavbar: React.FC = () => {
           ) : (
             <div
               onClick={() => setIsEditingTitle(true)}
-              className="text-xs font-black text-slate-800 hover:text-blue-600 cursor-pointer truncate max-w-[150px] lg:max-w-[200px]"
+              className="text-xs font-black text-slate-800 hover:text-blue-600 cursor-pointer truncate max-w-[130px] lg:max-w-[180px]"
               title="انقر لتعديل اسم المشروع"
             >
               {project.metadata.name}
@@ -143,7 +153,7 @@ export const TopNavbar: React.FC = () => {
         </div>
 
         {/* Undo / Redo */}
-        <div className="flex items-center gap-0.5 text-slate-500">
+        <div className="hidden lg:flex items-center gap-0.5 text-slate-500">
           <button
             onClick={undo}
             disabled={!canUndo}
@@ -163,93 +173,83 @@ export const TopNavbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Navigation Tabs Grouped Sleekly */}
-      <div className="flex items-center gap-2">
-        {/* Design Views Group */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 gap-0.5">
-          {designTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                  isActive
-                    ? 'bg-white text-blue-600 shadow-xs border border-slate-200/60'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                {tab.icon}
-                <span className="hidden xl:inline">{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
+      {/* CENTER SECTION: Ultra-Clean Segmented Views Bar */}
+      <nav className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200/80 gap-1">
+        {mainTabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                isActive
+                  ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              {tab.icon}
+              <span className="hidden sm:inline">{tab.label}</span>
+            </button>
+          );
+        })}
+      </nav>
 
-        {/* Factory & Costing Group */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 gap-0.5">
-          {factoryTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                  isActive
-                    ? 'bg-white text-emerald-600 shadow-xs border border-slate-200/60'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                {tab.icon}
-                <span className="hidden xl:inline">{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Actions Right Toolbar */}
+      {/* RIGHT SECTION: Quick Actions */}
       <div className="flex items-center gap-1.5">
-        {/* Custom Kitchen / Unit Builder Action */}
+        {/* Custom Kitchen / Unit Builder */}
         <button
           onClick={() => setIsCustomKitchenModalOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-extrabold shadow-sm transition transform active:scale-95"
           title="مصمم الوحدات والمطابخ المخصص"
         >
           <Sparkles size={14} />
-          <span className="hidden lg:inline">مطابخ كاستوم</span>
+          <span className="hidden xl:inline">مطابخ كاستوم</span>
         </button>
 
-        {/* Manufacturing Systems & Profiles */}
+        {/* Quick Save */}
         <button
-          onClick={() => setIsManufacturingSystemModalOpen(true)}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition border border-slate-200"
-          title="قواعد وأنظمة التصنيع والقطاعات"
+          onClick={handleQuickSave}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+            saveSuccess
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+          }`}
+          title="حفظ المشروع"
         >
-          <Settings2 size={14} className="text-blue-600" />
-          <span className="hidden 2xl:inline">أنظمة التصنيع</span>
+          {saveSuccess ? <Check size={14} /> : <Save size={14} />}
+          <span className="hidden lg:inline">{saveSuccess ? 'تم الحفظ' : 'حفظ'}</span>
         </button>
 
-        {/* Super Admin Subscription Dashboard */}
+        {/* Export Technical Package */}
+        <button
+          onClick={() => setIsExportModalOpen(true)}
+          className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-sm transition"
+          title="تصدير المخططات الهندسية والـ PDF"
+        >
+          <Download size={14} />
+          <span className="hidden sm:inline">تصدير</span>
+        </button>
+
+        {/* Comprehensive Settings Modal */}
+        <button
+          onClick={() => setIsSettingsModalOpen(true)}
+          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition border border-slate-200"
+          title="إعدادات المشروع والتصنيع"
+        >
+          <Settings size={14} className="text-slate-700" />
+        </button>
+
+        {/* Super Admin Licenses */}
         {currentUser?.role === 'admin' && (
           <button
             onClick={() => setIsAdminModalOpen(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
+            className="hidden 2xl:flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
             title="لوحة تحكم الاشتراكات والشركات"
           >
             <Building2 size={14} />
-            <span className="hidden 2xl:inline">الاشتراكات</span>
+            <span>الاشتراكات</span>
           </button>
         )}
-
-        {/* Room Sketcher */}
-        <button
-          onClick={() => setIsRoomSketcherOpen(true)}
-          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition border border-slate-200"
-          title="رسم وتعديل أبعاد الغرفة"
-        >
-          <PencilRuler size={14} className="text-indigo-600" />
-        </button>
 
         {/* Unit Toggle mm / cm */}
         <button
@@ -259,15 +259,6 @@ export const TopNavbar: React.FC = () => {
         >
           <span className={`px-1.5 py-0.5 rounded-lg ${unit === 'mm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>مم</span>
           <span className={`px-1.5 py-0.5 rounded-lg ${unit === 'cm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>سم</span>
-        </button>
-
-        {/* Export Technical Package Modal */}
-        <button
-          onClick={() => setIsExportModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-sm transition"
-        >
-          <Download size={14} />
-          <span className="hidden sm:inline">{t.exportPackage}</span>
         </button>
 
         {/* User Account */}

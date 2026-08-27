@@ -69,6 +69,8 @@ interface UIState {
   setIsTemplateModalOpen: (open: boolean) => void;
   isManufacturingSystemModalOpen: boolean;
   setIsManufacturingSystemModalOpen: (open: boolean) => void;
+  isSettingsModalOpen: boolean;
+  setIsSettingsModalOpen: (open: boolean) => void;
 }
 
 const savedLang = (localStorage.getItem('kitchan_lang') as Language) || 'ar';
@@ -159,4 +161,6 @@ export const useUIStore = create<UIState>((set) => ({
   setIsTemplateModalOpen: (isTemplateModalOpen) => set({ isTemplateModalOpen }),
   isManufacturingSystemModalOpen: false,
   setIsManufacturingSystemModalOpen: (isManufacturingSystemModalOpen) => set({ isManufacturingSystemModalOpen }),
+  isSettingsModalOpen: false,
+  setIsSettingsModalOpen: (isSettingsModalOpen) => set({ isSettingsModalOpen }),
 }));
