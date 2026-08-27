@@ -35,9 +35,20 @@ export const App: React.FC = () => {
     return <LoginScreen />;
   }
 
+  // If on projects dashboard (landing page), render only full screen dashboard without the top navbar
+  if (activeTab === 'dashboard') {
+    return (
+      <div className="w-screen h-screen overflow-hidden bg-slate-900 font-sans">
+        <ProjectDashboard />
+        <UserManagementModal />
+      </div>
+    );
+  }
+
+  // Inside Workspace: Render full Top Navbar, Workspace, Sidebars, and Status Bar
   return (
     <div className="flex flex-col w-screen h-screen bg-slate-100 text-slate-900 overflow-hidden font-sans">
-      {/* Top Navbar */}
+      {/* Top Navbar (Only visible inside workspace) */}
       <TopNavbar />
 
       {/* Main Workspace Layout */}
@@ -47,7 +58,6 @@ export const App: React.FC = () => {
 
         {/* Center Workspace */}
         <main className="flex-1 h-full relative overflow-hidden bg-slate-100">
-          {activeTab === 'dashboard' && <ProjectDashboard />}
           {activeTab === '2d-plan' && <Canvas2D />}
           {activeTab === '3d-view' && <Canvas3D />}
           {activeTab === 'elevations' && <ElevationViewer />}

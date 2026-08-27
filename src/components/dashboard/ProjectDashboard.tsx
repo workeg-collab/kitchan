@@ -1,6 +1,7 @@
 import React from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { ProjectType } from '../../types';
 import { 
   SAMPLE_PROJECT_KITCHEN, 
@@ -13,12 +14,14 @@ import {
   Shirt, 
   BedDouble, 
   BookOpen, 
-  ArrowLeft 
+  LogOut,
+  Users
 } from 'lucide-react';
 
 export const ProjectDashboard: React.FC = () => {
   const { loadSampleProject } = useProjectStore();
   const { setActiveTab } = useUIStore();
+  const { currentUser, logout, setIsUserModalOpen } = useAuthStore();
 
   const modules: {
     id: ProjectType;
@@ -85,8 +88,44 @@ export const ProjectDashboard: React.FC = () => {
         <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[3px]" />
       </div>
 
+      {/* Top Floating Discreet User Header (No white bar) */}
+      <div className="absolute top-6 inset-x-6 flex items-center justify-between z-20">
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg">
+            <span className="font-mono font-black text-white text-sm">FC</span>
+          </div>
+          <span className="font-bold text-base tracking-tight text-white drop-shadow">
+            فرنتشر كاد <span className="text-blue-400 font-extrabold">برو</span>
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsUserModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/30 rounded-xl text-xs font-bold transition shadow-md"
+            title="إدارة المستخدمين"
+          >
+            <Users size={14} />
+            <span>{currentUser?.username || 'admin'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (window.confirm('هل تريد تسجيل الخروج؟')) {
+                logout();
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white backdrop-blur-md border border-red-400/40 rounded-xl text-xs font-bold transition shadow-md"
+            title="تسجيل الخروج"
+          >
+            <LogOut size={14} />
+            <span>خروج</span>
+          </button>
+        </div>
+      </div>
+
       {/* 2. Main Center Content Container */}
-      <div className="relative z-10 max-w-5xl w-full flex flex-col items-center text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
+      <div className="relative z-10 max-w-5xl w-full flex flex-col items-center text-center space-y-8 animate-in fade-in zoom-in-95 duration-500 mt-6">
         {/* Header Title */}
         <div className="space-y-2 text-white">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold shadow-lg">
