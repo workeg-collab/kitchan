@@ -1,5 +1,7 @@
 import React from 'react';
 import { useUIStore } from './store/useUIStore';
+import { useAuthStore } from './store/useAuthStore';
+import { LoginScreen } from './components/auth/LoginScreen';
 import { TopNavbar } from './components/layout/TopNavbar';
 import { StatusBar } from './components/layout/StatusBar';
 import { LeftSidebar } from './components/layout/LeftSidebar';
@@ -16,9 +18,16 @@ import { RoomSketcherModal } from './components/modals/RoomSketcherModal';
 import { CustomCabinetModal } from './components/modals/CustomCabinetModal';
 import { TemplateModal } from './components/modals/TemplateModal';
 import { ExportModal } from './components/modals/ExportModal';
+import { UserManagementModal } from './components/modals/UserManagementModal';
 
 export const App: React.FC = () => {
   const { activeTab } = useUIStore();
+  const { isAuthenticated } = useAuthStore();
+
+  // If not authenticated, show login screen
+  if (!isAuthenticated) {
+    return <LoginScreen />;
+  }
 
   return (
     <div className="flex flex-col w-screen h-screen bg-slate-100 text-slate-900 overflow-hidden font-sans">
@@ -54,6 +63,7 @@ export const App: React.FC = () => {
       <CustomCabinetModal />
       <TemplateModal />
       <ExportModal />
+      <UserManagementModal />
     </div>
   );
 };

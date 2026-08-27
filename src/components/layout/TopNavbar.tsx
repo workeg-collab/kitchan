@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { ActiveTab } from '../../types';
 import { TRANSLATIONS } from '../../utils/i18n';
 import { 
@@ -17,11 +18,15 @@ import {
   PencilRuler, 
   Languages, 
   Check, 
-  LayoutTemplate 
+  LayoutTemplate,
+  Users,
+  LogOut,
+  UserCheck
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
   const { project, updateMetadata, undo, redo, canUndo, canRedo } = useProjectStore();
+  const { currentUser, setIsUserModalOpen, logout } = useAuthStore();
   const {
     activeTab,
     setActiveTab,
@@ -56,7 +61,7 @@ export const TopNavbar: React.FC = () => {
   return (
     <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 select-none z-30 relative shadow-sm">
       {/* Brand & Project Name */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
             <span className="font-mono font-black text-white text-sm tracking-tighter">KC</span>
@@ -77,7 +82,7 @@ export const TopNavbar: React.FC = () => {
               onChange={(e) => setTempTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle()}
               autoFocus
-              className="px-2.5 py-1 bg-slate-50 border border-blue-500 rounded-md text-xs text-slate-900 focus:outline-none w-48 font-semibold"
+              className="px-2.5 py-1 bg-slate-50 border border-blue-500 rounded-md text-xs text-slate-900 focus:outline-none w-44 font-semibold"
             />
             <button
               onClick={handleSaveTitle}
@@ -92,7 +97,7 @@ export const TopNavbar: React.FC = () => {
               setTempTitle(project.metadata.name);
               setIsEditingTitle(true);
             }}
-            className="text-xs font-semibold text-slate-700 hover:text-blue-600 px-2 py-1 rounded hover:bg-slate-100 transition max-w-[200px] truncate"
+            className="text-xs font-semibold text-slate-700 hover:text-blue-600 px-2 py-1 rounded hover:bg-slate-100 transition max-w-[160px] truncate"
             title="انقر لتعديل اسم المشروع"
           >
             {project.metadata.name}
@@ -147,14 +152,27 @@ export const TopNavbar: React.FC = () => {
 
       {/* Actions & Settings Right Toolbar */}
       <div className="flex items-center gap-2">
+        {/* User Management & Profile Button */}
+        <button
+          onClick={() => setIsUserModalOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition border border-blue-200 shadow-xs"
+          title="إدارة وإضافة مستخدمين جدد للنظام"
+        >
+          <Users size={15} className="text-blue-600" />
+          <span className="hidden md:inline">{currentUser?.username || 'admin'}</span>
+          <span className="text-[10px] bg-blue-200/70 text-blue-900 px-1 py-0.2 rounded font-mono font-bold hidden sm:inline">
+            +مستخدم
+          </span>
+        </button>
+
         {/* Language Switcher */}
         <button
           onClick={toggleLanguage}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition border border-slate-200"
+          className="flex items-center gap-1.5 px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition border border-slate-200"
           title="تغيير اللغة"
         >
           <Languages size={14} className="text-blue-600" />
-          <span>{language === 'ar' ? 'English' : 'العربية'}</span>
+          <span className="hidden sm:inline">{language === 'ar' ? 'EN' : 'عربي'}</span>
         </button>
 
         {/* Unit Toggle mm / cm */}
@@ -163,14 +181,14 @@ export const TopNavbar: React.FC = () => {
           className="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-0.5 text-xs font-mono font-bold text-slate-700 transition"
           title="تبديل وحدة القياس"
         >
-          <span className={`px-2 py-1 rounded ${unit === 'mm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>مم</span>
-          <span className={`px-2 py-1 rounded ${unit === 'cm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>سم</span>
+          <span className={`px-1.5 py-0.5 rounded ${unit === 'mm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>مم</span>
+          <span className={`px-1.5 py-0.5 rounded ${unit === 'cm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>سم</span>
         </button>
 
         {/* Room Sketcher */}
         <button
           onClick={() => setIsRoomSketcherOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
           title="رسم وتعديل أبعاد الغرفة"
         >
           <PencilRuler size={14} className="text-indigo-600" />
@@ -180,7 +198,7 @@ export const TopNavbar: React.FC = () => {
         {/* Templates */}
         <button
           onClick={() => setIsTemplateModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
           title="نماذج جاهزة"
         >
           <LayoutTemplate size={14} />
@@ -190,10 +208,23 @@ export const TopNavbar: React.FC = () => {
         {/* Export Technical Package Modal */}
         <button
           onClick={() => setIsExportModalOpen(true)}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold shadow-md shadow-blue-600/20 transition"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold shadow-md shadow-blue-600/20 transition"
         >
-          <Download size={15} />
+          <Download size={14} />
           <span>{t.exportPackage}</span>
+        </button>
+
+        {/* Logout Button */}
+        <button
+          onClick={() => {
+            if (window.confirm('هل تريد تسجيل الخروج؟')) {
+              logout();
+            }
+          }}
+          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+          title="تسجيل الخروج"
+        >
+          <LogOut size={16} />
         </button>
       </div>
     </header>
