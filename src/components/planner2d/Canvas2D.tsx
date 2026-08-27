@@ -6,7 +6,7 @@ import { ApplianceNode2D } from './ApplianceNode2D';
 import { ArchElementNode2D } from './ArchElementNode2D';
 import { DimensionLine } from './DimensionLine';
 import { calculateSnap, calculateAisleClearance } from '../../utils/cadGeometry';
-import { formatDimension } from '../../utils/unitConversion';
+import { formatDimension, convertMmToUnit, convertUnitToMm } from '../../utils/unitConversion';
 import { TRANSLATIONS } from '../../utils/i18n';
 import { 
   ZoomIn, 
@@ -18,7 +18,8 @@ import {
   Grid, 
   Ruler, 
   Eye,
-  PencilRuler
+  PencilRuler,
+  X
 } from 'lucide-react';
 
 export const Canvas2D: React.FC = () => {
@@ -608,6 +609,129 @@ export const Canvas2D: React.FC = () => {
           )}
         </g>
       </svg>
+
+      {/* Floating Direct Quick Dimension Editor Pill (Direct On-Canvas Editing) */}
+      {(selectedCabinet || selectedAppliance || selectedElement) && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md border border-slate-300 shadow-xl px-4 py-2 rounded-2xl flex items-center gap-3 z-30 animate-in fade-in slide-in-from-top-2 text-xs select-none">
+          <div className="flex items-center gap-1.5 font-bold text-slate-800">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+            <span>
+              {selectedCabinet?.name || selectedAppliance?.name || selectedElement?.name}
+            </span>
+          </div>
+
+          <div className="h-4 w-[1px] bg-slate-200" />
+
+          {/* Quick Editable Inputs for Width, Height, Depth */}
+          {selectedCabinet && (
+            <div className="flex items-center gap-2 font-mono">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">W:</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={convertMmToUnit(selectedCabinet.width, unit)}
+                  onChange={(e) => updateCabinet(selectedCabinet.id, { width: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-blue-600 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">H:</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={convertMmToUnit(selectedCabinet.height, unit)}
+                  onChange={(e) => updateCabinet(selectedCabinet.id, { height: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-slate-800 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">D:</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={convertMmToUnit(selectedCabinet.depth, unit)}
+                  onChange={(e) => updateCabinet(selectedCabinet.id, { depth: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-slate-800 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 font-bold">{unit}</span>
+            </div>
+          )}
+
+          {selectedAppliance && (
+            <div className="flex items-center gap-2 font-mono">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">W:</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={convertMmToUnit(selectedAppliance.width, unit)}
+                  onChange={(e) => updateAppliance(selectedAppliance.id, { width: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-amber-600 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">H:</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={convertMmToUnit(selectedAppliance.height, unit)}
+                  onChange={(e) => updateAppliance(selectedAppliance.id, { height: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-slate-800 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">D:</span>
+                <input
+                  type="number"
+                  min={50}
+                  value={convertMmToUnit(selectedAppliance.depth, unit)}
+                  onChange={(e) => updateAppliance(selectedAppliance.id, { depth: Math.max(50, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-slate-800 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 font-bold">{unit}</span>
+            </div>
+          )}
+
+          {selectedElement && (
+            <div className="flex items-center gap-2 font-mono">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">W:</span>
+                <input
+                  type="number"
+                  min={100}
+                  value={convertMmToUnit(selectedElement.width, unit)}
+                  onChange={(e) => updateElement(selectedElement.id, { width: Math.max(100, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-emerald-600 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 font-bold">H:</span>
+                <input
+                  type="number"
+                  min={100}
+                  value={convertMmToUnit(selectedElement.height, unit)}
+                  onChange={(e) => updateElement(selectedElement.id, { height: Math.max(100, convertUnitToMm(Number(e.target.value), unit)) })}
+                  className="w-16 px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-bold text-slate-800 focus:bg-white focus:outline-none text-center"
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 font-bold">{unit}</span>
+            </div>
+          )}
+
+          <button
+            onClick={clearSelection}
+            className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700 transition"
+            title="إلغاء التحديد"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

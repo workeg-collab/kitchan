@@ -272,6 +272,36 @@ export const LeftSidebar: React.FC = () => {
       {/* --- APPLIANCES & SCREENS TAB --- */}
       {activeCatalogTab === 'appliances' && (
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2.5">
+          {/* Custom Appliance Builder Banner */}
+          <button
+            onClick={() => {
+              addAppliance({
+                name: 'جهاز / شاشة بمقاسات مخصصة',
+                type: 'tv-screen',
+                width: 600,
+                height: 850,
+                depth: 600,
+                x: 1200,
+                y: 0,
+                z: 0,
+                rotation: 0,
+                wallId: 'wall-a',
+                finish: 'stainless',
+                customNotes: 'جهاز تم تخصيص مقاساته يدوياً',
+              });
+            }}
+            className="w-full flex items-center justify-between p-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl hover:border-amber-400 transition group shadow-sm text-right"
+          >
+            <div className="flex items-center gap-2">
+              <Plus size={16} className="text-amber-600 group-hover:rotate-90 transition" />
+              <div>
+                <div className="text-xs font-bold text-slate-900">إضافة جهاز أو شاشة بمقاس حر</div>
+                <div className="text-[10px] text-slate-500">تعديل العرض والارتفاع والعمق يدوياً</div>
+              </div>
+            </div>
+            <Tv size={16} className="text-amber-600" />
+          </button>
+
           {APPLIANCE_LIBRARY.map((template, idx) => (
             <div
               key={idx}
