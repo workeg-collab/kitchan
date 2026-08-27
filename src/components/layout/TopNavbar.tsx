@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { ActiveTab } from '../../types';
+import { ActiveTab, ProjectType } from '../../types';
 import { TRANSLATIONS } from '../../utils/i18n';
 import { 
   Compass, 
@@ -21,7 +21,11 @@ import {
   LayoutTemplate,
   Users,
   LogOut,
-  UserCheck
+  CookingPot,
+  Shirt,
+  BedDouble,
+  BookOpen,
+  LayoutDashboard
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
@@ -40,35 +44,63 @@ export const TopNavbar: React.FC = () => {
   } = useUIStore();
 
   const t = TRANSLATIONS[language];
+  const projectType = project.metadata.projectType || 'kitchen';
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(project.metadata.name);
 
   const handleSaveTitle = () => {
-    updateMetadata({ name: tempTitle.trim() || 'تصميم مطبخ جديد' });
+    updateMetadata({ name: tempTitle.trim() || 'مشروع تصميم جديد' });
     setIsEditingTitle(false);
   };
 
+  const getModuleBadge = (type: ProjectType) => {
+    switch (type) {
+      case 'dressing':
+        return { label: 'دريسنج روم', icon: <Shirt size={13} />, color: 'bg-amber-50 text-amber-800 border-amber-200' };
+      case 'bedroom':
+        return { label: 'غرف نوم', icon: <BedDouble size={13} />, color: 'bg-purple-50 text-purple-800 border-purple-200' };
+      case 'library':
+        return { label: 'مكتبات وشاشات', icon: <BookOpen size={13} />, color: 'bg-emerald-50 text-emerald-800 border-emerald-200' };
+      case 'kitchen':
+      default:
+        return { label: 'مطابخ', icon: <CookingPot size={13} />, color: 'bg-blue-50 text-blue-800 border-blue-200' };
+    }
+  };
+
+  const moduleInfo = getModuleBadge(projectType);
+
   const navTabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
-    { id: '2d-plan', label: t.plan2D, icon: <Compass size={16} /> },
-    { id: '3d-view', label: t.view3D, icon: <Box size={16} /> },
-    { id: 'elevations', label: t.elevations, icon: <Layers size={16} /> },
-    { id: 'technical-drawings', label: t.blueprint, icon: <FileText size={16} /> },
-    { id: 'cabinet-schedule', label: t.schedule, icon: <FileSpreadsheet size={16} /> },
-    { id: 'manufacturing-bom', label: t.manufacturing, icon: <Scissors size={16} /> },
-    { id: 'pricing-calculator', label: language === 'ar' ? 'حاسبة الأمتار والتسعير' : 'Pricing & Meters', icon: <Calculator size={16} /> },
+    { id: 'dashboard', label: 'لوحة المشاريع', icon: <LayoutDashboard size={15} /> },
+    { id: '2d-plan', label: t.plan2D, icon: <Compass size={15} /> },
+    { id: '3d-view', label: t.view3D, icon: <Box size={15} /> },
+    { id: 'elevations', label: t.elevations, icon: <Layers size={15} /> },
+    { id: 'technical-drawings', label: t.blueprint, icon: <FileText size={15} /> },
+    { id: 'cabinet-schedule', label: t.schedule, icon: <FileSpreadsheet size={15} /> },
+    { id: 'manufacturing-bom', label: t.manufacturing, icon: <Scissors size={15} /> },
+    { id: 'pricing-calculator', label: t.pricingCalculator, icon: <Calculator size={15} /> },
   ];
 
   return (
     <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 select-none z-30 relative shadow-sm">
-      {/* Brand & Project Name */}
+      {/* Brand & Project Info */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
-            <span className="font-mono font-black text-white text-sm tracking-tighter">KC</span>
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className="flex items-center gap-2 group text-left"
+          title="العودة للوحة الأقسام والمشاريع"
+        >
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition">
+            <span className="font-mono font-black text-white text-sm tracking-tighter">FC</span>
           </div>
           <span className="font-bold text-sm tracking-tight text-slate-900 hidden md:inline">
-            {language === 'ar' ? 'كيتشن كاد' : 'KITCHEN'}<span className="text-blue-600 font-extrabold">{language === 'ar' ? ' برو' : 'CAD PRO'}</span>
+            فرنتشر كاد <span className="text-blue-600 font-extrabold">برو</span>
           </span>
+        </button>
+
+        {/* Module Badge */}
+        <div className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${moduleInfo.color}`}>
+          {moduleInfo.icon}
+          <span>{moduleInfo.label}</span>
         </div>
 
         <div className="h-5 w-[1px] bg-slate-200 hidden sm:block" />
@@ -82,7 +114,7 @@ export const TopNavbar: React.FC = () => {
               onChange={(e) => setTempTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle()}
               autoFocus
-              className="px-2.5 py-1 bg-slate-50 border border-blue-500 rounded-md text-xs text-slate-900 focus:outline-none w-44 font-semibold"
+              className="px-2.5 py-1 bg-slate-50 border border-blue-500 rounded-md text-xs text-slate-900 focus:outline-none w-40 font-semibold"
             />
             <button
               onClick={handleSaveTitle}
@@ -97,7 +129,7 @@ export const TopNavbar: React.FC = () => {
               setTempTitle(project.metadata.name);
               setIsEditingTitle(true);
             }}
-            className="text-xs font-semibold text-slate-700 hover:text-blue-600 px-2 py-1 rounded hover:bg-slate-100 transition max-w-[160px] truncate"
+            className="text-xs font-semibold text-slate-700 hover:text-blue-600 px-2 py-1 rounded hover:bg-slate-100 transition max-w-[150px] truncate"
             title="انقر لتعديل اسم المشروع"
           >
             {project.metadata.name}
@@ -114,7 +146,7 @@ export const TopNavbar: React.FC = () => {
             }`}
             title="تراجع"
           >
-            <RotateCcw size={15} />
+            <RotateCcw size={14} />
           </button>
           <button
             onClick={redo}
@@ -124,7 +156,7 @@ export const TopNavbar: React.FC = () => {
             }`}
             title="إعادة"
           >
-            <RotateCw size={15} />
+            <RotateCw size={14} />
           </button>
         </div>
       </div>
@@ -150,15 +182,15 @@ export const TopNavbar: React.FC = () => {
         })}
       </nav>
 
-      {/* Actions & Settings Right Toolbar */}
+      {/* Actions Right Toolbar */}
       <div className="flex items-center gap-2">
-        {/* User Management & Profile Button */}
+        {/* User Management */}
         <button
           onClick={() => setIsUserModalOpen(true)}
           className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition border border-blue-200 shadow-xs"
-          title="إدارة وإضافة مستخدمين جدد للنظام"
+          title="إدارة المستخدمين"
         >
-          <Users size={15} className="text-blue-600" />
+          <Users size={14} className="text-blue-600" />
           <span className="hidden md:inline">{currentUser?.username || 'admin'}</span>
           <span className="text-[10px] bg-blue-200/70 text-blue-900 px-1 py-0.2 rounded font-mono font-bold hidden sm:inline">
             +مستخدم
@@ -214,7 +246,7 @@ export const TopNavbar: React.FC = () => {
           <span>{t.exportPackage}</span>
         </button>
 
-        {/* Logout Button */}
+        {/* Logout */}
         <button
           onClick={() => {
             if (window.confirm('هل تريد تسجيل الخروج؟')) {

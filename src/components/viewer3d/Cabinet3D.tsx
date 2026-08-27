@@ -1,15 +1,16 @@
 import React, { useRef } from 'react';
-import { CabinetItem, MaterialFinishes, CountertopConfig, PlinthConfig } from '../../types';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { CabinetItem, MaterialFinishes, CountertopConfig, PlinthConfig } from '../../types';
 
 interface Cabinet3DProps {
   cabinet: CabinetItem;
   materials: MaterialFinishes;
   countertop: CountertopConfig;
   plinth: PlinthConfig;
-  isOpenDoors: boolean;
-  isSelected: boolean;
-  onSelect: () => void;
+  isOpenDoors?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
 export const Cabinet3D: React.FC<Cabinet3DProps> = ({
@@ -17,243 +18,198 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
   materials,
   countertop,
   plinth,
-  isOpenDoors,
-  isSelected,
+  isOpenDoors = false,
+  isSelected = false,
   onSelect,
 }) => {
-  const {
-    id,
-    category,
-    type,
-    width,
-    height,
-    depth,
-    x,
-    y,
-    z,
-    rotation,
-    shelfCount,
-    doorCount,
-    drawerCount,
-    doorHinge,
-    isOpen: itemIsOpen,
-  } = cabinet;
+  const groupRef = useRef<THREE.Group>(null);
+  const leftDoorRef = useRef<THREE.Group>(null);
+  const rightDoorRef = useRef<THREE.Group>(null);
 
-  const openState = isOpenDoors || !!itemIsOpen;
+  const W = cabinet.width / 1000;
+  const H = cabinet.height / 1000;
+  const D = cabinet.depth / 1000;
+  const X = (cabinet.x + cabinet.width / 2) / 1000;
+  const Y = (cabinet.z + cabinet.height / 2) / 1000;
+  const Z = (cabinet.y + cabinet.depth / 2) / 1000;
 
-  // Scale mm to 3D Three.js units (1 unit = 1 meter = 1000 mm)
-  const W = width / 1000;
-  const H = height / 1000;
-  const D = depth / 1000;
-  const posX = (x + width / 2) / 1000;
-  const posZ = (y + depth / 2) / 1000; // Y in 2D is Z in Three.js
-  const posY = (z + height / 2) / 1000;
+  const isBed = cabinet.category === 'bed' || cabinet.type.startsWith('bed-');
+  const isNightstand = cabinet.category === 'nightstand';
+  const isDresser = cabinet.category === 'dresser';
+  const isWardrobe = cabinet.category === 'wardrobe' || cabinet.category === 'closet-internals';
+  const isLibrary = cabinet.category === 'library-full' || cabinet.category === 'bookshelf' || cabinet.category === 'tv-media';
+  const isKitchenBase = cabinet.category === 'base';
 
-  const rotRad = (-rotation * Math.PI) / 180;
-  const boardT = 0.018; // 18mm carcase
+  // Smooth Door Opening Animation
+  useFrame((_, delta) => {
+    const targetAngle = isOpenDoors ? Math.PI / 2.2 : 0;
+    if (leftDoorRef.current) {
+      leftDoorRef.current.rotation.y = THREE.MathUtils.damp(leftDoorRef.current.rotation.y, -targetAngle, 6, delta);
+    }
+    if (rightDoorRef.current) {
+      rightDoorRef.current.rotation.y = THREE.MathUtils.damp(rightDoorRef.current.rotation.y, targetAngle, 6, delta);
+    }
+  });
 
-  // Material Colors
-  const frontColor = materials.frontColor || '#f8fafc';
-  const carcassColor = materials.bodyColor || '#cbd5e1';
-  const worktopColor = materials.countertopColor || '#f8fafc';
-  const handleColor = materials.handleColor || '#09090b';
-
-  const isWall = category === 'wall';
-  const isTall = category === 'tall';
-  const isBase = category === 'base' || category === 'corner';
+  const bodyColor = cabinet.materialBody || materials.bodyColor || '#cbd5e1';
+  const frontColor = cabinet.materialFront || materials.frontColor || '#f8fafc';
+  const topColor = materials.countertopColor || '#f8fafc';
+  const selectionHighlight = isSelected ? '#3b82f6' : undefined;
 
   return (
     <group
-      position={[posX, posY, posZ]}
-      rotation={[0, rotRad, 0]}
+      ref={groupRef}
+      position={[X, Y, Z]}
+      rotation={[0, (-cabinet.rotation * Math.PI) / 180, 0]}
       onClick={(e) => {
         e.stopPropagation();
-        onSelect();
+        onSelect?.();
       }}
     >
-      {/* Selection Bounding Wireframe */}
-      {isSelected && (
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[W + 0.02, H + 0.02, D + 0.02]} />
-          <meshBasicMaterial color="#38bdf8" wireframe />
-        </mesh>
-      )}
+      {/* 1. BED 3D MODEL */}
+      {isBed ? (
+        <group>
+          {/* Bed Base Frame */}
+          <mesh position={[0, -H / 2 + 0.18, 0]} castShadow receiveShadow>
+            <boxGeometry args={[W, 0.36, D]} />
+            <meshStandardMaterial color={frontColor} roughness={0.6} />
+          </mesh>
 
-      {/* --- CARCASE BOX --- */}
-      {/* Left Gable Panel */}
-      <mesh position={[-W / 2 + boardT / 2, 0, 0]} castShadow receiveShadow>
-        <boxGeometry args={[boardT, H, D]} />
-        <meshStandardMaterial color={carcassColor} roughness={0.6} />
-      </mesh>
+          {/* Mattress */}
+          <mesh position={[0, -H / 2 + 0.36 + 0.12, 0.05]} castShadow receiveShadow>
+            <boxGeometry args={[W - 0.1, 0.24, D - 0.15]} />
+            <meshStandardMaterial color="#ffffff" roughness={0.9} />
+          </mesh>
 
-      {/* Right Gable Panel */}
-      <mesh position={[W / 2 - boardT / 2, 0, 0]} castShadow receiveShadow>
-        <boxGeometry args={[boardT, H, D]} />
-        <meshStandardMaterial color={carcassColor} roughness={0.6} />
-      </mesh>
+          {/* Headboard */}
+          <mesh position={[0, 0.1, -D / 2 + 0.05]} castShadow receiveShadow>
+            <boxGeometry args={[W + 0.1, H, 0.1]} />
+            <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+          </mesh>
 
-      {/* Bottom Panel */}
-      <mesh position={[0, -H / 2 + boardT / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[W - 2 * boardT, boardT, D]} />
-        <meshStandardMaterial color={carcassColor} roughness={0.6} />
-      </mesh>
+          {/* Pillows */}
+          <mesh position={[-W / 4, -H / 2 + 0.52, -D / 2 + 0.4]} rotation={[0.2, 0, 0]} castShadow>
+            <boxGeometry args={[0.55, 0.12, 0.4]} />
+            <meshStandardMaterial color="#f1f5f9" roughness={0.8} />
+          </mesh>
+          <mesh position={[W / 4, -H / 2 + 0.52, -D / 2 + 0.4]} rotation={[0.2, 0, 0]} castShadow>
+            <boxGeometry args={[0.55, 0.12, 0.4]} />
+            <meshStandardMaterial color="#f1f5f9" roughness={0.8} />
+          </mesh>
+        </group>
+      ) : isDresser && cabinet.hasMirror ? (
+        /* 2. DRESSER WITH VERTICAL MIRROR */
+        <group>
+          {/* Dresser Cabinet Body */}
+          <mesh position={[0, -H / 2 + 0.425, 0]} castShadow receiveShadow>
+            <boxGeometry args={[W, 0.85, D]} />
+            <meshStandardMaterial color={bodyColor} roughness={0.6} />
+          </mesh>
 
-      {/* Top Panel (Full for Wall/Tall, Rails for Base) */}
-      {isWall || isTall ? (
-        <mesh position={[0, H / 2 - boardT / 2, 0]} castShadow receiveShadow>
-          <boxGeometry args={[W - 2 * boardT, boardT, D]} />
-          <meshStandardMaterial color={carcassColor} roughness={0.6} />
-        </mesh>
+          {/* Mirror Frame & Glass */}
+          <mesh position={[0, 0.45, -D / 2 + 0.02]} castShadow>
+            <boxGeometry args={[W * 0.75, 0.9, 0.03]} />
+            <meshStandardMaterial color="#e2e8f0" metalness={0.9} roughness={0.1} />
+          </mesh>
+        </group>
       ) : (
-        <>
-          <mesh position={[0, H / 2 - boardT / 2, -D / 2 + 0.05]} castShadow>
-            <boxGeometry args={[W - 2 * boardT, boardT, 0.1]} />
-            <meshStandardMaterial color={carcassColor} roughness={0.6} />
+        /* 3. STANDARD MODULAR CARCASE (Kitchen, Wardrobes, Libraries) */
+        <group>
+          {/* Left Side Panel */}
+          <mesh position={[-W / 2 + 0.009, 0, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.018, H, D]} />
+            <meshStandardMaterial color={bodyColor} roughness={0.6} />
           </mesh>
-          <mesh position={[0, H / 2 - boardT / 2, D / 2 - 0.05]} castShadow>
-            <boxGeometry args={[W - 2 * boardT, boardT, 0.1]} />
-            <meshStandardMaterial color={carcassColor} roughness={0.6} />
+
+          {/* Right Side Panel */}
+          <mesh position={[W / 2 - 0.009, 0, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.018, H, D]} />
+            <meshStandardMaterial color={bodyColor} roughness={0.6} />
           </mesh>
-        </>
-      )}
 
-      {/* Back Panel */}
-      <mesh position={[0, 0, -D / 2 + 0.015]} receiveShadow>
-        <boxGeometry args={[W - 2 * boardT, H - 2 * boardT, 0.006]} />
-        <meshStandardMaterial color="#f1f5f9" roughness={0.8} />
-      </mesh>
+          {/* Bottom Panel */}
+          <mesh position={[0, -H / 2 + 0.009, 0]} castShadow receiveShadow>
+            <boxGeometry args={[W - 0.036, 0.018, D]} />
+            <meshStandardMaterial color={bodyColor} roughness={0.6} />
+          </mesh>
 
-      {/* Internal Adjustable Shelves */}
-      {shelfCount > 0 &&
-        Array.from({ length: shelfCount }).map((_, idx) => {
-          const shelfY = -H / 2 + ((H - boardT) / (shelfCount + 1)) * (idx + 1);
-          return (
-            <mesh key={idx} position={[0, shelfY, 0.01]} receiveShadow>
-              <boxGeometry args={[W - 2 * boardT - 0.002, boardT, D - 0.03]} />
-              <meshStandardMaterial color={carcassColor} roughness={0.6} />
+          {/* Top Panel (or Rails) */}
+          <mesh position={[0, H / 2 - 0.009, 0]} castShadow receiveShadow>
+            <boxGeometry args={[W - 0.036, 0.018, D]} />
+            <meshStandardMaterial color={bodyColor} roughness={0.6} />
+          </mesh>
+
+          {/* Back Panel */}
+          <mesh position={[0, 0, -D / 2 + 0.015]} receiveShadow>
+            <boxGeometry args={[W - 0.036, H - 0.036, 0.006]} />
+            <meshStandardMaterial color={bodyColor} roughness={0.7} />
+          </mesh>
+
+          {/* Shelves */}
+          {cabinet.shelfCount > 0 &&
+            Array.from({ length: Math.min(cabinet.shelfCount, 6) }).map((_, idx) => {
+              const sy = -H / 2 + ((idx + 1) * H) / (Math.min(cabinet.shelfCount, 6) + 1);
+              return (
+                <mesh key={idx} position={[0, sy, 0]} castShadow receiveShadow>
+                  <boxGeometry args={[W - 0.036, 0.018, D - 0.02]} />
+                  <meshStandardMaterial color={bodyColor} roughness={0.6} />
+                </mesh>
+              );
+            })}
+
+          {/* Wardrobe Hanging Rails */}
+          {cabinet.hasHangingRail && (
+            <mesh position={[0, H / 2 - 0.25, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.012, 0.012, W - 0.04, 16]} />
+              <meshStandardMaterial color="#94a3b8" metalness={0.9} roughness={0.2} />
             </mesh>
-          );
-        })}
+          )}
 
-      {/* Plinth / Kickboard (for Base & Tall) */}
-      {(isBase || isTall) && plinth.enabled && (
-        <mesh position={[0, -H / 2 - (plinth.height / 2000), D / 2 - 0.05]} castShadow receiveShadow>
-          <boxGeometry args={[W, plinth.height / 1000, 0.018]} />
-          <meshStandardMaterial color={materials.handleColor || '#1e293b'} roughness={0.7} />
-        </mesh>
-      )}
+          {/* Kitchen Base Countertop */}
+          {isKitchenBase && countertop.enabled && (
+            <mesh position={[0, H / 2 + (countertop.thickness / 2000), (countertop.overhangFront / 2000)]} castShadow receiveShadow>
+              <boxGeometry args={[W + (countertop.overhangSides * 2 / 1000), countertop.thickness / 1000, D + (countertop.overhangFront / 1000)]} />
+              <meshStandardMaterial color={topColor} roughness={0.3} metalness={0.1} />
+            </mesh>
+          )}
 
-      {/* Countertop Slice (for Base Cabinets) */}
-      {isBase && countertop.enabled && (
-        <mesh position={[0, H / 2 + countertop.thickness / 2000, countertop.overhangFront / 2000]} castShadow receiveShadow>
-          <boxGeometry args={[W, countertop.thickness / 1000, D + countertop.overhangFront / 1000]} />
-          <meshStandardMaterial color={worktopColor} roughness={0.25} metalness={0.1} />
-        </mesh>
-      )}
-
-      {/* --- FRONT DOORS / DRAWERS --- */}
-      {/* Drawers */}
-      {drawerCount > 0 &&
-        Array.from({ length: drawerCount }).map((_, idx) => {
-          const drwH = (H - 0.003 * (drawerCount + 1)) / drawerCount;
-          const drwY = -H / 2 + 0.003 + drwH / 2 + idx * (drwH + 0.003);
-          const pullOutZ = openState ? 0.35 : 0;
-
-          return (
-            <group key={idx} position={[0, drwY, D / 2 + boardT / 2 + pullOutZ]}>
-              {/* Drawer Front Panel */}
-              <mesh castShadow receiveShadow>
-                <boxGeometry args={[W - 0.004, drwH, boardT]} />
-                <meshStandardMaterial color={frontColor} roughness={0.7} metalness={0.05} />
+          {/* Doors & Fronts */}
+          {cabinet.doorCount === 1 && (
+            <group ref={leftDoorRef} position={[-W / 2 + 0.009, 0, D / 2 + 0.009]}>
+              <mesh position={[W / 2 - 0.009, 0, 0]} castShadow receiveShadow>
+                <boxGeometry args={[W - 0.004, H - 0.004, 0.018]} />
+                <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
               </mesh>
-              {/* Drawer Box (Visible when pulled out) */}
-              {openState && (
-                <mesh position={[0, 0, -D / 2]} castShadow>
-                  <boxGeometry args={[W - 0.05, drwH - 0.04, D - 0.05]} />
-                  <meshStandardMaterial color="#94a3b8" roughness={0.5} />
-                </mesh>
-              )}
-              {/* Drawer Handle */}
-              {materials.handleStyle !== 'handleless' && (
-                <mesh position={[0, 0, boardT / 2 + 0.015]} castShadow>
-                  <boxGeometry args={[0.16, 0.012, 0.025]} />
-                  <meshStandardMaterial color={handleColor} metalness={0.8} roughness={0.2} />
-                </mesh>
-              )}
             </group>
-          );
-        })}
+          )}
 
-      {/* Single Door */}
-      {doorCount === 1 && drawerCount === 0 && (
-        <group
-          position={[doorHinge === 'left' ? -W / 2 : W / 2, 0, D / 2 + boardT / 2]}
-          rotation={[0, openState ? (doorHinge === 'left' ? -1.4 : 1.4) : 0, 0]}
-        >
-          {/* Door leaf pivoted around hinge side */}
-          <mesh
-            position={[doorHinge === 'left' ? W / 2 - 0.002 : -W / 2 + 0.002, 0, 0]}
-            castShadow
-            receiveShadow
-          >
-            <boxGeometry args={[W - 0.004, H - 0.004, boardT]} />
-            <meshStandardMaterial color={frontColor} roughness={0.7} metalness={0.05} />
-          </mesh>
-
-          {/* Handle */}
-          {materials.handleStyle !== 'handleless' && (
-            <mesh
-              position={[
-                doorHinge === 'left' ? W - 0.04 : -W + 0.04,
-                isWall ? -H / 3 : H / 3,
-                boardT / 2 + 0.015,
-              ]}
-              castShadow
-            >
-              <boxGeometry args={[0.015, 0.16, 0.025]} />
-              <meshStandardMaterial color={handleColor} metalness={0.8} roughness={0.2} />
-            </mesh>
+          {cabinet.doorCount >= 2 && cabinet.doorType !== 'open' && (
+            <>
+              {/* Left Door */}
+              <group ref={leftDoorRef} position={[-W / 2 + 0.009, 0, D / 2 + 0.009]}>
+                <mesh position={[W / 4 - 0.009, 0, 0]} castShadow receiveShadow>
+                  <boxGeometry args={[W / 2 - 0.004, H - 0.004, 0.018]} />
+                  <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                </mesh>
+              </group>
+              {/* Right Door */}
+              <group ref={rightDoorRef} position={[W / 2 - 0.009, 0, D / 2 + 0.009]}>
+                <mesh position={[-W / 4 + 0.009, 0, 0]} castShadow receiveShadow>
+                  <boxGeometry args={[W / 2 - 0.004, H - 0.004, 0.018]} />
+                  <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                </mesh>
+              </group>
+            </>
           )}
         </group>
       )}
 
-      {/* Double Doors */}
-      {doorCount === 2 && drawerCount === 0 && (
-        <>
-          {/* Left Door */}
-          <group
-            position={[-W / 2, 0, D / 2 + boardT / 2]}
-            rotation={[0, openState ? -1.4 : 0, 0]}
-          >
-            <mesh position={[W / 4 - 0.002, 0, 0]} castShadow receiveShadow>
-              <boxGeometry args={[W / 2 - 0.004, H - 0.004, boardT]} />
-              <meshStandardMaterial color={frontColor} roughness={0.7} metalness={0.05} />
-            </mesh>
-            {materials.handleStyle !== 'handleless' && (
-              <mesh position={[W / 2 - 0.04, isWall ? -H / 3 : H / 3, boardT / 2 + 0.015]} castShadow>
-                <boxGeometry args={[0.015, 0.16, 0.025]} />
-                <meshStandardMaterial color={handleColor} metalness={0.8} roughness={0.2} />
-              </mesh>
-            )}
-          </group>
-
-          {/* Right Door */}
-          <group
-            position={[W / 2, 0, D / 2 + boardT / 2]}
-            rotation={[0, openState ? 1.4 : 0, 0]}
-          >
-            <mesh position={[-W / 4 + 0.002, 0, 0]} castShadow receiveShadow>
-              <boxGeometry args={[W / 2 - 0.004, H - 0.004, boardT]} />
-              <meshStandardMaterial color={frontColor} roughness={0.7} metalness={0.05} />
-            </mesh>
-            {materials.handleStyle !== 'handleless' && (
-              <mesh position={[-W / 2 + 0.04, isWall ? -H / 3 : H / 3, boardT / 2 + 0.015]} castShadow>
-                <boxGeometry args={[0.015, 0.16, 0.025]} />
-                <meshStandardMaterial color={handleColor} metalness={0.8} roughness={0.2} />
-              </mesh>
-            )}
-          </group>
-        </>
+      {/* Selection Bounding Box Outline */}
+      {isSelected && (
+        <lineSegments position={[0, 0, 0]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(W + 0.02, H + 0.02, D + 0.02)]} />
+          <lineBasicMaterial color="#2563eb" linewidth={2} />
+        </lineSegments>
       )}
     </group>
   );

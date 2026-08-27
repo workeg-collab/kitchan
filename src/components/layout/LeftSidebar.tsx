@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
 import { CABINET_LIBRARY, CabinetTemplate } from '../../constants/cabinetLibrary';
+import { WARDROBE_LIBRARY, WardrobeTemplate } from '../../constants/wardrobeLibrary';
+import { BEDROOM_LIBRARY, BedroomTemplate } from '../../constants/bedroomLibrary';
+import { LIBRARY_LIBRARY, LibraryTemplate } from '../../constants/libraryUnitLibrary';
 import { APPLIANCE_LIBRARY, ApplianceTemplate } from '../../constants/applianceLibrary';
 import { ARCHITECTURAL_LIBRARY, ArchitecturalTemplate } from '../../constants/archLibrary';
 import { FRONT_FINISHES, COUNTERTOP_MATERIALS, CARCASS_FINISHES, FLOOR_MATERIALS, WALL_COLORS, HANDLE_OPTIONS } from '../../constants/materialCatalog';
@@ -16,34 +19,43 @@ import {
   Sliders, 
   Search, 
   Layers, 
-  AppWindow, 
-  Maximize2 
+  Shirt, 
+  BedDouble, 
+  BookOpen, 
+  Sparkles,
+  CookingPot
 } from 'lucide-react';
 
 export const LeftSidebar: React.FC = () => {
   const { project, addCabinet, addAppliance, addElement, updateMaterials } = useProjectStore();
   const { unit, setIsCustomCabinetModalOpen, language } = useUIStore();
   const t = TRANSLATIONS[language];
+  const projectType = project.metadata.projectType || 'kitchen';
 
-  const [activeCatalogTab, setActiveCatalogTab] = useState<'cabinets' | 'appliances' | 'architecture' | 'finishes'>('cabinets');
-  const [cabinetCategory, setCabinetCategory] = useState<'all' | 'base' | 'wall' | 'tall' | 'corner'>('all');
-  const [applianceCategory, setApplianceCategory] = useState<'all' | 'cooling' | 'cooking' | 'cleaning' | 'ventilation' | 'sinks'>('all');
-  const [archCategory, setArchCategory] = useState<'all' | 'doors' | 'windows' | 'structural'>('all');
+  const [activeCatalogTab, setActiveCatalogTab] = useState<'main' | 'appliances' | 'architecture' | 'finishes'>('main');
+  const [kitchenCat, setKitchenCat] = useState<string>('all');
+  const [dressingCat, setDressingCat] = useState<string>('all');
+  const [bedroomCat, setBedroomCat] = useState<string>('all');
+  const [libraryCat, setLibraryCat] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Handle adding cabinet
-  const handleAddCabinet = (template: CabinetTemplate, widthOverride?: number) => {
+  // Handle adding item
+  const handleAddItem = (template: any, widthOverride?: number) => {
     const W = widthOverride || template.defaultWidth;
     const D = template.defaultDepth;
     const H = template.defaultHeight;
-    const Z = template.defaultZ;
+    const Z = template.defaultZ || 0;
 
-    const xPos = Math.min(Math.max(100, (project.cabinets.length * 600) % (project.room.width - 700)), project.room.width - W);
+    const xPos = Math.min(
+      Math.max(100, (project.cabinets.length * 600) % Math.max(1000, project.room.width - 800)),
+      project.room.width - W
+    );
 
     addCabinet({
       name: template.name,
       category: template.category,
       type: template.type,
+      projectType,
       width: W,
       height: H,
       depth: D,
@@ -52,46 +64,40 @@ export const LeftSidebar: React.FC = () => {
       z: Z,
       rotation: 0,
       wallId: 'wall-a',
-      shelfCount: template.shelfCount,
-      doorCount: template.doorCount,
-      drawerCount: template.drawerCount,
-      doorHinge: template.doorHinge,
+      shelfCount: template.shelfCount || 0,
+      doorCount: template.doorCount || 0,
+      drawerCount: template.drawerCount || 0,
+      doorHinge: template.doorHinge || (template.doorCount === 2 ? 'double' : template.doorCount === 1 ? 'right' : 'none'),
+      doorType: template.doorType,
       hasSinkCutout: template.hasSinkCutout,
       hasApplianceCavity: template.hasApplianceCavity,
       applianceCavityHeight: template.applianceCavityHeight,
       applianceCavityZ: template.applianceCavityZ,
+      hasHangingRail: template.hasHangingRail,
+      hangingRailCount: template.hangingRailCount,
+      hasShoeShelves: template.hasShoeShelves,
+      hasJewelryDrawer: template.hasJewelryDrawer,
+      bedSize: template.bedType,
+      mattressWidth: template.mattressWidth,
+      mattressLength: template.mattressLength,
+      headboardHeight: template.headboardHeight,
+      headboardThickness: template.headboardThickness,
+      hasHydraulicStorage: template.hasHydraulicStorage,
+      hasMirror: template.hasMirror,
+      mirrorHeight: template.mirrorHeight,
+      hasTvCavity: template.hasTvCavity,
+      tvWidth: template.tvWidth,
+      tvHeight: template.tvHeight,
+      tvDepth: template.tvDepth,
+      verticalDividersCount: template.verticalDividersCount,
+      hasGlassDoors: template.hasGlassDoors,
+      hasIntegratedLed: template.hasIntegratedLed,
       materialFront: project.materials.frontFinish,
       materialBody: project.materials.bodyColor,
       handleType: project.materials.handleStyle,
     });
   };
 
-  // Handle adding appliance
-  const handleAddAppliance = (template: ApplianceTemplate, widthOverride?: number) => {
-    const W = widthOverride || template.defaultWidth;
-    const D = template.defaultDepth;
-    const H = template.defaultHeight;
-    const Z = template.defaultZ;
-
-    addAppliance({
-      name: template.name,
-      type: template.type,
-      width: W,
-      height: H,
-      depth: D,
-      x: 1200,
-      y: 0,
-      z: Z,
-      rotation: 0,
-      wallId: 'wall-a',
-      clearanceSides: template.clearanceSides,
-      clearanceBack: template.clearanceBack,
-      clearanceTop: template.clearanceTop,
-      finish: 'stainless',
-    });
-  };
-
-  // Handle adding architectural element
   const handleAddArchElement = (template: ArchitecturalTemplate) => {
     addElement({
       name: language === 'ar' ? template.nameAr : template.name,
@@ -108,32 +114,30 @@ export const LeftSidebar: React.FC = () => {
     });
   };
 
-  // Filtered Cabinets
-  const filteredCabinets = CABINET_LIBRARY.filter((c) => {
-    const matchesCat = cabinetCategory === 'all' || c.category === cabinetCategory;
-    const matchesSearch =
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCat && matchesSearch;
-  });
+  // Get current active library based on projectType
+  let currentLibrary: any[] = CABINET_LIBRARY;
+  let mainTabTitle = t.cabinets;
+  let mainIcon = <CookingPot size={16} className="mb-0.5" />;
 
-  // Filtered Appliances
-  const filteredAppliances = APPLIANCE_LIBRARY.filter((a) => {
-    const matchesCat = applianceCategory === 'all' || a.category === applianceCategory;
-    const matchesSearch =
-      a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCat && matchesSearch;
-  });
+  if (projectType === 'dressing') {
+    currentLibrary = WARDROBE_LIBRARY;
+    mainTabTitle = 'دواليب ودريسنج';
+    mainIcon = <Shirt size={16} className="mb-0.5" />;
+  } else if (projectType === 'bedroom') {
+    currentLibrary = BEDROOM_LIBRARY;
+    mainTabTitle = 'أثاث النوم';
+    mainIcon = <BedDouble size={16} className="mb-0.5" />;
+  } else if (projectType === 'library') {
+    currentLibrary = LIBRARY_LIBRARY;
+    mainTabTitle = 'مكتبات وشاشات';
+    mainIcon = <BookOpen size={16} className="mb-0.5" />;
+  }
 
-  // Filtered Architectural Elements
-  const filteredArch = ARCHITECTURAL_LIBRARY.filter((el) => {
-    const matchesCat = archCategory === 'all' || el.category === archCategory;
+  const filteredItems = currentLibrary.filter((item) => {
     const matchesSearch =
-      el.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      el.nameAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      el.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCat && matchesSearch;
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
   });
 
   return (
@@ -141,71 +145,56 @@ export const LeftSidebar: React.FC = () => {
       {/* Top Sidebar Category Navigation */}
       <div className="grid grid-cols-4 p-2 bg-slate-50 border-b border-slate-200 gap-1">
         <button
-          onClick={() => setActiveCatalogTab('cabinets')}
-          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[11px] font-bold transition ${
-            activeCatalogTab === 'cabinets' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+          onClick={() => setActiveCatalogTab('main')}
+          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[10px] font-bold transition ${
+            activeCatalogTab === 'main' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Box size={16} className="mb-0.5" />
-          <span>{t.cabinets}</span>
+          {mainIcon}
+          <span className="truncate max-w-[65px]">{mainTabTitle}</span>
         </button>
 
         <button
           onClick={() => setActiveCatalogTab('appliances')}
-          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[11px] font-bold transition ${
+          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[10px] font-bold transition ${
             activeCatalogTab === 'appliances' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Tv size={16} className="mb-0.5" />
-          <span>{t.appliances}</span>
+          <span>{projectType === 'kitchen' ? 'الأجهزة' : 'الشاشات'}</span>
         </button>
 
         <button
           onClick={() => setActiveCatalogTab('architecture')}
-          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[11px] font-bold transition ${
+          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[10px] font-bold transition ${
             activeCatalogTab === 'architecture' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <DoorClosed size={16} className="mb-0.5" />
-          <span>{t.obstacles}</span>
+          <span>أبواب ونوافذ</span>
         </button>
 
         <button
           onClick={() => setActiveCatalogTab('finishes')}
-          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[11px] font-bold transition ${
+          className={`flex flex-col items-center justify-center py-2 rounded-xl text-[10px] font-bold transition ${
             activeCatalogTab === 'finishes' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Palette size={16} className="mb-0.5" />
-          <span>{t.finishes}</span>
+          <span>الخامات</span>
         </button>
       </div>
 
-      {/* --- CABINETS TAB --- */}
-      {activeCatalogTab === 'cabinets' && (
+      {/* --- MAIN MODULE LIBRARY TAB --- */}
+      {activeCatalogTab === 'main' && (
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Subcategory Filter */}
-          <div className="p-3 border-b border-slate-100 flex items-center gap-1 overflow-x-auto bg-slate-50/50">
-            {(['all', 'base', 'wall', 'tall', 'corner'] as const).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCabinetCategory(cat)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize whitespace-nowrap transition ${
-                  cabinetCategory === cat ? 'bg-white text-blue-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {cat === 'all' ? t.all : cat === 'base' ? t.base : cat === 'wall' ? t.wall_cat : cat === 'tall' ? t.tall : t.corner}
-              </button>
-            ))}
-          </div>
-
           {/* Search Box */}
-          <div className="px-3 pt-2 pb-1">
+          <div className="px-3 pt-3 pb-1">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
               <input
                 type="text"
-                placeholder={language === 'ar' ? 'بحث في الوحدات...' : 'Search modules...'}
+                placeholder={`بحث في وحدات الـ ${projectType}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500"
@@ -213,7 +202,7 @@ export const LeftSidebar: React.FC = () => {
             </div>
           </div>
 
-          {/* Custom Cabinet Creator Banner */}
+          {/* Custom Unit Builder Banner */}
           <div className="px-3 py-2">
             <button
               onClick={() => setIsCustomCabinetModalOpen(true)}
@@ -222,17 +211,17 @@ export const LeftSidebar: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Sliders size={16} className="text-blue-600 group-hover:rotate-45 transition" />
                 <div className="text-left">
-                  <div className="text-xs font-bold text-slate-900">{t.customBox}</div>
-                  <div className="text-[10px] text-slate-500">{language === 'ar' ? 'تحديد العرض والارتفاع بدقة' : 'Custom W x H x D dimensions'}</div>
+                  <div className="text-xs font-bold text-slate-900">إنشاء وحدة مخصصة (Custom)</div>
+                  <div className="text-[10px] text-slate-500">تحديد العرض، الارتفاع، والتقسيم الداخلي</div>
                 </div>
               </div>
               <Plus size={16} className="text-blue-600" />
             </button>
           </div>
 
-          {/* Cabinet Modules List */}
+          {/* Module Modules List */}
           <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2.5">
-            {filteredCabinets.map((template, idx) => (
+            {filteredItems.map((template, idx) => (
               <div
                 key={idx}
                 className="bg-white border border-slate-200 rounded-xl p-3 hover:border-blue-400 hover:shadow-md transition"
@@ -242,7 +231,7 @@ export const LeftSidebar: React.FC = () => {
                     <h4 className="text-xs font-bold text-slate-900">{template.name}</h4>
                     <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{template.description}</p>
                   </div>
-                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-slate-100 text-blue-600 rounded font-bold">
+                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded font-bold">
                     {template.category}
                   </span>
                 </div>
@@ -255,10 +244,10 @@ export const LeftSidebar: React.FC = () => {
 
                 <div className="mt-2.5 flex items-center justify-between">
                   <div className="flex items-center gap-1 flex-wrap">
-                    {template.standardWidths.map((sw) => (
+                    {template.standardWidths?.map((sw: number) => (
                       <button
                         key={sw}
-                        onClick={() => handleAddCabinet(template, sw)}
+                        onClick={() => handleAddItem(template, sw)}
                         className="px-2 py-0.5 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 rounded text-[10px] font-mono transition"
                       >
                         {formatDimension(sw, unit, false)}
@@ -267,9 +256,9 @@ export const LeftSidebar: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={() => handleAddCabinet(template)}
+                    onClick={() => handleAddItem(template)}
                     className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition ml-2 shadow-sm"
-                    title="Add Cabinet"
+                    title="إضافة الوحدة للمخطط"
                   >
                     <Plus size={14} />
                   </button>
@@ -280,111 +269,81 @@ export const LeftSidebar: React.FC = () => {
         </div>
       )}
 
-      {/* --- APPLIANCES TAB --- */}
+      {/* --- APPLIANCES & SCREENS TAB --- */}
       {activeCatalogTab === 'appliances' && (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="p-3 border-b border-slate-100 flex items-center gap-1 overflow-x-auto bg-slate-50/50">
-            {(['all', 'cooling', 'cooking', 'cleaning', 'ventilation', 'sinks'] as const).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setApplianceCategory(cat)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize whitespace-nowrap transition ${
-                  applianceCategory === cat ? 'bg-white text-amber-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {cat === 'all' ? t.all : cat === 'cooling' ? t.cooling : cat === 'cooking' ? t.cooking : cat === 'cleaning' ? t.cleaning : cat === 'ventilation' ? t.ventilation : t.sinks}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2.5">
-            {filteredAppliances.map((template, idx) => (
-              <div
-                key={idx}
-                className="bg-white border border-slate-200 rounded-xl p-3 hover:border-amber-400 hover:shadow-md transition"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">{template.name}</h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{template.description}</p>
-                  </div>
-                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-bold">
-                    {template.category}
-                  </span>
+        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2.5">
+          {APPLIANCE_LIBRARY.map((template, idx) => (
+            <div
+              key={idx}
+              className="bg-white border border-slate-200 rounded-xl p-3 hover:border-amber-400 hover:shadow-md transition"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">{template.name}</h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{template.description}</p>
                 </div>
-
-                <div className="flex items-center gap-2 text-[10px] font-mono text-slate-600 mt-2 bg-slate-50 px-2 py-1 rounded border border-slate-100">
-                  <span>W:{formatDimension(template.defaultWidth, unit)}</span>
-                  <span>H:{formatDimension(template.defaultHeight, unit)}</span>
-                  <span>D:{formatDimension(template.defaultDepth, unit)}</span>
-                </div>
-
-                <div className="mt-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    {template.standardWidths.map((sw) => (
-                      <button
-                        key={sw}
-                        onClick={() => handleAddAppliance(template, sw)}
-                        className="px-2 py-0.5 bg-slate-100 hover:bg-amber-600 hover:text-white text-slate-700 rounded text-[10px] font-mono transition"
-                      >
-                        {formatDimension(sw, unit, false)}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => handleAddAppliance(template)}
-                    className="p-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition shadow-sm"
-                    title="Place Appliance"
-                  >
-                    <Plus size={14} />
-                  </button>
-                </div>
+                <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-bold">
+                  {template.category}
+                </span>
               </div>
-            ))}
-          </div>
+
+              <div className="mt-2.5 flex items-center justify-between">
+                <span className="text-[10px] font-mono text-slate-500">
+                  {formatDimension(template.defaultWidth, unit)} x {formatDimension(template.defaultHeight, unit)}
+                </span>
+
+                <button
+                  onClick={() => {
+                    addAppliance({
+                      name: template.name,
+                      type: template.type,
+                      width: template.defaultWidth,
+                      height: template.defaultHeight,
+                      depth: template.defaultDepth,
+                      x: 1200,
+                      y: 0,
+                      z: template.defaultZ,
+                      rotation: 0,
+                      wallId: 'wall-a',
+                      clearanceSides: template.clearanceSides,
+                      clearanceBack: template.clearanceBack,
+                      clearanceTop: template.clearanceTop,
+                      finish: 'stainless',
+                    });
+                  }}
+                  className="p-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition shadow-sm"
+                  title="وضع الجهاز أو الشاشة"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {/* --- DOORS, WINDOWS & ARCHITECTURE TAB --- */}
       {activeCatalogTab === 'architecture' && (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Subcategory Filter */}
-          <div className="p-3 border-b border-slate-100 flex items-center gap-1 overflow-x-auto bg-slate-50/50">
-            {(['all', 'doors', 'windows', 'structural'] as const).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setArchCategory(cat)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize whitespace-nowrap transition ${
-                  archCategory === cat ? 'bg-white text-emerald-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {cat === 'all' ? t.all : cat === 'doors' ? (language === 'ar' ? 'الأبواب' : 'Doors') : cat === 'windows' ? (language === 'ar' ? 'النوافذ' : 'Windows') : (language === 'ar' ? 'أعمدة ومواسير' : 'Structural')}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
-            {filteredArch.map((template, idx) => (
-              <div
-                key={idx}
-                onClick={() => handleAddArchElement(template)}
-                className="p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-500 hover:shadow-md cursor-pointer transition flex items-center justify-between group"
-              >
-                <div>
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition">
-                    {language === 'ar' ? template.nameAr : template.name}
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
-                    {formatDimension(template.defaultWidth, unit)} × {formatDimension(template.defaultHeight, unit)}
-                  </div>
+        <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
+          {ARCHITECTURAL_LIBRARY.map((template, idx) => (
+            <div
+              key={idx}
+              onClick={() => handleAddArchElement(template)}
+              className="p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-500 hover:shadow-md cursor-pointer transition flex items-center justify-between group"
+            >
+              <div>
+                <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition">
+                  {language === 'ar' ? template.nameAr : template.name}
                 </div>
-                <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition">
-                  <Plus size={15} />
+                <div className="text-[11px] text-slate-500 mt-0.5">
+                  {formatDimension(template.defaultWidth, unit)} × {formatDimension(template.defaultHeight, unit)}
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition">
+                <Plus size={15} />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -393,7 +352,7 @@ export const LeftSidebar: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-3 space-y-4">
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 font-mono">
-              {language === 'ar' ? 'واجهات الأبواب' : 'Cabinet Fronts'}
+              واجهات الأثاث والخشب
             </h4>
             <div className="grid grid-cols-2 gap-2">
               {FRONT_FINISHES.map((mat) => (
@@ -404,8 +363,8 @@ export const LeftSidebar: React.FC = () => {
                     project.materials.frontFinish === mat.name ? 'border-blue-600 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <div className="w-5 h-5 rounded-full border border-slate-300 shadow-sm" style={{ backgroundColor: mat.color }} />
-                  <span className="text-[11px] font-semibold text-slate-800 truncate">{mat.name.split(' ')[0]} {mat.name.split(' ')[1]}</span>
+                  <div className="w-5 h-5 rounded-full border border-slate-300 shadow-sm shrink-0" style={{ backgroundColor: mat.color }} />
+                  <span className="text-[11px] font-semibold text-slate-800 truncate">{mat.name}</span>
                 </button>
               ))}
             </div>
@@ -413,27 +372,7 @@ export const LeftSidebar: React.FC = () => {
 
           <div>
             <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 font-mono">
-              {language === 'ar' ? 'أسطح العمل (رخام / كوارتز)' : 'Countertop Material'}
-            </h4>
-            <div className="grid grid-cols-2 gap-2">
-              {COUNTERTOP_MATERIALS.map((mat) => (
-                <button
-                  key={mat.id}
-                  onClick={() => updateMaterials({ countertopMaterial: mat.name, countertopColor: mat.color })}
-                  className={`p-2 rounded-xl border text-left flex items-center gap-2 transition ${
-                    project.materials.countertopMaterial === mat.name ? 'border-blue-600 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <div className="w-5 h-5 rounded-md border border-slate-300 shadow-sm" style={{ backgroundColor: mat.color }} />
-                  <span className="text-[11px] font-semibold text-slate-800 truncate">{mat.name.split(' ')[0]}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 font-mono">
-              {language === 'ar' ? 'المقابض' : 'Cabinet Handles'}
+              المقابض وإكسسوارات الفتح
             </h4>
             <div className="space-y-1.5">
               {HANDLE_OPTIONS.map((h) => (

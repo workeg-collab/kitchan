@@ -183,6 +183,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       metadata: {
         id: `proj-${Date.now()}`,
         name: 'تصميم مطبخ جديد',
+        projectType: 'kitchen',
         clientName: '',
         designerName: '',
         date: new Date().toISOString().split('T')[0],

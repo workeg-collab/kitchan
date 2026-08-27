@@ -1,6 +1,21 @@
 export type UnitType = 'mm' | 'cm';
 
+export type ProjectType = 'kitchen' | 'dressing' | 'bedroom' | 'library';
+
 export type CabinetCategory = 'base' | 'wall' | 'tall' | 'corner' | 'custom';
+
+// Dressing / Wardrobe Types
+export type WardrobeCategory = 'wardrobe' | 'closet-internals' | 'accessories' | 'custom';
+export type WardrobeDoorType = 'hinged' | 'sliding' | 'folding' | 'open';
+
+// Bedroom Types
+export type BedroomCategory = 'bed' | 'nightstand' | 'dresser' | 'tv-unit' | 'bench' | 'custom';
+export type BedType = 'single' | 'double' | 'queen' | 'king' | 'storage-hydraulic' | 'platform' | 'upholstered' | 'wooden';
+
+// Library Types
+export type LibraryCategory = 'library-full' | 'bookshelf' | 'tv-media' | 'display' | 'floating' | 'custom';
+
+export type FurnitureCategory = CabinetCategory | WardrobeCategory | BedroomCategory | LibraryCategory;
 
 export type CabinetType = 
   | 'base-single-door'
@@ -22,7 +37,36 @@ export type CabinetType =
   | 'tall-microwave-tower'
   | 'tall-fridge-housing'
   | 'tall-utility'
-  | 'custom-box';
+  | 'custom-box'
+  // Wardrobe / Dressing types
+  | 'wardrobe-hinged-2d'
+  | 'wardrobe-hinged-3d'
+  | 'wardrobe-sliding-2d'
+  | 'wardrobe-sliding-3d'
+  | 'wardrobe-walkin-open'
+  | 'wardrobe-corner-l'
+  | 'wardrobe-hanging-long'
+  | 'wardrobe-hanging-double'
+  | 'wardrobe-shelves-drawers'
+  | 'wardrobe-shoe-rack'
+  | 'wardrobe-jewelry-vanity'
+  // Bedroom types
+  | 'bed-single'
+  | 'bed-double'
+  | 'bed-queen'
+  | 'bed-king'
+  | 'bed-storage-hydraulic'
+  | 'bedroom-nightstand'
+  | 'bedroom-dresser-mirror'
+  | 'bedroom-tv-credenza'
+  | 'bedroom-bench-ottoman'
+  // Library types
+  | 'library-full-wall'
+  | 'library-bookshelf-open'
+  | 'library-bookshelf-doors'
+  | 'library-tv-center'
+  | 'library-display-glass'
+  | 'library-floating-shelves';
 
 export type ApplianceType =
   | 'fridge-freestanding'
@@ -36,7 +80,10 @@ export type ApplianceType =
   | 'hood-wall'
   | 'hood-integrated'
   | 'sink-single'
-  | 'sink-double';
+  | 'sink-double'
+  | 'tv-screen'
+  | 'soundbar'
+  | 'led-strip';
 
 export type ArchitecturalElementType =
   | 'door'
@@ -46,14 +93,15 @@ export type ArchitecturalElementType =
   | 'recess'
   | 'pipe';
 
-export type DoorHinge = 'left' | 'right' | 'double' | 'top' | 'none';
+export type DoorHinge = 'left' | 'right' | 'double' | 'top' | 'sliding' | 'folding' | 'none';
 export type HandleType = 'bar-black' | 'bar-brass' | 'bar-chrome' | 'edge-pull' | 'knob' | 'handleless' | 'none';
 
 export interface CabinetItem {
-  id: string; // e.g. B01, W01, T01
+  id: string; // e.g. B01, W01, T01, WD01, BD01, LIB01
   name: string;
-  category: CabinetCategory;
+  category: FurnitureCategory;
   type: CabinetType;
+  projectType?: ProjectType;
   width: number;
   height: number;
   depth: number;
@@ -66,10 +114,43 @@ export interface CabinetItem {
   doorCount: number;
   drawerCount: number;
   doorHinge: DoorHinge;
+  doorType?: WardrobeDoorType;
+
+  // Kitchen Specific
   hasSinkCutout?: boolean;
   hasApplianceCavity?: boolean;
   applianceCavityHeight?: number;
   applianceCavityZ?: number;
+
+  // Dressing Specific
+  hasHangingRail?: boolean;
+  hangingRailCount?: number;
+  hasShoeShelves?: boolean;
+  hasJewelryDrawer?: boolean;
+  hasTrouserRack?: boolean;
+  hasLaundryBasket?: boolean;
+  slidingTracksCount?: number;
+
+  // Bedroom Specific
+  bedSize?: 'single' | 'double' | 'queen' | 'king';
+  mattressWidth?: number;
+  mattressLength?: number;
+  headboardHeight?: number;
+  headboardThickness?: number;
+  hasHydraulicStorage?: boolean;
+  hasMirror?: boolean;
+  mirrorHeight?: number;
+
+  // Library & TV Specific
+  hasTvCavity?: boolean;
+  tvWidth?: number;
+  tvHeight?: number;
+  tvDepth?: number;
+  verticalDividersCount?: number;
+  hasGlassDoors?: boolean;
+  hasIntegratedLed?: boolean;
+
+  // Materials & Finish
   materialFront?: string;
   materialBody?: string;
   handleType?: HandleType;
@@ -182,6 +263,8 @@ export interface ManufacturingSettings {
   doorReveal: number;
   drawerSlideLoss: number;
   shelfSetback: number;
+  constructionMethod: 'sides-full-height' | 'top-bottom-full-width';
+  backPanelMount: 'grooved' | 'surface-mounted';
 }
 
 export interface CuttingPanel {
@@ -206,29 +289,30 @@ export interface CuttingPanel {
 export interface HardwareItem {
   id: string;
   name: string;
-  category: 'hinge' | 'slide' | 'handle' | 'leg' | 'bracket' | 'screw' | 'shelf-pin';
+  category: 'hinge' | 'slide' | 'handle' | 'leg' | 'bracket' | 'screw' | 'shelf-pin' | 'rail' | 'hydraulic';
   quantity: number;
   unit: string;
   description: string;
 }
 
 export interface PricingSettings {
-  currency: string; // 'ج.م' | 'ر.س' | 'د.إ' | '$'
-  pricePerSquareMeterFronts: number; // سعر متر الواجهات مسطح م²
-  pricePerSquareMeterCarcass: number; // سعر المتر المربع لخشب الشاسيه م²
-  pricePerLinearMeterBase: number; // سعر المتر الطولي للوحدات السفلية
-  pricePerLinearMeterWall: number; // سعر المتر الطولي للوحدات العلوية
-  pricePerLinearMeterTall: number; // سعر المتر الطولي للوحدات الطولية
-  pricePerSquareMeterCountertop: number; // سعر متر الرخام / الكوارتز م²
-  accessoriesCost: number; // تكلفة إكسسوارات ثابتة
-  installationCostPercentage: number; // نسبة المصنعية والتركيب (مثلاً 10%)
-  taxPercentage: number; // نسبة الضريبة إن وجدت
-  discountAmount: number; // خصم
+  currency: string;
+  pricePerSquareMeterFronts: number;
+  pricePerSquareMeterCarcass: number;
+  pricePerLinearMeterBase: number;
+  pricePerLinearMeterWall: number;
+  pricePerLinearMeterTall: number;
+  pricePerSquareMeterCountertop: number;
+  accessoriesCost: number;
+  installationCostPercentage: number;
+  taxPercentage: number;
+  discountAmount: number;
 }
 
 export interface ProjectMetadata {
   id: string;
   name: string;
+  projectType: ProjectType;
   clientName: string;
   designerName: string;
   date: string;
@@ -257,5 +341,5 @@ export type ActiveTab =
   | 'technical-drawings' 
   | 'cabinet-schedule' 
   | 'manufacturing-bom' 
-  | 'pricing-calculator' 
-  | 'export-package';
+  | 'pricing-calculator'
+  | 'dashboard';

@@ -6,6 +6,7 @@ import { TopNavbar } from './components/layout/TopNavbar';
 import { StatusBar } from './components/layout/StatusBar';
 import { LeftSidebar } from './components/layout/LeftSidebar';
 import { RightSidebar } from './components/layout/RightSidebar';
+import { ProjectDashboard } from './components/dashboard/ProjectDashboard';
 import { Canvas2D } from './components/planner2d/Canvas2D';
 import { Canvas3D } from './components/viewer3d/Canvas3D';
 import { ElevationViewer } from './components/elevations/ElevationViewer';
@@ -41,6 +42,7 @@ export const App: React.FC = () => {
 
         {/* Center Workspace */}
         <main className="flex-1 h-full relative overflow-hidden bg-slate-100">
+          {activeTab === 'dashboard' && <ProjectDashboard />}
           {activeTab === '2d-plan' && <Canvas2D />}
           {activeTab === '3d-view' && <Canvas3D />}
           {activeTab === 'elevations' && <ElevationViewer />}

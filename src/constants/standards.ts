@@ -9,6 +9,8 @@ export const DEFAULT_MANUFACTURING_SETTINGS: ManufacturingSettings = {
   doorReveal: 3, // 3mm
   drawerSlideLoss: 25,
   shelfSetback: 20,
+  constructionMethod: 'sides-full-height',
+  backPanelMount: 'grooved',
 };
 
 export const DEFAULT_COUNTERTOP_CONFIG: CountertopConfig = {
@@ -51,15 +53,15 @@ export const DEFAULT_MATERIAL_FINISHES: MaterialFinishes = {
 };
 
 export const DEFAULT_PRICING_SETTINGS: PricingSettings = {
-  currency: 'ج.م', // جنيه مصري / أو يمكن تغييره لريال أو دولار
-  pricePerSquareMeterFronts: 1800, // سعر متر مسطح الواجهات
-  pricePerSquareMeterCarcass: 850, // سعر متر الشاسيه الداخلي
-  pricePerLinearMeterBase: 3200, // سعر المتر الطولي للوحدات السفلية
-  pricePerLinearMeterWall: 2600, // سعر المتر الطولي للوحدات العلوية
-  pricePerLinearMeterTall: 5400, // سعر المتر الطولي للدواليب الطولية
-  pricePerSquareMeterCountertop: 2400, // سعر متر الرخام / الكوارتز
-  accessoriesCost: 1500, // تكلفة إكسسوارات ومفصلات
-  installationCostPercentage: 10, // 10% مصنعية ونقل وتركيب
-  taxPercentage: 0, // ضريبة
-  discountAmount: 0, // خصم
+  currency: 'ج.م',
+  pricePerSquareMeterFronts: 1800,
+  pricePerSquareMeterCarcass: 850,
+  pricePerLinearMeterBase: 3200,
+  pricePerLinearMeterWall: 2600,
+  pricePerLinearMeterTall: 5400,
+  pricePerSquareMeterCountertop: 2400,
+  accessoriesCost: 1500,
+  installationCostPercentage: 10,
+  taxPercentage: 0,
+  discountAmount: 0,
 };
