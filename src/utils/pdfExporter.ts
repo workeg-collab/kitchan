@@ -8,12 +8,12 @@ export interface PDFExportOptions {
 }
 
 /**
- * High-End Multi-Page Architectural PDF Dossier with:
- * 1. 3D Render & Project Specifications Cover Sheet
- * 2. 2D Architectural Floor Plan with CM dimensions
- * 3. Side-by-Side Live Wall Elevations (Wall A, B, C, D) showing cabinet sequences
- * 4. Individual Cabinet Workshop Cut Sheets with individual facade illustrations and CM dimensions
- * 5. Cutting List Table & Pricing Quotation Summary
+ * Photorealistic Architectural PDF Dossier Generator with:
+ * 1. Natural 3D Render & Complete Manufacturing Contract Specs
+ * 2. 2D Architectural Top Plan with Centimeter Dimensions
+ * 3. Photorealistic Live Side-by-Side Wall Elevations with Shaded Materials & Full Height Chains
+ * 4. Individual Cabinet Workshop Cut Sheets with Photorealistic Facades & CM Badges
+ * 5. Cutting Schedule Table & Pricing Quotation Summary
  */
 export async function exportTechnicalPDF({
   project,
@@ -25,7 +25,7 @@ export async function exportTechnicalPDF({
 
   const toCm = (mm: number) => ((mm || 0) / 10).toFixed(1) + ' سم';
 
-  // Canvas sheet dimensions (A4 Landscape 1920x1358 px)
+  // High-DPI Canvas sheet dimensions (A4 Landscape 1920x1358 px)
   const CANVAS_WIDTH = 1920;
   const CANVAS_HEIGHT = 1358;
 
@@ -38,7 +38,7 @@ export async function exportTechnicalPDF({
     throw new Error('Canvas 2D context not available');
   }
 
-  // Preload 3D image if provided
+  // Preload 3D image if available
   let loaded3DImg: HTMLImageElement | null = null;
   if (render3DImage && render3DImage.startsWith('data:image')) {
     try {
@@ -61,11 +61,11 @@ export async function exportTechnicalPDF({
 
   // Helper for Title Block & Sheet Frame
   const drawSheetFrame = (sheetTitle: string, pageNum: number, totalPages: number) => {
-    // 1. White Background
+    // Background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // 2. Outer Architectural Borders
+    // Outer Blueprint Border
     ctx.strokeStyle = '#0f172a';
     ctx.lineWidth = 4;
     ctx.strokeRect(30, 30, CANVAS_WIDTH - 60, CANVAS_HEIGHT - 60);
@@ -74,7 +74,7 @@ export async function exportTechnicalPDF({
     ctx.lineWidth = 1.5;
     ctx.strokeRect(36, 36, CANVAS_WIDTH - 72, CANVAS_HEIGHT - 72);
 
-    // 3. Top Blue Header Bar
+    // Top Header Bar
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(30, 30, CANVAS_WIDTH - 60, 80);
 
@@ -88,7 +88,7 @@ export async function exportTechnicalPDF({
     ctx.font = '16px "Cairo", "Tajawal", "Segoe UI", sans-serif';
     ctx.fillText(`الملف الفني الهندسي الشامل وقوائم التصنيع — ${metadata.projectType === 'kitchen' ? 'مطابخ' : 'دريسينج وأثاث'}`, CANVAS_WIDTH - 60, 103);
 
-    // Left Brand in English
+    // Left Brand
     ctx.direction = 'ltr';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#38bdf8';
@@ -99,7 +99,7 @@ export async function exportTechnicalPDF({
     ctx.font = '16px "Segoe UI", Arial, sans-serif';
     ctx.fillText(`Sheet: ${sheetTitle}`, 60, 100);
 
-    // 4. Bottom Title Block (Engineering Stamp)
+    // Bottom Title Block (Engineering Stamp)
     const stampY = CANVAS_HEIGHT - 95;
     ctx.fillStyle = '#f8fafc';
     ctx.fillRect(30, stampY, CANVAS_WIDTH - 60, 65);
@@ -131,8 +131,8 @@ export async function exportTechnicalPDF({
     ctx.fillText(`PAGE ${pageNum} OF ${totalPages}`, 60, stampY + 40);
   };
 
-  // Helper to draw an individual Cabinet Facade Illustration
-  const drawCabinetFacade = (
+  // Helper to draw a Photorealistic Shaded Cabinet Facade
+  const drawPhotorealisticCabinet = (
     c: CabinetItem,
     boxX: number,
     boxY: number,
@@ -144,19 +144,23 @@ export async function exportTechnicalPDF({
     const isLoft = c.isCeilingUnit || c.flipUpDoor || c.type.includes('loft');
     const isFlap = c.flipUpDoor || c.doorHinge === 'top' || c.type.includes('lift-up') || c.type.includes('aventos');
 
-    // 1. Cabinet Outer Box
-    ctx.fillStyle = '#f8fafc';
+    // 1. Shaded Body Background
+    const bodyGrad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
+    bodyGrad.addColorStop(0, '#f8fafc');
+    bodyGrad.addColorStop(1, '#e2e8f0');
+    ctx.fillStyle = bodyGrad;
     ctx.fillRect(boxX, boxY, boxW, boxH);
+
     ctx.strokeStyle = isLoft ? '#d97706' : isTall ? '#312e81' : isWall ? '#0284c7' : '#0f172a';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2;
     ctx.strokeRect(boxX, boxY, boxW, boxH);
 
     // 2. Plinth if base or tall
     if (c.category === 'base' || isTall) {
       const plinthH = Math.max(12, boxH * 0.12);
-      ctx.fillStyle = '#cbd5e1';
+      ctx.fillStyle = '#64748b';
       ctx.fillRect(boxX, boxY + boxH - plinthH, boxW, plinthH);
-      ctx.strokeStyle = '#64748b';
+      ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1;
       ctx.strokeRect(boxX, boxY + boxH - plinthH, boxW, plinthH);
     }
@@ -164,51 +168,75 @@ export async function exportTechnicalPDF({
     // 3. Countertop if base
     if (c.category === 'base') {
       const ctH = Math.max(8, boxH * 0.06);
-      ctx.fillStyle = '#94a3b8';
+      const ctGrad = ctx.createLinearGradient(boxX - 4, boxY - ctH, boxX + boxW + 4, boxY);
+      ctGrad.addColorStop(0, '#e2e8f0');
+      ctGrad.addColorStop(0.5, '#ffffff');
+      ctGrad.addColorStop(1, '#94a3b8');
+      ctx.fillStyle = ctGrad;
       ctx.fillRect(boxX - 4, boxY - ctH, boxW + 8, ctH);
       ctx.strokeStyle = '#475569';
       ctx.lineWidth = 1;
       ctx.strokeRect(boxX - 4, boxY - ctH, boxW + 8, ctH);
     }
 
-    // 4. Drawers or Doors Facade Drawing
+    // 4. Doors & Drawers with realistic shadow reveals
     const usableH = c.category === 'base' || isTall ? boxH * 0.88 : boxH;
 
     if (c.drawerCount > 0 && !isFlap) {
       const drwH = usableH / c.drawerCount;
       for (let i = 0; i < c.drawerCount; i++) {
         const dy = boxY + i * drwH;
+        // Drawer front panel
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(boxX + 3, dy + 3, boxW - 6, drwH - 6);
         ctx.strokeStyle = '#cbd5e1';
         ctx.lineWidth = 1.5;
-        ctx.strokeRect(boxX + 4, dy + 4, boxW - 8, drwH - 8);
+        ctx.strokeRect(boxX + 3, dy + 3, boxW - 6, drwH - 6);
 
-        // Handle
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(boxX + boxW / 2 - boxW * 0.2, dy + drwH / 2 - 2, boxW * 0.4, 4);
+        // Metallic Handle with chrome gradient
+        const handleGrad = ctx.createLinearGradient(boxX, dy, boxX + boxW, dy);
+        handleGrad.addColorStop(0, '#475569');
+        handleGrad.addColorStop(0.5, '#f8fafc');
+        handleGrad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = handleGrad;
+        ctx.fillRect(boxX + boxW / 2 - boxW * 0.22, dy + drwH / 2 - 2, boxW * 0.44, 4);
       }
     } else if (isFlap) {
-      // Flap Door: Upward triangle swing symbol
+      // Flap Door
+      ctx.fillStyle = '#fffbeb';
+      ctx.fillRect(boxX + 3, boxY + 3, boxW - 6, usableH - 6);
       ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(boxX + 3, boxY + 3, boxW - 6, usableH - 6);
+
+      // Swing Arrow
+      ctx.strokeStyle = '#d97706';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 3]);
       ctx.beginPath();
-      ctx.moveTo(boxX + 6, boxY + usableH - 6);
-      ctx.lineTo(boxX + boxW / 2, boxY + 8);
-      ctx.lineTo(boxX + boxW - 6, boxY + usableH - 6);
+      ctx.moveTo(boxX + 6, boxY + usableH - 8);
+      ctx.lineTo(boxX + boxW / 2, boxY + 10);
+      ctx.lineTo(boxX + boxW - 6, boxY + usableH - 8);
       ctx.stroke();
       ctx.setLineDash([]);
 
       // Bottom Pull Handle
       ctx.fillStyle = '#0f172a';
-      ctx.fillRect(boxX + boxW * 0.25, boxY + usableH - 12, boxW * 0.5, 4);
+      ctx.fillRect(boxX + boxW * 0.2, boxY + usableH - 12, boxW * 0.6, 4);
 
       ctx.direction = 'rtl';
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#d97706';
+      ctx.fillStyle = '#b45309';
       ctx.font = 'bold 11px "Cairo", sans-serif';
       ctx.fillText('قلاب ⮝', boxX + boxW / 2, boxY + usableH / 2 + 10);
     } else if (c.doorCount === 1) {
-      // Single Door Swing Triangle
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(boxX + 3, boxY + 3, boxW - 6, usableH - 6);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(boxX + 3, boxY + 3, boxW - 6, usableH - 6);
+
+      // Single door swing arc
       ctx.strokeStyle = '#94a3b8';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 3]);
@@ -225,31 +253,35 @@ export async function exportTechnicalPDF({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Handle
+      // Vertical Bar Handle
+      const hX = c.doorHinge === 'left' ? boxX + boxW - 14 : boxX + 10;
       ctx.fillStyle = '#0f172a';
-      const handleX = c.doorHinge === 'left' ? boxX + boxW - 14 : boxX + 10;
-      ctx.fillRect(handleX, boxY + usableH / 2 - 14, 4, 28);
+      ctx.fillRect(hX, boxY + usableH / 2 - 14, 4, 28);
     } else if (c.doorCount === 2) {
-      // Double Door
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(boxX + 3, boxY + 3, boxW - 6, usableH - 6);
       ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = 1.5;
+      ctx.strokeRect(boxX + 3, boxY + 3, boxW - 6, usableH - 6);
+
+      // Center dividing reveal
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(boxX + boxW / 2, boxY);
-      ctx.lineTo(boxX + boxW / 2, boxY + usableH);
+      ctx.moveTo(boxX + boxW / 2, boxY + 3);
+      ctx.lineTo(boxX + boxW / 2, boxY + usableH - 3);
       ctx.stroke();
 
-      // Left & Right swing triangles
-      ctx.strokeStyle = '#94a3b8';
+      // Swing triangles
+      ctx.strokeStyle = '#cbd5e1';
       ctx.setLineDash([4, 3]);
       ctx.beginPath();
-      // Left door
-      ctx.moveTo(boxX + 4, boxY + 4);
+      ctx.moveTo(boxX + 6, boxY + 6);
       ctx.lineTo(boxX + boxW / 2 - 4, boxY + usableH / 2);
-      ctx.lineTo(boxX + 4, boxY + usableH - 4);
-      // Right door
-      ctx.moveTo(boxX + boxW - 4, boxY + 4);
+      ctx.lineTo(boxX + 6, boxY + usableH - 6);
+      ctx.moveTo(boxX + boxW - 6, boxY + 6);
       ctx.lineTo(boxX + boxW / 2 + 4, boxY + usableH / 2);
-      ctx.lineTo(boxX + boxW - 4, boxY + usableH - 4);
+      ctx.lineTo(boxX + boxW - 6, boxY + usableH - 6);
       ctx.stroke();
       ctx.setLineDash([]);
 
@@ -259,21 +291,23 @@ export async function exportTechnicalPDF({
       ctx.fillRect(boxX + boxW / 2 + 7, boxY + usableH / 2 - 14, 3, 28);
     }
 
-    // Glass Vitrine Diagonals
+    // Glass Vitrine Translucency
     if (c.hasGlassDoors || c.type === 'wall-glass-vitrine') {
+      ctx.fillStyle = 'rgba(186, 230, 253, 0.4)';
+      ctx.fillRect(boxX + 6, boxY + 6, boxW - 12, usableH - 12);
       ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([2, 4]);
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 4]);
       ctx.beginPath();
-      ctx.moveTo(boxX + 8, boxY + 8);
-      ctx.lineTo(boxX + boxW - 8, boxY + usableH - 8);
-      ctx.moveTo(boxX + boxW - 8, boxY + 8);
-      ctx.lineTo(boxX + 8, boxY + usableH - 8);
+      ctx.moveTo(boxX + 10, boxY + 10);
+      ctx.lineTo(boxX + boxW - 10, boxY + usableH - 10);
+      ctx.moveTo(boxX + boxW - 10, boxY + 10);
+      ctx.lineTo(boxX + 10, boxY + usableH - 10);
       ctx.stroke();
       ctx.setLineDash([]);
     }
 
-    // Sink Cutout Symbol
+    // Sink Cutout
     if (c.hasSinkCutout) {
       ctx.fillStyle = '#e0f2fe';
       ctx.fillRect(boxX + boxW * 0.2, boxY + usableH * 0.2, boxW * 0.6, usableH * 0.5);
@@ -282,9 +316,9 @@ export async function exportTechnicalPDF({
       ctx.strokeRect(boxX + boxW * 0.2, boxY + usableH * 0.2, boxW * 0.6, usableH * 0.5);
     }
 
-    // Appliance Cavity (Oven)
+    // Built-in Oven Cavity
     if (c.hasApplianceCavity) {
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = '#0f172a';
       ctx.fillRect(boxX + boxW * 0.1, boxY + usableH * 0.25, boxW * 0.8, usableH * 0.5);
       ctx.strokeStyle = '#f97316';
       ctx.lineWidth = 1.5;
@@ -297,9 +331,8 @@ export async function exportTechnicalPDF({
   // =========================================================================
   // PAGE 1: COVER & 3D RENDERING + SPECIFICATIONS
   // =========================================================================
-  drawSheetFrame('01 / Project Overview & 3D Render', 1, TOTAL_PAGES);
+  drawSheetFrame('01 / Project Overview & 3D Render (المنظور ثلاثي الأبعاد والمواصفات)', 1, TOTAL_PAGES);
 
-  // 3D Perspective Box (Left Side)
   const renderBoxX = 60;
   const renderBoxY = 140;
   const renderBoxW = 1000;
@@ -325,7 +358,6 @@ export async function exportTechnicalPDF({
     ctx.fillText('منظور ثلاثي الأبعاد للمشروع (3D Render)', renderBoxX + renderBoxW / 2, renderBoxY + renderBoxH / 2);
   }
 
-  // Specifications Box (Right Side)
   const specBoxX = 1090;
   const specBoxY = 140;
   const specBoxW = CANVAS_WIDTH - specBoxX - 60;
@@ -456,11 +488,10 @@ export async function exportTechnicalPDF({
   doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
 
   // =========================================================================
-  // PAGE 3: SIDE-BY-SIDE WALL ELEVATIONS (واجهات الجدران وترتيب الوحدات)
+  // PAGE 3: SIDE-BY-SIDE PHOTOREALISTIC WALL ELEVATIONS (المقاطع الجدارية الحية)
   // =========================================================================
-  drawSheetFrame('03 / Wall Elevations & Side-by-Side Sequence (واجهات الجدران وترتيب الوحدات)', 3, TOTAL_PAGES);
+  drawSheetFrame('03 / Live Wall Elevations & Side-by-Side Sequence (المقاطع والواجهات الجدارية)', 3, TOTAL_PAGES);
 
-  // Split into Wall A (Top Half) and Wall B (Bottom Half)
   const wallElevations = [
     {
       id: 'wall-a',
@@ -503,29 +534,28 @@ export async function exportTechnicalPDF({
     ctx.strokeRect(eBoxX, eBoxY + 36, eBoxW, eBoxH - 36);
 
     // Floor Line
-    const floorY = eBoxY + eBoxH - 30;
+    const floorY = eBoxY + eBoxH - 35;
     ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(eBoxX, floorY);
     ctx.lineTo(eBoxX + eBoxW, floorY);
     ctx.stroke();
 
-    // Scale Factor: Map wall.length (mm) to available pixel width
+    // Scale Factor
     const scaleFactor = (eBoxW - 80) / wall.length;
     const scaleH = (eBoxH - 120) / room.ceilingHeight;
 
-    // Draw Cabinets arranged side-by-side on this wall
+    // Draw Units arranged side-by-side on this wall
     wall.cabinets.forEach((c) => {
-      // Relative offset along wall
       const relX = wall.id === 'wall-a' ? c.x : c.y;
       const cabPxX = eBoxX + 40 + relX * scaleFactor;
       const cabPxW = Math.max(30, c.width * scaleFactor);
       const cabPxH = Math.max(30, c.height * scaleH);
       const cabPxY = floorY - (c.z + c.height) * scaleH;
 
-      // Draw Facade for this unit
-      drawCabinetFacade(c, cabPxX, cabPxY, cabPxW, cabPxH);
+      // Draw Photorealistic Facade
+      drawPhotorealisticCabinet(c, cabPxX, cabPxY, cabPxW, cabPxH);
 
       // Dimension Label above cabinet
       ctx.direction = 'ltr';
@@ -536,7 +566,7 @@ export async function exportTechnicalPDF({
 
       ctx.fillStyle = '#2563eb';
       ctx.font = 'bold 11px sans-serif';
-      ctx.fillText(toCm(c.width), cabPxX + cabPxW / 2, cabPxY + cabPxH + 16);
+      ctx.fillText(toCm(c.width), cabPxX + cabPxW / 2, cabPxY + cabPxH + 18);
     });
   });
 
@@ -590,7 +620,7 @@ export async function exportTechnicalPDF({
     const drawBoxH = 130;
     const drawBoxX = x + cardW - drawBoxW - 14;
     const drawBoxY = y + 50;
-    drawCabinetFacade(c, drawBoxX, drawBoxY, drawBoxW, drawBoxH);
+    drawPhotorealisticCabinet(c, drawBoxX, drawBoxY, drawBoxW, drawBoxH);
 
     // Dimensions in CM (Center Column)
     const dimX = x + cardW - drawBoxW - 30;
@@ -638,7 +668,6 @@ export async function exportTechnicalPDF({
   // =========================================================================
   drawSheetFrame('05 / Cutting List & Quotation Summary (جدول التقطيع والتسعير)', 5, TOTAL_PAGES);
 
-  // Table Box (Left)
   const tblX = 60;
   const tblY = 140;
   const tblW = 1180;
@@ -650,7 +679,6 @@ export async function exportTechnicalPDF({
   ctx.lineWidth = 2;
   ctx.strokeRect(tblX, tblY, tblW, tblH);
 
-  // Table Header Row
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(tblX, tblY, tblW, 45);
 
@@ -667,7 +695,6 @@ export async function exportTechnicalPDF({
   ctx.fillText('السمك', tblX + tblW - 920, tblY + 30);
   ctx.fillText('القشاط ABS', tblX + tblW - 1060, tblY + 30);
 
-  // Table Data Rows
   const displayPanels = allPanels.slice(0, 16);
   let rowY = tblY + 45;
 
@@ -704,7 +731,6 @@ export async function exportTechnicalPDF({
     rowY += 36;
   });
 
-  // Quotation & Hardware Summary Card (Right Side)
   const qBoxX = 1270;
   const qBoxY = 140;
   const qBoxW = CANVAS_WIDTH - qBoxX - 60;
@@ -716,7 +742,6 @@ export async function exportTechnicalPDF({
   ctx.lineWidth = 2;
   ctx.strokeRect(qBoxX, qBoxY, qBoxW, qBoxH);
 
-  // Quotation Header
   ctx.fillStyle = '#1d4ed8';
   ctx.fillRect(qBoxX, qBoxY, qBoxW, 50);
   ctx.direction = 'rtl';
@@ -725,7 +750,6 @@ export async function exportTechnicalPDF({
   ctx.font = 'bold 18px "Cairo", sans-serif';
   ctx.fillText('عرض السعر التقديري والمفصلات', qBoxX + qBoxW - 20, qBoxY + 33);
 
-  // Hardware Items
   ctx.fillStyle = '#1e3a8a';
   ctx.font = 'bold 16px "Cairo", sans-serif';
   ctx.fillText('حصر الإكسسوارات والمفصلات:', qBoxX + qBoxW - 20, qBoxY + 80);
@@ -738,7 +762,6 @@ export async function exportTechnicalPDF({
     hwY += 28;
   });
 
-  // Pricing Totals
   const baseMeters = (cabinets.filter((c) => c.category === 'base').reduce((acc, c) => acc + c.width, 0) / 1000).toFixed(2);
   const wallMeters = (cabinets.filter((c) => c.category === 'wall').reduce((acc, c) => acc + c.width, 0) / 1000).toFixed(2);
   const priceBase = pricing.pricePerLinearMeterBase || 3500;
@@ -754,14 +777,12 @@ export async function exportTechnicalPDF({
   ctx.fillText(`• أمتار سفلي: ${baseMeters} م × ${priceBase} ${pricing.currency || 'ج.م'}`, qBoxX + qBoxW - 20, hwY + 60);
   ctx.fillText(`• أمتار علوي: ${wallMeters} م × ${priceWall} ${pricing.currency || 'ج.م'}`, qBoxX + qBoxW - 20, hwY + 90);
 
-  // Total Pill Box
   ctx.fillStyle = '#1d4ed8';
   ctx.fillRect(qBoxX + 20, qBoxY + qBoxH - 80, qBoxW - 40, 60);
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 20px "Cairo", sans-serif';
   ctx.fillText(`الإجمالي التقديري: ${totalAmount.toLocaleString()} ${pricing.currency || 'ج.م'}`, qBoxX + qBoxW - 40, qBoxY + qBoxH - 42);
 
-  // Add Page 5
   doc.addPage('a4', 'landscape');
   doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
 

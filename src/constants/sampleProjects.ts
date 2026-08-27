@@ -156,11 +156,11 @@ export const SAMPLE_PROJECT_BEDROOM: ProjectData = {
     { id: 'BD02', name: 'كومودينو يسار السرير', category: 'nightstand', type: 'bedroom-nightstand', projectType: 'bedroom', width: 500, height: 500, depth: 450, x: 350, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
     { id: 'BD03', name: 'كومودينو يمين السرير', category: 'nightstand', type: 'bedroom-nightstand', projectType: 'bedroom', width: 500, height: 500, depth: 450, x: 2850, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
     { id: 'BD04', name: 'بانكيت مبطن نهاية السرير', category: 'bench', type: 'bedroom-bench-ottoman', projectType: 'bedroom', width: 1500, height: 450, depth: 450, x: 1100, y: 2200, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 0, doorHinge: 'none' },
-    { id: 'BD05', name: 'تسريحة دريسير 6 أدراج مع مرآة', category: 'dresser', type: 'bedroom-dresser-mirror', projectType: 'bedroom', width: 1400, height: 850, depth: 500, x: 4800 - 500, y: 1200, z: 0, rotation: 90, wallId: 'wall-b', shelfCount: 0, doorCount: 0, drawerCount: 6, doorHinge: 'none', hasMirror: true, mirrorHeight: 900 },
-    { id: 'BD06', name: 'وحدة تلفزيون وكونسول معلقة', category: 'tv-unit', type: 'bedroom-tv-credenza', projectType: 'bedroom', width: 1800, height: 400, depth: 350, x: 1400, y: 4200 - 350, z: 450, rotation: 180, wallId: 'wall-c', shelfCount: 1, doorCount: 2, drawerCount: 1, doorHinge: 'double' },
+    { id: 'BD05', name: 'تسريحة دريسير 6 أدراج مع مرآة', category: 'dresser', type: 'bedroom-dresser-mirror', projectType: 'bedroom', width: 1400, height: 850, depth: 500, x: 4800, y: 1200, z: 0, rotation: 90, wallId: 'wall-b', shelfCount: 0, doorCount: 0, drawerCount: 6, doorHinge: 'none', hasMirror: true, mirrorHeight: 900 },
+    { id: 'BD06', name: 'وحدة تلفزيون وكونسول معلقة', category: 'tv-unit', type: 'bedroom-tv-credenza', projectType: 'bedroom', width: 1800, height: 400, depth: 350, x: 3200, y: 4200, z: 450, rotation: 180, wallId: 'wall-c', shelfCount: 1, doorCount: 2, drawerCount: 1, doorHinge: 'double' },
   ],
   appliances: [
-    { id: 'TV01', name: 'شاشة تلفزيون 55 بوصة', type: 'tv-screen', width: 1250, height: 720, depth: 60, x: 1675, y: 4200 - 50, z: 950, rotation: 180, wallId: 'wall-c' }
+    { id: 'TV01', name: 'شاشة تلفزيون 55 بوصة', type: 'tv-screen', width: 1250, height: 720, depth: 60, x: 2925, y: 4200, z: 950, rotation: 180, wallId: 'wall-c' }
   ],
   architecturalElements: BEDROOM_ARCH_ELEMENTS,
   countertop: { ...DEFAULT_COUNTERTOP_CONFIG, enabled: false },

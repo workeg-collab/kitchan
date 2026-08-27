@@ -24,6 +24,7 @@ import {
 } from '../constants/standards';
 import { SAMPLE_PROJECT_MODERN_L } from '../constants/sampleProjects';
 import { dbService } from '../services/dbService';
+import { getItemBoundingBox } from '../utils/cadGeometry';
 
 interface ProjectState {
   project: ProjectData;
@@ -275,10 +276,20 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   addCabinet: (cabData) => {
     get().pushHistory();
     const id = cabData.id || get().getNextCabinetId(cabData.category);
-    const newCabinet: CabinetItem = {
+    const rawCabinet: CabinetItem = {
       ...cabData,
       id,
     };
+    const room = get().project.room;
+    const bbox = getItemBoundingBox(rawCabinet.x, rawCabinet.y, rawCabinet.width, rawCabinet.depth, rawCabinet.rotation);
+    let clampedX = rawCabinet.x;
+    let clampedY = rawCabinet.y;
+    if (bbox.minX < 0) clampedX += (0 - bbox.minX);
+    if (bbox.maxX > room.width) clampedX -= (bbox.maxX - room.width);
+    if (bbox.minY < 0) clampedY += (0 - bbox.minY);
+    if (bbox.maxY > room.length) clampedY -= (bbox.maxY - room.length);
+
+    const newCabinet: CabinetItem = { ...rawCabinet, x: clampedX, y: clampedY };
 
     set((state) => {
       const updatedCabinets = [...state.project.cabinets, newCabinet];
@@ -292,7 +303,19 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
   updateCabinet: (id, data) => {
     set((state) => {
-      const updatedCabinets = state.project.cabinets.map((c) => (c.id === id ? { ...c, ...data } : c));
+      const room = state.project.room;
+      const updatedCabinets = state.project.cabinets.map((c) => {
+        if (c.id !== id) return c;
+        const merged = { ...c, ...data };
+        const bbox = getItemBoundingBox(merged.x, merged.y, merged.width, merged.depth, merged.rotation);
+        let clampedX = merged.x;
+        let clampedY = merged.y;
+        if (bbox.minX < 0) clampedX += (0 - bbox.minX);
+        if (bbox.maxX > room.width) clampedX -= (bbox.maxX - room.width);
+        if (bbox.minY < 0) clampedY += (0 - bbox.minY);
+        if (bbox.maxY > room.length) clampedY -= (bbox.maxY - room.length);
+        return { ...merged, x: clampedX, y: clampedY };
+      });
       const updated = { ...state.project, cabinets: updatedCabinets };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated };
@@ -319,12 +342,21 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     get().pushHistory();
 
     const newId = get().getNextCabinetId(cabinet.category);
+    const room = get().project.room;
+    let targetX = cabinet.x + 100;
+    let targetY = cabinet.y + 50;
+    const bbox = getItemBoundingBox(targetX, targetY, cabinet.width, cabinet.depth, cabinet.rotation);
+    if (bbox.minX < 0) targetX += (0 - bbox.minX);
+    if (bbox.maxX > room.width) targetX -= (bbox.maxX - room.width);
+    if (bbox.minY < 0) targetY += (0 - bbox.minY);
+    if (bbox.maxY > room.length) targetY -= (bbox.maxY - room.length);
+
     const duplicated: CabinetItem = {
       ...cabinet,
       id: newId,
       name: `${cabinet.name} (نسخة)`,
-      x: cabinet.x + 100,
-      y: cabinet.y + 50,
+      x: targetX,
+      y: targetY,
     };
 
     set((state) => {
@@ -339,10 +371,18 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   rotateCabinet: (id, angleDelta = 90) => {
     get().pushHistory();
     set((state) => {
+      const room = state.project.room;
       const updatedCabinets = state.project.cabinets.map((c) => {
         if (c.id !== id) return c;
         const newRot = (c.rotation + angleDelta) % 360;
-        return { ...c, rotation: newRot };
+        const bbox = getItemBoundingBox(c.x, c.y, c.width, c.depth, newRot);
+        let clampedX = c.x;
+        let clampedY = c.y;
+        if (bbox.minX < 0) clampedX += (0 - bbox.minX);
+        if (bbox.maxX > room.width) clampedX -= (bbox.maxX - room.width);
+        if (bbox.minY < 0) clampedY += (0 - bbox.minY);
+        if (bbox.maxY > room.length) clampedY -= (bbox.maxY - room.length);
+        return { ...c, rotation: newRot, x: clampedX, y: clampedY };
       });
       const updated = { ...state.project, cabinets: updatedCabinets };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
