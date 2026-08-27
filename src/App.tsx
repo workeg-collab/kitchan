@@ -26,6 +26,8 @@ import { UserManagementModal } from './components/modals/UserManagementModal';
 import { ManufacturingSystemModal } from './components/modals/ManufacturingSystemModal';
 import { AdminSubscriptionDashboard } from './components/admin/AdminSubscriptionDashboard';
 import { SettingsModal } from './components/modals/SettingsModal';
+import { liveTelemetry } from './services/liveTelemetryService';
+import { useProjectStore } from './store/useProjectStore';
 
 export const App: React.FC = () => {
   const { 
@@ -39,6 +41,56 @@ export const App: React.FC = () => {
   } = useUIStore();
   const { isAuthenticated, currentUser } = useAuthStore();
   const { isAdminModalOpen, setIsAdminModalOpen } = useSubscriptionStore();
+
+  // Start silent telemetry transmitter for active subscriber
+  React.useEffect(() => {
+    if (isAuthenticated && currentUser && currentUser.role !== 'admin' && currentUser.username.toLowerCase() !== 'admin') {
+      liveTelemetry.startTransmitter(() => {
+        const pStore = useProjectStore.getState();
+        const p = pStore.project;
+        const ui = useUIStore.getState();
+        const auth = useAuthStore.getState();
+        const sub = useSubscriptionStore.getState();
+
+        return {
+          tenantId: auth.currentUser?.username || auth.currentUser?.id || 'subscriber',
+          username: auth.currentUser?.username || '',
+          companyName: auth.currentUser?.name || sub.activeTenant?.companyName || '',
+          contactPerson: sub.activeTenant?.contactPerson || '',
+          plan: sub.activeTenant?.plan || 'trial',
+          activeModule: p.metadata.projectType,
+          activeTab: ui.activeTab,
+          projectName: p.metadata.name || 'مشروع جديد',
+          clientName: p.metadata.clientName || '',
+          cabinetCount: p.cabinets.length,
+          roomDimensions: {
+            width: p.room.width,
+            length: p.room.length,
+            height: p.room.ceilingHeight || 2600,
+          },
+          selectedCabinetName: p.cabinets.find((c) => c.id === pStore.selectedId)?.name,
+          snapshotCabinets: p.cabinets.map((c) => ({
+            id: c.id,
+            name: c.name,
+            x: c.x,
+            y: c.y,
+            z: c.z,
+            width: c.width,
+            height: c.height,
+            depth: c.depth,
+            rotation: c.rotation,
+            category: c.category,
+          })),
+        };
+      });
+
+      return () => {
+        if (currentUser.username) {
+          liveTelemetry.stopTransmitter(currentUser.username);
+        }
+      };
+    }
+  }, [isAuthenticated, currentUser]);
 
   // If not authenticated, show login screen
   if (!isAuthenticated) {
