@@ -1,4 +1,5 @@
 import React from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { useUIStore } from './store/useUIStore';
 import { useAuthStore } from './store/useAuthStore';
 import { useSubscriptionStore } from './store/useSubscriptionStore';
@@ -60,6 +61,7 @@ export const App: React.FC = () => {
           isOpen={isSettingsModalOpen}
           onClose={() => setIsSettingsModalOpen(false)}
         />
+        <Analytics />
       </div>
     );
   }
@@ -118,6 +120,7 @@ export const App: React.FC = () => {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
+      <Analytics />
     </div>
   );
 };
