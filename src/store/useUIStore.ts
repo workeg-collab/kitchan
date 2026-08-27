@@ -63,6 +63,8 @@ interface UIState {
   setIsExportModalOpen: (open: boolean) => void;
   isCustomCabinetModalOpen: boolean;
   setIsCustomCabinetModalOpen: (open: boolean) => void;
+  isCustomKitchenModalOpen: boolean;
+  setIsCustomKitchenModalOpen: (open: boolean) => void;
   isTemplateModalOpen: boolean;
   setIsTemplateModalOpen: (open: boolean) => void;
   isManufacturingSystemModalOpen: boolean;
@@ -151,6 +153,8 @@ export const useUIStore = create<UIState>((set) => ({
   setIsExportModalOpen: (isExportModalOpen) => set({ isExportModalOpen }),
   isCustomCabinetModalOpen: false,
   setIsCustomCabinetModalOpen: (isCustomCabinetModalOpen) => set({ isCustomCabinetModalOpen }),
+  isCustomKitchenModalOpen: false,
+  setIsCustomKitchenModalOpen: (isCustomKitchenModalOpen) => set({ isCustomKitchenModalOpen }),
   isTemplateModalOpen: false,
   setIsTemplateModalOpen: (isTemplateModalOpen) => set({ isTemplateModalOpen }),
   isManufacturingSystemModalOpen: false,

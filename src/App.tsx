@@ -18,6 +18,7 @@ import { PricingCalculatorView } from './components/pricing/PricingCalculatorVie
 import { RoomConfigModal } from './components/modals/RoomConfigModal';
 import { RoomSketcherModal } from './components/modals/RoomSketcherModal';
 import { CustomCabinetModal } from './components/modals/CustomCabinetModal';
+import { CustomKitchenModal } from './components/modals/CustomKitchenModal';
 import { TemplateModal } from './components/modals/TemplateModal';
 import { ExportModal } from './components/modals/ExportModal';
 import { UserManagementModal } from './components/modals/UserManagementModal';
@@ -28,7 +29,9 @@ export const App: React.FC = () => {
   const { 
     activeTab, 
     isManufacturingSystemModalOpen, 
-    setIsManufacturingSystemModalOpen 
+    setIsManufacturingSystemModalOpen,
+    isCustomKitchenModalOpen,
+    setIsCustomKitchenModalOpen
   } = useUIStore();
   const { isAuthenticated } = useAuthStore();
   const { isAdminModalOpen, setIsAdminModalOpen } = useSubscriptionStore();
@@ -85,6 +88,10 @@ export const App: React.FC = () => {
       <RoomConfigModal />
       <RoomSketcherModal />
       <CustomCabinetModal />
+      <CustomKitchenModal
+        isOpen={isCustomKitchenModalOpen}
+        onClose={() => setIsCustomKitchenModalOpen(false)}
+      />
       <TemplateModal />
       <ExportModal />
       <UserManagementModal />
