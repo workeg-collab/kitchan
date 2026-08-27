@@ -8,23 +8,26 @@ export interface PDFExportOptions {
 }
 
 /**
- * 100% Bulletproof Native Canvas-to-PDF Engine
- * Zero HTML/CSS parsing errors, Zero external dependencies on html2canvas DOM cloning.
- * Produces crisp, beautiful 300 DPI landscape architectural sheets with native Arabic text.
+ * High-End Multi-Page Architectural PDF Dossier with:
+ * 1. 3D Render & Project Specifications Cover Sheet
+ * 2. 2D Architectural Floor Plan with CM dimensions
+ * 3. Side-by-Side Live Wall Elevations (Wall A, B, C, D) showing cabinet sequences
+ * 4. Individual Cabinet Workshop Cut Sheets with individual facade illustrations and CM dimensions
+ * 5. Cutting List Table & Pricing Quotation Summary
  */
 export async function exportTechnicalPDF({
   project,
   render3DImage,
 }: PDFExportOptions): Promise<void> {
-  const { metadata, room, cabinets, manufacturing, materials, pricing, plinth, countertop } = project;
+  const { metadata, room, cabinets, appliances, manufacturing, materials, pricing, plinth, countertop } = project;
   const { allPanels, aggregatedHardware, sheetEstimates } = generateFullProjectBOM(cabinets, manufacturing);
   const totalBoardCount = sheetEstimates.sheetsNeeded;
 
   const toCm = (mm: number) => ((mm || 0) / 10).toFixed(1) + ' سم';
 
-  // Canvas sheet dimensions (A4 Landscape at 150-200 DPI for high crispness & fast speed)
+  // Canvas sheet dimensions (A4 Landscape 1920x1358 px)
   const CANVAS_WIDTH = 1920;
-  const CANVAS_HEIGHT = 1358; // Approx A4 aspect ratio 1.414
+  const CANVAS_HEIGHT = 1358;
 
   const canvas = document.createElement('canvas');
   canvas.width = CANVAS_WIDTH;
@@ -56,13 +59,13 @@ export async function exportTechnicalPDF({
     format: 'a4',
   });
 
-  // Helper for Title Block & Sheet Header
+  // Helper for Title Block & Sheet Frame
   const drawSheetFrame = (sheetTitle: string, pageNum: number, totalPages: number) => {
-    // 1. Background
+    // 1. White Background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // 2. Outer Architectural Border
+    // 2. Outer Architectural Borders
     ctx.strokeStyle = '#0f172a';
     ctx.lineWidth = 4;
     ctx.strokeRect(30, 30, CANVAS_WIDTH - 60, CANVAS_HEIGHT - 60);
@@ -78,14 +81,14 @@ export async function exportTechnicalPDF({
     ctx.direction = 'rtl';
     ctx.textAlign = 'right';
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 30px "Cairo", "Tajawal", "Segoe UI", sans-serif';
-    ctx.fillText(metadata.name || 'مشروع كيتشن كاد', CANVAS_WIDTH - 60, 80);
+    ctx.font = 'bold 28px "Cairo", "Tajawal", "Segoe UI", sans-serif';
+    ctx.fillText(metadata.name || 'مشروع كيتشن كاد', CANVAS_WIDTH - 60, 78);
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '18px "Cairo", "Tajawal", "Segoe UI", sans-serif';
-    ctx.fillText(`الملف الفني الهندسي الشامل وقوائم التصنيع — ${metadata.projectType === 'kitchen' ? 'مطابخ' : 'دريسينج وأثاث'}`, CANVAS_WIDTH - 60, 105);
+    ctx.font = '16px "Cairo", "Tajawal", "Segoe UI", sans-serif';
+    ctx.fillText(`الملف الفني الهندسي الشامل وقوائم التصنيع — ${metadata.projectType === 'kitchen' ? 'مطابخ' : 'دريسينج وأثاث'}`, CANVAS_WIDTH - 60, 103);
 
-    // Left brand in English
+    // Left Brand in English
     ctx.direction = 'ltr';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#38bdf8';
@@ -110,15 +113,15 @@ export async function exportTechnicalPDF({
     ctx.direction = 'rtl';
     ctx.textAlign = 'right';
     ctx.fillStyle = '#0f172a';
-    ctx.font = 'bold 16px "Cairo", "Tajawal", sans-serif';
+    ctx.font = 'bold 15px "Cairo", "Tajawal", sans-serif';
     ctx.fillText(`العميل: ${metadata.clientName || 'غير محدد'}`, CANVAS_WIDTH - 60, stampY + 28);
     ctx.fillText(`المصمم: ${metadata.designerName || 'استوديو كيتشن كاد'}`, CANVAS_WIDTH - 60, stampY + 54);
 
-    ctx.fillText(`أبعاد الغرفة: ${toCm(room.width)} × ${toCm(room.length)} (ارتفاع: ${toCm(room.ceilingHeight)})`, CANVAS_WIDTH - 500, stampY + 28);
-    ctx.fillText(`التاريخ: ${metadata.date || new Date().toISOString().split('T')[0]}`, CANVAS_WIDTH - 500, stampY + 54);
+    ctx.fillText(`أبعاد الغرفة: ${toCm(room.width)} × ${toCm(room.length)} (ارتفاع: ${toCm(room.ceilingHeight)})`, CANVAS_WIDTH - 480, stampY + 28);
+    ctx.fillText(`التاريخ: ${metadata.date || new Date().toISOString().split('T')[0]}`, CANVAS_WIDTH - 480, stampY + 54);
 
-    ctx.fillText(`الخامة: ألواح ${manufacturing.boardThickness}مم / ${materials.frontFinish || 'أبيض مطفي'}`, CANVAS_WIDTH - 1000, stampY + 28);
-    ctx.fillText(`الوزرة: ${toCm(plinth.height)} / الرخام: ${materials.countertopMaterial || 'رخام'} (${countertop.thickness}مم)`, CANVAS_WIDTH - 1000, stampY + 54);
+    ctx.fillText(`الخامة: ألواح ${manufacturing.boardThickness}مم / ${materials.frontFinish || 'أبيض مطفي'}`, CANVAS_WIDTH - 960, stampY + 28);
+    ctx.fillText(`الوزرة: ${toCm(plinth.height)} / الرخام: ${materials.countertopMaterial || 'رخام'} (${countertop.thickness}مم)`, CANVAS_WIDTH - 960, stampY + 54);
 
     // Page Number
     ctx.direction = 'ltr';
@@ -128,10 +131,173 @@ export async function exportTechnicalPDF({
     ctx.fillText(`PAGE ${pageNum} OF ${totalPages}`, 60, stampY + 40);
   };
 
+  // Helper to draw an individual Cabinet Facade Illustration
+  const drawCabinetFacade = (
+    c: CabinetItem,
+    boxX: number,
+    boxY: number,
+    boxW: number,
+    boxH: number
+  ) => {
+    const isWall = c.category === 'wall';
+    const isTall = c.category === 'tall';
+    const isLoft = c.isCeilingUnit || c.flipUpDoor || c.type.includes('loft');
+    const isFlap = c.flipUpDoor || c.doorHinge === 'top' || c.type.includes('lift-up') || c.type.includes('aventos');
+
+    // 1. Cabinet Outer Box
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeStyle = isLoft ? '#d97706' : isTall ? '#312e81' : isWall ? '#0284c7' : '#0f172a';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    // 2. Plinth if base or tall
+    if (c.category === 'base' || isTall) {
+      const plinthH = Math.max(12, boxH * 0.12);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(boxX, boxY + boxH - plinthH, boxW, plinthH);
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(boxX, boxY + boxH - plinthH, boxW, plinthH);
+    }
+
+    // 3. Countertop if base
+    if (c.category === 'base') {
+      const ctH = Math.max(8, boxH * 0.06);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(boxX - 4, boxY - ctH, boxW + 8, ctH);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(boxX - 4, boxY - ctH, boxW + 8, ctH);
+    }
+
+    // 4. Drawers or Doors Facade Drawing
+    const usableH = c.category === 'base' || isTall ? boxH * 0.88 : boxH;
+
+    if (c.drawerCount > 0 && !isFlap) {
+      const drwH = usableH / c.drawerCount;
+      for (let i = 0; i < c.drawerCount; i++) {
+        const dy = boxY + i * drwH;
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(boxX + 4, dy + 4, boxW - 8, drwH - 8);
+
+        // Handle
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(boxX + boxW / 2 - boxW * 0.2, dy + drwH / 2 - 2, boxW * 0.4, 4);
+      }
+    } else if (isFlap) {
+      // Flap Door: Upward triangle swing symbol
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(boxX + 6, boxY + usableH - 6);
+      ctx.lineTo(boxX + boxW / 2, boxY + 8);
+      ctx.lineTo(boxX + boxW - 6, boxY + usableH - 6);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Bottom Pull Handle
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(boxX + boxW * 0.25, boxY + usableH - 12, boxW * 0.5, 4);
+
+      ctx.direction = 'rtl';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#d97706';
+      ctx.font = 'bold 11px "Cairo", sans-serif';
+      ctx.fillText('قلاب ⮝', boxX + boxW / 2, boxY + usableH / 2 + 10);
+    } else if (c.doorCount === 1) {
+      // Single Door Swing Triangle
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      if (c.doorHinge === 'left') {
+        ctx.moveTo(boxX + 6, boxY + 6);
+        ctx.lineTo(boxX + boxW - 6, boxY + usableH / 2);
+        ctx.lineTo(boxX + 6, boxY + usableH - 6);
+      } else {
+        ctx.moveTo(boxX + boxW - 6, boxY + 6);
+        ctx.lineTo(boxX + 6, boxY + usableH / 2);
+        ctx.lineTo(boxX + boxW - 6, boxY + usableH - 6);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Handle
+      ctx.fillStyle = '#0f172a';
+      const handleX = c.doorHinge === 'left' ? boxX + boxW - 14 : boxX + 10;
+      ctx.fillRect(handleX, boxY + usableH / 2 - 14, 4, 28);
+    } else if (c.doorCount === 2) {
+      // Double Door
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(boxX + boxW / 2, boxY);
+      ctx.lineTo(boxX + boxW / 2, boxY + usableH);
+      ctx.stroke();
+
+      // Left & Right swing triangles
+      ctx.strokeStyle = '#94a3b8';
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      // Left door
+      ctx.moveTo(boxX + 4, boxY + 4);
+      ctx.lineTo(boxX + boxW / 2 - 4, boxY + usableH / 2);
+      ctx.lineTo(boxX + 4, boxY + usableH - 4);
+      // Right door
+      ctx.moveTo(boxX + boxW - 4, boxY + 4);
+      ctx.lineTo(boxX + boxW / 2 + 4, boxY + usableH / 2);
+      ctx.lineTo(boxX + boxW - 4, boxY + usableH - 4);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Dual Handles
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(boxX + boxW / 2 - 10, boxY + usableH / 2 - 14, 3, 28);
+      ctx.fillRect(boxX + boxW / 2 + 7, boxY + usableH / 2 - 14, 3, 28);
+    }
+
+    // Glass Vitrine Diagonals
+    if (c.hasGlassDoors || c.type === 'wall-glass-vitrine') {
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath();
+      ctx.moveTo(boxX + 8, boxY + 8);
+      ctx.lineTo(boxX + boxW - 8, boxY + usableH - 8);
+      ctx.moveTo(boxX + boxW - 8, boxY + 8);
+      ctx.lineTo(boxX + 8, boxY + usableH - 8);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Sink Cutout Symbol
+    if (c.hasSinkCutout) {
+      ctx.fillStyle = '#e0f2fe';
+      ctx.fillRect(boxX + boxW * 0.2, boxY + usableH * 0.2, boxW * 0.6, usableH * 0.5);
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(boxX + boxW * 0.2, boxY + usableH * 0.2, boxW * 0.6, usableH * 0.5);
+    }
+
+    // Appliance Cavity (Oven)
+    if (c.hasApplianceCavity) {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(boxX + boxW * 0.1, boxY + usableH * 0.25, boxW * 0.8, usableH * 0.5);
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(boxX + boxW * 0.1, boxY + usableH * 0.25, boxW * 0.8, usableH * 0.5);
+    }
+  };
+
+  const TOTAL_PAGES = 5;
+
   // =========================================================================
   // PAGE 1: COVER & 3D RENDERING + SPECIFICATIONS
   // =========================================================================
-  drawSheetFrame('01 / Project Overview & 3D Render', 1, 4);
+  drawSheetFrame('01 / Project Overview & 3D Render', 1, TOTAL_PAGES);
 
   // 3D Perspective Box (Left Side)
   const renderBoxX = 60;
@@ -171,16 +337,14 @@ export async function exportTechnicalPDF({
   ctx.lineWidth = 2;
   ctx.strokeRect(specBoxX, specBoxY, specBoxW, specBoxH);
 
-  // Specs Header
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(specBoxX, specBoxY, specBoxW, 50);
   ctx.direction = 'rtl';
   ctx.textAlign = 'right';
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 20px "Cairo", sans-serif';
-  ctx.fillText('المواصفات الفنية المعتمدة للتصنيع', specBoxX + specBoxW - 20, specBoxY + 33);
+  ctx.fillText('المواصفات الفنية وبيانات العقد', specBoxX + specBoxW - 20, specBoxY + 33);
 
-  // Specs Rows
   const specsList = [
     { label: 'اسم العميل:', val: metadata.clientName || 'غير محدد' },
     { label: 'المهندس / المصمم:', val: metadata.designerName || 'استوديو كيتشن كاد' },
@@ -222,21 +386,18 @@ export async function exportTechnicalPDF({
     ctx.fillText(`ملاحظات: ${metadata.notes}`, specBoxX + specBoxW - 20, specBoxY + specBoxH - 30);
   }
 
-  // Add Page 1
   doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
 
   // =========================================================================
   // PAGE 2: 2D ARCHITECTURAL FLOOR PLAN WITH CENTIMETER DIMENSIONS
   // =========================================================================
-  drawSheetFrame('02 / 2D Architectural Floor Plan (المسقط الأفقي)', 2, 4);
+  drawSheetFrame('02 / 2D Architectural Floor Plan (المسقط الأفقي)', 2, TOTAL_PAGES);
 
-  // Room Schematic Box
   const planBoxX = 160;
   const planBoxY = 180;
   const planBoxW = CANVAS_WIDTH - 320;
   const planBoxH = CANVAS_HEIGHT - 320;
 
-  // Draw Room Walls
   ctx.strokeStyle = '#334155';
   ctx.lineWidth = 16;
   ctx.strokeRect(planBoxX, planBoxY, planBoxW, planBoxH);
@@ -244,17 +405,13 @@ export async function exportTechnicalPDF({
   ctx.fillStyle = '#f8fafc';
   ctx.fillRect(planBoxX, planBoxY, planBoxW, planBoxH);
 
-  // Wall Dimension Annotations in CM
   ctx.direction = 'rtl';
   ctx.textAlign = 'center';
   ctx.fillStyle = '#1e293b';
   ctx.font = 'bold 22px "Cairo", sans-serif';
-  // Top Wall A
   ctx.fillText(`الجدار الخلفي أ — [ ${toCm(room.width)} ]`, planBoxX + planBoxW / 2, planBoxY - 25);
-  // Bottom Wall C
   ctx.fillText(`الجدار الأمامي ج — [ ${toCm(room.width)} ]`, planBoxX + planBoxW / 2, planBoxY + planBoxH + 40);
 
-  // Side Wall B & D
   ctx.save();
   ctx.translate(planBoxX + planBoxW + 40, planBoxY + planBoxH / 2);
   ctx.rotate(Math.PI / 2);
@@ -267,7 +424,6 @@ export async function exportTechnicalPDF({
   ctx.fillText(`الجدار الأيسر د — [ ${toCm(room.length)} ]`, 0, 0);
   ctx.restore();
 
-  // Draw Cabinets inside Room
   cabinets.forEach((c) => {
     const leftPx = planBoxX + (c.x / room.width) * planBoxW;
     const topPx = planBoxY + (c.y / room.length) * planBoxH;
@@ -285,7 +441,6 @@ export async function exportTechnicalPDF({
     ctx.lineWidth = 2;
     ctx.strokeRect(leftPx, topPx, widthPx, depthPx);
 
-    // Cabinet Label & Width in CM
     ctx.direction = 'ltr';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#ffffff';
@@ -297,14 +452,101 @@ export async function exportTechnicalPDF({
     ctx.fillText(toCm(c.width), leftPx + widthPx / 2, topPx + depthPx / 2 + 14);
   });
 
-  // Add Page 2
   doc.addPage('a4', 'landscape');
   doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
 
   // =========================================================================
-  // PAGE 3: DETAILED CABINET WORKSHOP CARDS (تفاصيل كل كابينة بالسنتيمتر)
+  // PAGE 3: SIDE-BY-SIDE WALL ELEVATIONS (واجهات الجدران وترتيب الوحدات)
   // =========================================================================
-  drawSheetFrame('03 / Detailed Cabinet Workshop Cards (بطاقات تفاصيل الكبائن)', 3, 4);
+  drawSheetFrame('03 / Wall Elevations & Side-by-Side Sequence (واجهات الجدران وترتيب الوحدات)', 3, TOTAL_PAGES);
+
+  // Split into Wall A (Top Half) and Wall B (Bottom Half)
+  const wallElevations = [
+    {
+      id: 'wall-a',
+      name: 'الجدار أ (الخلفي)',
+      length: room.width,
+      cabinets: cabinets.filter((c) => c.wallId === 'wall-a' || c.rotation === 0 || c.y <= 100),
+      startY: 140,
+      height: 480,
+    },
+    {
+      id: 'wall-b',
+      name: 'الجدار ب (الأيمن)',
+      length: room.length,
+      cabinets: cabinets.filter((c) => c.wallId === 'wall-b' || c.rotation === 90 || c.x >= room.width - 700),
+      startY: 680,
+      height: 480,
+    },
+  ];
+
+  wallElevations.forEach((wall) => {
+    const eBoxX = 60;
+    const eBoxY = wall.startY;
+    const eBoxW = CANVAS_WIDTH - 120;
+    const eBoxH = wall.height;
+
+    // Header strip for this wall
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(eBoxX, eBoxY, eBoxW, 36);
+    ctx.direction = 'rtl';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 16px "Cairo", sans-serif';
+    ctx.fillText(`${wall.name} — الطول الإجمالي: ${toCm(wall.length)} (ارتفاع السقف: ${toCm(room.ceilingHeight)})`, eBoxX + eBoxW - 16, eBoxY + 24);
+
+    // Wall Background
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(eBoxX, eBoxY + 36, eBoxW, eBoxH - 36);
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(eBoxX, eBoxY + 36, eBoxW, eBoxH - 36);
+
+    // Floor Line
+    const floorY = eBoxY + eBoxH - 30;
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(eBoxX, floorY);
+    ctx.lineTo(eBoxX + eBoxW, floorY);
+    ctx.stroke();
+
+    // Scale Factor: Map wall.length (mm) to available pixel width
+    const scaleFactor = (eBoxW - 80) / wall.length;
+    const scaleH = (eBoxH - 120) / room.ceilingHeight;
+
+    // Draw Cabinets arranged side-by-side on this wall
+    wall.cabinets.forEach((c) => {
+      // Relative offset along wall
+      const relX = wall.id === 'wall-a' ? c.x : c.y;
+      const cabPxX = eBoxX + 40 + relX * scaleFactor;
+      const cabPxW = Math.max(30, c.width * scaleFactor);
+      const cabPxH = Math.max(30, c.height * scaleH);
+      const cabPxY = floorY - (c.z + c.height) * scaleH;
+
+      // Draw Facade for this unit
+      drawCabinetFacade(c, cabPxX, cabPxY, cabPxW, cabPxH);
+
+      // Dimension Label above cabinet
+      ctx.direction = 'ltr';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(c.id, cabPxX + cabPxW / 2, cabPxY - 8);
+
+      ctx.fillStyle = '#2563eb';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(toCm(c.width), cabPxX + cabPxW / 2, cabPxY + cabPxH + 16);
+    });
+  });
+
+  doc.addPage('a4', 'landscape');
+  doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
+
+  // =========================================================================
+  // PAGE 4: INDIVIDUAL CABINET WORKSHOP CARDS (صور ومقاسات كل كابينة منفردة)
+  // =========================================================================
+  drawSheetFrame('04 / Individual Cabinet Workshop Cards (صور ومقاسات كل كابينة منفردة)', 4, TOTAL_PAGES);
 
   const cardW = 420;
   const cardH = 260;
@@ -335,85 +577,66 @@ export async function exportTechnicalPDF({
 
     // Card Header
     ctx.fillStyle = headerBg;
-    ctx.fillRect(x, y, cardW, 42);
+    ctx.fillRect(x, y, cardW, 38);
 
     ctx.direction = 'rtl';
     ctx.textAlign = 'right';
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 16px "Cairo", sans-serif';
-    ctx.fillText(`${c.id} - ${c.name}`, x + cardW - 14, y + 27);
+    ctx.font = 'bold 15px "Cairo", sans-serif';
+    ctx.fillText(`${c.id} - ${c.name}`, x + cardW - 12, y + 25);
 
-    // Dimension Pill Box in CM
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillRect(x + 10, y + 52, cardW - 20, 50);
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x + 10, y + 52, cardW - 20, 50);
+    // Mini Live 2D/3D Facade Drawing of this specific cabinet
+    const drawBoxW = 90;
+    const drawBoxH = 130;
+    const drawBoxX = x + cardW - drawBoxW - 14;
+    const drawBoxY = y + 50;
+    drawCabinetFacade(c, drawBoxX, drawBoxY, drawBoxW, drawBoxH);
 
+    // Dimensions in CM (Center Column)
+    const dimX = x + cardW - drawBoxW - 30;
     ctx.direction = 'rtl';
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'right';
     ctx.font = 'bold 12px "Cairo", sans-serif';
 
-    const colW = (cardW - 20) / 4;
-    // Width
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('العرض W', x + 10 + colW * 3.5, y + 70);
-    ctx.fillStyle = '#2563eb';
-    ctx.fillText(toCm(c.width), x + 10 + colW * 3.5, y + 92);
+    const dims = [
+      { l: 'العرض (W):', v: toCm(c.width) },
+      { l: 'الارتفاع (H):', v: toCm(c.height) },
+      { l: 'العمق (D):', v: toCm(c.depth) },
+      { l: 'المنسوب (Z):', v: toCm(c.z) },
+    ];
 
-    // Height
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('الارتفاع H', x + 10 + colW * 2.5, y + 70);
-    ctx.fillStyle = '#2563eb';
-    ctx.fillText(toCm(c.height), x + 10 + colW * 2.5, y + 92);
-
-    // Depth
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('العمق D', x + 10 + colW * 1.5, y + 70);
-    ctx.fillStyle = '#2563eb';
-    ctx.fillText(toCm(c.depth), x + 10 + colW * 1.5, y + 92);
-
-    // Elevation Z
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('المنسوب Z', x + 10 + colW * 0.5, y + 70);
-    ctx.fillStyle = '#16a34a';
-    ctx.fillText(toCm(c.z), x + 10 + colW * 0.5, y + 92);
+    let dY = y + 68;
+    dims.forEach((d) => {
+      ctx.fillStyle = '#64748b';
+      ctx.fillText(d.l, dimX, dY);
+      ctx.fillStyle = '#2563eb';
+      ctx.fillText(d.v, dimX - 80, dY);
+      dY += 24;
+    });
 
     // Specifications List
     ctx.direction = 'rtl';
     ctx.textAlign = 'right';
     ctx.fillStyle = '#334155';
-    ctx.font = '14px "Cairo", sans-serif';
-    let lineY = y + 130;
+    ctx.font = '12.5px "Cairo", sans-serif';
+    let lineY = y + 195;
 
-    ctx.fillText(`• الضلف: ${c.doorCount} ${c.flipUpDoor ? '(قلاب هيدروليك للأعلى ⮝)' : `(مفصلات ${c.doorHinge || 'عادية'})`}`, x + cardW - 16, lineY);
-    lineY += 26;
+    ctx.fillText(`• الضلف: ${c.doorCount} ${c.flipUpDoor ? '(قلاب باكم هيدروليك ⮝)' : `(مفصلات ${c.doorHinge || 'عادية'})`}`, x + cardW - 14, lineY);
+    lineY += 22;
 
-    ctx.fillText(`• الأدراج: ${c.drawerCount > 0 ? `${c.drawerCount} أدراج سحاب تاندوم` : 'بدون أدراج'}`, x + cardW - 16, lineY);
-    lineY += 26;
+    ctx.fillText(`• الأدراج: ${c.drawerCount > 0 ? `${c.drawerCount} أدراج سحاب تاندوم` : 'بدون أدراج'}`, x + cardW - 14, lineY);
+    lineY += 22;
 
-    ctx.fillText(`• الرفوف الداخلية: ${c.shelfCount} رف قابل للتعديل`, x + cardW - 16, lineY);
-    lineY += 26;
-
-    if (c.hasSinkCutout) {
-      ctx.fillStyle = '#0284c7';
-      ctx.font = 'bold 13px "Cairo", sans-serif';
-      ctx.fillText('• مجهزة بتفريغ حوض السباكة وعزل الرطوبة', x + cardW - 16, lineY);
-    } else if (c.hasApplianceCavity) {
-      ctx.fillStyle = '#ea580c';
-      ctx.font = 'bold 13px "Cairo", sans-serif';
-      ctx.fillText('• مجهزة بتجويف فرن وميكروويف مدمج', x + cardW - 16, lineY);
-    }
+    ctx.fillText(`• الرفوف: ${c.shelfCount} رف داخلي`, x + cardW - 14, lineY);
   });
 
-  // Add Page 3
   doc.addPage('a4', 'landscape');
   doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
 
   // =========================================================================
-  // PAGE 4: CUTTING LIST & QUOTATION SUMMARY (جدول التقطيع والتسعير)
+  // PAGE 5: CUTTING LIST & QUOTATION SUMMARY (جدول التقطيع والتسعير)
   // =========================================================================
-  drawSheetFrame('04 / Cutting List & Quotation Summary (جدول التقطيع والتسعير)', 4, 4);
+  drawSheetFrame('05 / Cutting List & Quotation Summary (جدول التقطيع والتسعير)', 5, TOTAL_PAGES);
 
   // Table Box (Left)
   const tblX = 60;
@@ -538,7 +761,7 @@ export async function exportTechnicalPDF({
   ctx.font = 'bold 20px "Cairo", sans-serif';
   ctx.fillText(`الإجمالي التقديري: ${totalAmount.toLocaleString()} ${pricing.currency || 'ج.م'}`, qBoxX + qBoxW - 40, qBoxY + qBoxH - 42);
 
-  // Add Page 4
+  // Add Page 5
   doc.addPage('a4', 'landscape');
   doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
 
