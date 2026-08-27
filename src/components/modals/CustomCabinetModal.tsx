@@ -1,47 +1,27 @@
 import React, { useState } from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
-import { CabinetCategory, CabinetType, DoorHinge } from '../../types';
+import { CabinetCategory } from '../../types';
 import { convertMmToUnit, convertUnitToMm } from '../../utils/unitConversion';
-import { X, Sliders, Check, Plus } from 'lucide-react';
+import { X, Check, Plus } from 'lucide-react';
 
 export const CustomCabinetModal: React.FC = () => {
   const { addCabinet, project } = useProjectStore();
   const { isCustomCabinetModalOpen, setIsCustomCabinetModalOpen, unit } = useUIStore();
 
-  const [name, setName] = useState('Custom Unit');
+  const [name, setName] = useState('وحدة مخصصة خاصة');
   const [category, setCategory] = useState<CabinetCategory>('base');
   const [width, setWidth] = useState(600);
   const [height, setHeight] = useState(720);
   const [depth, setDepth] = useState(560);
   const [z, setZ] = useState(100);
-  const [shelfCount, setShelfCount] = useState(1);
   const [doorCount, setDoorCount] = useState(1);
   const [drawerCount, setDrawerCount] = useState(0);
-  const [doorHinge, setDoorHinge] = useState<DoorHinge>('right');
-  const [customNotes, setCustomNotes] = useState('');
+  const [shelfCount, setShelfCount] = useState(1);
+  const [doorHinge, setDoorHinge] = useState<'left' | 'right' | 'double' | 'top' | 'none'>('right');
+  const [notes, setNotes] = useState('');
 
   if (!isCustomCabinetModalOpen) return null;
-
-  const handleCategoryChange = (cat: CabinetCategory) => {
-    setCategory(cat);
-    if (cat === 'wall') {
-      setHeight(720);
-      setDepth(350);
-      setZ(1450);
-      setShelfCount(2);
-    } else if (cat === 'tall') {
-      setHeight(2050);
-      setDepth(580);
-      setZ(100);
-      setShelfCount(4);
-      setDoorCount(2);
-    } else {
-      setHeight(720);
-      setDepth(560);
-      setZ(100);
-    }
-  };
 
   const handleCreate = () => {
     addCabinet({
@@ -56,97 +36,114 @@ export const CustomCabinetModal: React.FC = () => {
       z,
       rotation: 0,
       wallId: 'wall-a',
-      shelfCount,
       doorCount,
       drawerCount,
+      shelfCount,
       doorHinge,
-      customNotes,
+      customNotes: notes,
       materialFront: project.materials.frontFinish,
       materialBody: project.materials.bodyColor,
       handleType: project.materials.handleStyle,
       isCustom: true,
     });
+
     setIsCustomCabinetModalOpen(false);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden text-white flex flex-col animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-purple-600/20 text-purple-400">
-              <Sliders size={18} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden text-slate-900 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
+              <Plus size={20} />
             </div>
             <div>
-              <h2 className="text-base font-bold">Custom Cabinet Builder</h2>
-              <p className="text-xs text-slate-400">Build bespoke cabinet with custom manufacturing dimensions</p>
+              <h2 className="text-base font-bold text-slate-900">إنشاء وحدة / كابينة بمقاسات مخصصة</h2>
+              <p className="text-xs text-slate-500">تحديد العرض، الارتفاع، العمق، والتقسيم الداخلي بدقة</p>
             </div>
           </div>
           <button
             onClick={() => setIsCustomCabinetModalOpen(false)}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition"
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
-          {/* Cabinet Name & Category */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-slate-300">Cabinet Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-semibold text-slate-300">Category</label>
-              <select
-                value={category}
-                onChange={(e) => handleCategoryChange(e.target.value as CabinetCategory)}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
-              >
-                <option value="base">Base Unit</option>
-                <option value="wall">Wall Unit (Upper)</option>
-                <option value="tall">Tall Unit (Pantry/Tower)</option>
-                <option value="custom">Bespoke Custom</option>
-              </select>
-            </div>
+        {/* Form Body */}
+        <div className="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
+          <div>
+            <label className="text-xs font-semibold text-slate-700">اسم وتوصيف الوحدة</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
+            />
           </div>
 
-          {/* Exact Dimensions */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700">نوع وتصنيف الوحدة</label>
+            <select
+              value={category}
+              onChange={(e) => {
+                const cat = e.target.value as CabinetCategory;
+                setCategory(cat);
+                if (cat === 'wall') {
+                  setHeight(720);
+                  setDepth(350);
+                  setZ(1450);
+                } else if (cat === 'tall') {
+                  setHeight(2050);
+                  setDepth(560);
+                  setZ(100);
+                } else {
+                  setHeight(720);
+                  setDepth(560);
+                  setZ(100);
+                }
+              }}
+              className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none"
+            >
+              <option value="base">وحدة سفلية (Base)</option>
+              <option value="wall">وحدة علوية جدارية (Wall)</option>
+              <option value="tall">دولاب طولي كامل (Tall)</option>
+              <option value="corner">وحدة ركنة زاوية (Corner)</option>
+              <option value="custom">تصنيع خاص (Custom)</option>
+            </select>
+          </div>
+
+          {/* Dimensions */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-300">Width ({unit})</label>
+              <label className="text-[11px] font-semibold text-slate-600">العرض ({unit})</label>
               <input
                 type="number"
                 value={convertMmToUnit(width, unit)}
                 onChange={(e) => setWidth(convertUnitToMm(Number(e.target.value), unit))}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-300">Height ({unit})</label>
+              <label className="text-[11px] font-semibold text-slate-600">الارتفاع ({unit})</label>
               <input
                 type="number"
                 value={convertMmToUnit(height, unit)}
                 onChange={(e) => setHeight(convertUnitToMm(Number(e.target.value), unit))}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-300">Depth ({unit})</label>
+              <label className="text-[11px] font-semibold text-slate-600">العمق ({unit})</label>
               <input
                 type="number"
                 value={convertMmToUnit(depth, unit)}
                 onChange={(e) => setDepth(convertUnitToMm(Number(e.target.value), unit))}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
@@ -154,67 +151,68 @@ export const CustomCabinetModal: React.FC = () => {
           {/* Internals */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-300">Shelves</label>
-              <input
-                type="number"
-                min={0}
-                max={10}
-                value={shelfCount}
-                onChange={(e) => setShelfCount(Number(e.target.value))}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-semibold text-slate-300">Doors</label>
+              <label className="text-[11px] font-semibold text-slate-600">عدد الأبواب</label>
               <input
                 type="number"
                 min={0}
                 max={4}
                 value={doorCount}
                 onChange={(e) => setDoorCount(Number(e.target.value))}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-300">Drawers</label>
+              <label className="text-[11px] font-semibold text-slate-600">عدد الأدراج</label>
               <input
                 type="number"
                 min={0}
                 max={6}
                 value={drawerCount}
                 onChange={(e) => setDrawerCount(Number(e.target.value))}
-                className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-[11px] font-semibold text-slate-600">عدد الرفوف</label>
+              <input
+                type="number"
+                min={0}
+                max={8}
+                value={shelfCount}
+                onChange={(e) => setShelfCount(Number(e.target.value))}
+                className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-300">Custom Notes</label>
-            <input
-              type="text"
-              placeholder="e.g. Cutout for gas valve or custom divider"
-              value={customNotes}
-              onChange={(e) => setCustomNotes(e.target.value)}
-              className="w-full mt-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+            <label className="text-[11px] font-semibold text-slate-600">ملاحظات التصنيع والإكسسوارات</label>
+            <textarea
+              rows={2}
+              placeholder="مثال: سلة قلاب للقمامة، مجاري بلوم تاندم..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800 bg-slate-950">
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50">
           <button
             onClick={() => setIsCustomCabinetModalOpen(false)}
-            className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition"
+            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
           >
-            Cancel
+            إلغاء
           </button>
           <button
             onClick={handleCreate}
-            className="flex items-center gap-1.5 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 transition"
+            className="flex items-center gap-1.5 px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 transition"
           >
-            <Plus size={15} />
-            <span>Create Cabinet</span>
+            <Check size={15} />
+            <span>إضافة الوحدة للمخطط</span>
           </button>
         </div>
       </div>

@@ -10,13 +10,14 @@ import {
   FileText, 
   FileSpreadsheet, 
   Scissors, 
+  Calculator, 
   RotateCcw, 
   RotateCw, 
   Download, 
   PencilRuler, 
   Languages, 
   Check, 
-  LayoutTemplate
+  LayoutTemplate 
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
@@ -38,7 +39,7 @@ export const TopNavbar: React.FC = () => {
   const [tempTitle, setTempTitle] = useState(project.metadata.name);
 
   const handleSaveTitle = () => {
-    updateMetadata({ name: tempTitle.trim() || 'Untitled Kitchen Project' });
+    updateMetadata({ name: tempTitle.trim() || 'تصميم مطبخ جديد' });
     setIsEditingTitle(false);
   };
 
@@ -49,6 +50,7 @@ export const TopNavbar: React.FC = () => {
     { id: 'technical-drawings', label: t.blueprint, icon: <FileText size={16} /> },
     { id: 'cabinet-schedule', label: t.schedule, icon: <FileSpreadsheet size={16} /> },
     { id: 'manufacturing-bom', label: t.manufacturing, icon: <Scissors size={16} /> },
+    { id: 'pricing-calculator', label: language === 'ar' ? 'حاسبة الأمتار والتسعير' : 'Pricing & Meters', icon: <Calculator size={16} /> },
   ];
 
   return (
@@ -75,7 +77,7 @@ export const TopNavbar: React.FC = () => {
               onChange={(e) => setTempTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle()}
               autoFocus
-              className="px-2.5 py-1 bg-slate-50 border border-blue-500 rounded-md text-xs text-slate-900 focus:outline-none w-44 font-semibold"
+              className="px-2.5 py-1 bg-slate-50 border border-blue-500 rounded-md text-xs text-slate-900 focus:outline-none w-48 font-semibold"
             />
             <button
               onClick={handleSaveTitle}
@@ -90,8 +92,8 @@ export const TopNavbar: React.FC = () => {
               setTempTitle(project.metadata.name);
               setIsEditingTitle(true);
             }}
-            className="text-xs font-semibold text-slate-700 hover:text-blue-600 px-2 py-1 rounded hover:bg-slate-100 transition max-w-[180px] truncate"
-            title="Click to rename project"
+            className="text-xs font-semibold text-slate-700 hover:text-blue-600 px-2 py-1 rounded hover:bg-slate-100 transition max-w-[200px] truncate"
+            title="انقر لتعديل اسم المشروع"
           >
             {project.metadata.name}
           </button>
@@ -105,7 +107,7 @@ export const TopNavbar: React.FC = () => {
             className={`p-1.5 rounded transition ${
               canUndo ? 'hover:text-slate-900 hover:bg-slate-100' : 'opacity-30 cursor-not-allowed'
             }`}
-            title="Undo"
+            title="تراجع"
           >
             <RotateCcw size={15} />
           </button>
@@ -115,7 +117,7 @@ export const TopNavbar: React.FC = () => {
             className={`p-1.5 rounded transition ${
               canRedo ? 'hover:text-slate-900 hover:bg-slate-100' : 'opacity-30 cursor-not-allowed'
             }`}
-            title="Redo"
+            title="إعادة"
           >
             <RotateCw size={15} />
           </button>
@@ -130,7 +132,7 @@ export const TopNavbar: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 isActive
                   ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -145,11 +147,11 @@ export const TopNavbar: React.FC = () => {
 
       {/* Actions & Settings Right Toolbar */}
       <div className="flex items-center gap-2">
-        {/* Language Switcher (AR / EN) */}
+        {/* Language Switcher */}
         <button
           onClick={toggleLanguage}
           className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition border border-slate-200"
-          title="Switch Language / تغيير اللغة"
+          title="تغيير اللغة"
         >
           <Languages size={14} className="text-blue-600" />
           <span>{language === 'ar' ? 'English' : 'العربية'}</span>
@@ -159,17 +161,17 @@ export const TopNavbar: React.FC = () => {
         <button
           onClick={toggleUnit}
           className="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-0.5 text-xs font-mono font-bold text-slate-700 transition"
-          title="Switch unit"
+          title="تبديل وحدة القياس"
         >
-          <span className={`px-2 py-1 rounded ${unit === 'mm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>mm</span>
-          <span className={`px-2 py-1 rounded ${unit === 'cm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>cm</span>
+          <span className={`px-2 py-1 rounded ${unit === 'mm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>مم</span>
+          <span className={`px-2 py-1 rounded ${unit === 'cm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>سم</span>
         </button>
 
-        {/* Room Sketcher Wizard */}
+        {/* Room Sketcher */}
         <button
           onClick={() => setIsRoomSketcherOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
-          title="Sketch custom room and wall dimensions"
+          title="رسم وتعديل أبعاد الغرفة"
         >
           <PencilRuler size={14} className="text-indigo-600" />
           <span className="hidden xl:inline">{t.sketchRoom}</span>
@@ -179,7 +181,7 @@ export const TopNavbar: React.FC = () => {
         <button
           onClick={() => setIsTemplateModalOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
-          title="Load pre-configured sample kitchen layout"
+          title="نماذج جاهزة"
         >
           <LayoutTemplate size={14} />
           <span className="hidden xl:inline">{t.templates}</span>

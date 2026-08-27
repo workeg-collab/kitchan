@@ -1,57 +1,65 @@
-import { ManufacturingSettings, CountertopConfig, PlinthConfig, BacksplashConfig, MaterialFinishes } from '../types';
+import { ManufacturingSettings, CountertopConfig, PlinthConfig, BacksplashConfig, MaterialFinishes, PricingSettings } from '../types';
 
 export const DEFAULT_MANUFACTURING_SETTINGS: ManufacturingSettings = {
-  boardThickness: 18, // standard 18mm MFC/MDF
-  backPanelThickness: 6, // 6mm grooved back
-  backPanelRecess: 15, // 15mm service void behind back
-  edgeBandingFront: 1.0, // 1mm ABS impact edge
-  edgeBandingHidden: 0.4, // 0.4mm melamine edge
-  doorReveal: 3, // 3mm gap between doors/drawers
-  drawerSlideLoss: 25, // deduction for undermount/side-mount drawer slides
-  shelfSetback: 20, // 20mm setback from front edge
+  boardThickness: 18, // 18mm standard
+  backPanelThickness: 6, // 6mm
+  backPanelRecess: 15, // 15mm void
+  edgeBandingFront: 1.0, // 1mm ABS
+  edgeBandingHidden: 0.4, // 0.4mm
+  doorReveal: 3, // 3mm
+  drawerSlideLoss: 25,
+  shelfSetback: 20,
 };
 
 export const DEFAULT_COUNTERTOP_CONFIG: CountertopConfig = {
   enabled: true,
-  thickness: 30, // 30mm standard quartz/granite
-  depth: 620, // 600mm cabinet + 20mm front overhang
+  thickness: 30,
+  depth: 620,
   overhangFront: 20,
   overhangSides: 10,
-  material: 'quartz-calacatta',
+  material: 'رخام كلكتا جولد / كوارتز أبيض',
   edgeProfile: 'square',
 };
 
 export const DEFAULT_PLINTH_CONFIG: PlinthConfig = {
   enabled: true,
-  height: 100, // 100mm plinth
-  setback: 50, // 50mm setback
-  material: 'matte-anthracite',
+  height: 100,
+  setback: 50,
+  material: 'رمادي فحمي مطفي',
 };
 
 export const DEFAULT_BACKSPLASH_CONFIG: BacksplashConfig = {
   enabled: true,
-  height: 600, // 600mm splash zone
+  height: 600,
   thickness: 15,
-  material: 'quartz-calacatta',
+  material: 'رخام كلكتا جولد',
 };
 
 export const DEFAULT_MATERIAL_FINISHES: MaterialFinishes = {
-  frontFinish: 'matte-white',
+  frontFinish: 'أبيض ألباين مطفي',
   frontColor: '#f8fafc',
   bodyColor: '#cbd5e1',
-  countertopMaterial: 'quartz-calacatta',
+  countertopMaterial: 'رخام كلكتا جولد',
   countertopColor: '#f8fafc',
-  backsplashMaterial: 'quartz-calacatta',
+  backsplashMaterial: 'رخام كلكتا جولد',
   backsplashColor: '#f8fafc',
   wallColor: '#f1f5f9',
-  floorMaterial: 'floor-wood-oak',
+  floorMaterial: 'خشب باركيه أرو طبيعي',
   floorColor: '#8c6843',
   handleStyle: 'bar-black',
   handleColor: '#09090b',
 };
 
-export const STANDARD_CARCASE_HEIGHTS = [720, 780, 840];
-export const STANDARD_BASE_DEPTHS = [560, 580, 600];
-export const STANDARD_WALL_DEPTHS = [320, 350, 380];
-export const STANDARD_TALL_HEIGHTS = [1950, 2050, 2150, 2300];
-export const STANDARD_PLINTH_HEIGHTS = [80, 100, 120, 150];
+export const DEFAULT_PRICING_SETTINGS: PricingSettings = {
+  currency: 'ج.م', // جنيه مصري / أو يمكن تغييره لريال أو دولار
+  pricePerSquareMeterFronts: 1800, // سعر متر مسطح الواجهات
+  pricePerSquareMeterCarcass: 850, // سعر متر الشاسيه الداخلي
+  pricePerLinearMeterBase: 3200, // سعر المتر الطولي للوحدات السفلية
+  pricePerLinearMeterWall: 2600, // سعر المتر الطولي للوحدات العلوية
+  pricePerLinearMeterTall: 5400, // سعر المتر الطولي للدواليب الطولية
+  pricePerSquareMeterCountertop: 2400, // سعر متر الرخام / الكوارتز
+  accessoriesCost: 1500, // تكلفة إكسسوارات ومفصلات
+  installationCostPercentage: 10, // 10% مصنعية ونقل وتركيب
+  taxPercentage: 0, // ضريبة
+  discountAmount: 0, // خصم
+};

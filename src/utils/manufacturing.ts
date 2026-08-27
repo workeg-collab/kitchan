@@ -10,7 +10,7 @@ export interface CabinetBreakout {
 export function generateCabinetBreakout(
   cab: CabinetItem,
   settings: ManufacturingSettings,
-  materialName: string = 'Melamine 18mm'
+  materialName: string = 'ميلامين 18 مم'
 ): CabinetBreakout {
   const { boardThickness, backPanelThickness, backPanelRecess, doorReveal, shelfSetback } = settings;
   const W = cab.width;
@@ -20,25 +20,12 @@ export function generateCabinetBreakout(
   const panels: CuttingPanel[] = [];
   const hardware: HardwareItem[] = [];
 
-  // 1. Carcase Sides (Left and Right Gable)
+  // 1. جوانب الشاسيه (جنب يسار ويمين)
   panels.push({
     id: `${cab.id}-SIDE-L`,
     cabinetId: cab.id,
     cabinetName: cab.name,
-    partName: 'Left Side Panel',
-    quantity: 1,
-    length: H,
-    width: D,
-    thickness: boardThickness,
-    material: cab.materialBody || materialName,
-    edgeBanding: { top: false, bottom: false, left: false, right: true }, // Front edge banded
-  });
-
-  panels.push({
-    id: `${cab.id}-SIDE-R`,
-    cabinetId: cab.id,
-    cabinetName: cab.name,
-    partName: 'Right Side Panel',
+    partName: 'جنب شاسيه يسار',
     quantity: 1,
     length: H,
     width: D,
@@ -47,13 +34,26 @@ export function generateCabinetBreakout(
     edgeBanding: { top: false, bottom: false, left: false, right: true },
   });
 
-  // 2. Carcase Bottom Panel
+  panels.push({
+    id: `${cab.id}-SIDE-R`,
+    cabinetId: cab.id,
+    cabinetName: cab.name,
+    partName: 'جنب شاسيه يمين',
+    quantity: 1,
+    length: H,
+    width: D,
+    thickness: boardThickness,
+    material: cab.materialBody || materialName,
+    edgeBanding: { top: false, bottom: false, left: false, right: true },
+  });
+
+  // 2. قاع الشاسيه
   const internalWidth = W - 2 * boardThickness;
   panels.push({
     id: `${cab.id}-BOT`,
     cabinetId: cab.id,
     cabinetName: cab.name,
-    partName: 'Bottom Panel',
+    partName: 'قاع شاسيه سفلي',
     quantity: 1,
     length: internalWidth,
     width: D,
@@ -62,14 +62,13 @@ export function generateCabinetBreakout(
     edgeBanding: { top: false, bottom: false, left: false, right: true },
   });
 
-  // 3. Top Panel / Top Rails
+  // 3. سقف الوحدة أو عوارض الربط
   if (cab.category === 'base' || cab.type === 'base-sink') {
-    // Base cabinets usually have 2 top stretcher rails (e.g. 100mm wide)
     panels.push({
       id: `${cab.id}-TOP-RAIL-F`,
       cabinetId: cab.id,
       cabinetName: cab.name,
-      partName: 'Front Top Stretcher Rail',
+      partName: 'عارضة تثبيت علوية أمامية',
       quantity: 1,
       length: internalWidth,
       width: 100,
@@ -81,7 +80,7 @@ export function generateCabinetBreakout(
       id: `${cab.id}-TOP-RAIL-B`,
       cabinetId: cab.id,
       cabinetName: cab.name,
-      partName: 'Rear Top Stretcher Rail',
+      partName: 'عارضة تثبيت علوية خلفية',
       quantity: 1,
       length: internalWidth,
       width: 100,
@@ -90,12 +89,11 @@ export function generateCabinetBreakout(
       edgeBanding: { top: false, bottom: false, left: false, right: false },
     });
   } else {
-    // Wall and Tall units have full solid top panel
     panels.push({
       id: `${cab.id}-TOP`,
       cabinetId: cab.id,
       cabinetName: cab.name,
-      partName: 'Top Panel',
+      partName: 'سقف شاسيه علوي',
       quantity: 1,
       length: internalWidth,
       width: D,
@@ -105,32 +103,32 @@ export function generateCabinetBreakout(
     });
   }
 
-  // 4. Back Panel (Grooved 6mm or 3mm back, inset by recess)
-  const backHeight = H - 2 * boardThickness + 16; // 8mm groove top and bottom
-  const backWidth = internalWidth + 16; // 8mm groove each side
+  // 4. ظهر الوحدة المحفور
+  const backHeight = H - 2 * boardThickness + 16;
+  const backWidth = internalWidth + 16;
   panels.push({
     id: `${cab.id}-BACK`,
     cabinetId: cab.id,
     cabinetName: cab.name,
-    partName: 'Back Panel (Grooved)',
+    partName: 'ظهر شاسيه (مفحور 6 مم)',
     quantity: 1,
     length: backHeight,
     width: backWidth,
     thickness: backPanelThickness,
-    material: 'HDF White Backing',
+    material: 'أبلكاش / MDF أبيض 6 مم',
     edgeBanding: { top: false, bottom: false, left: false, right: false },
-    notes: `Recessed ${backPanelRecess}mm from rear`,
+    notes: `مفحور على بعد ${backPanelRecess} مم`,
   });
 
-  // 5. Internal Shelves
+  // 5. رفوف داخلية
   if (cab.shelfCount > 0) {
     const shelfDepth = D - backPanelRecess - backPanelThickness - shelfSetback;
-    const shelfWidth = internalWidth - 2; // 1mm play on each side
+    const shelfWidth = internalWidth - 2;
     panels.push({
       id: `${cab.id}-SHELF`,
       cabinetId: cab.id,
       cabinetName: cab.name,
-      partName: 'Adjustable Shelf',
+      partName: 'رف داخلي متحرك',
       quantity: cab.shelfCount,
       length: shelfWidth,
       width: Math.max(shelfDepth, 150),
@@ -139,18 +137,17 @@ export function generateCabinetBreakout(
       edgeBanding: { top: false, bottom: false, left: false, right: true },
     });
 
-    // Hardware: Shelf pins (4 per shelf)
     hardware.push({
       id: `${cab.id}-HW-PINS`,
-      name: '5mm Metal Shelf Pins',
+      name: 'كوابيل وعصافير رفوف 5 مم نيكل',
       category: 'shelf-pin',
       quantity: cab.shelfCount * 4,
-      unit: 'pcs',
-      description: 'Nickel-plated shelf support pins',
+      unit: 'قطعة',
+      description: 'كوابيل تثبيت الرفوف المعدنية',
     });
   }
 
-  // 6. Door Fronts
+  // 6. ضلف الأبواب
   if (cab.doorCount > 0) {
     const doorHeight = H - doorReveal;
     const doorWidth = cab.doorCount === 1 
@@ -161,52 +158,49 @@ export function generateCabinetBreakout(
       id: `${cab.id}-DOOR`,
       cabinetId: cab.id,
       cabinetName: cab.name,
-      partName: cab.doorCount === 1 ? 'Door Front' : `Door Front (1 of ${cab.doorCount})`,
+      partName: cab.doorCount === 1 ? 'ضلفة باب واجهة' : `ضلفة باب واجهة (1 من ${cab.doorCount})`,
       quantity: cab.doorCount,
       length: doorHeight,
       width: doorWidth,
       thickness: boardThickness,
-      material: cab.materialFront || 'Front Finish',
-      edgeBanding: { top: true, bottom: true, left: true, right: true }, // All 4 edges banded
+      material: cab.materialFront || 'خامة الواجهة',
+      edgeBanding: { top: true, bottom: true, left: true, right: true },
     });
 
-    // Hinges: 2 hinges for H <= 900mm, 3 for H <= 1600mm, 4 for H > 1600mm
     let hingesPerDoor = 2;
     if (H > 1600) hingesPerDoor = 4;
     else if (H > 900) hingesPerDoor = 3;
 
     hardware.push({
       id: `${cab.id}-HW-HINGE`,
-      name: '110° Soft-Close Concealed Hinge + Baseplate',
+      name: 'مفصلة سوفت كلوز هيدروليك 110° + كعب',
       category: 'hinge',
       quantity: cab.doorCount * hingesPerDoor,
-      unit: 'pcs',
-      description: 'Clip-on soft-close 35mm cup hinges',
+      unit: 'قطعة',
+      description: 'مفصلات باستم هيدروليك غلق هادئ',
     });
 
     if (cab.handleType && cab.handleType !== 'handleless' && cab.handleType !== 'none') {
       hardware.push({
         id: `${cab.id}-HW-HANDLE`,
-        name: `Handle (${cab.handleType})`,
+        name: `مقبض (${cab.handleType})`,
         category: 'handle',
         quantity: cab.doorCount,
-        unit: 'pcs',
-        description: 'Cabinet pull handle with M4 fixing bolts',
+        unit: 'قطعة',
+        description: 'مقبض سحب للضلفة مع مسامير M4',
       });
     }
   }
 
-  // 7. Drawers
+  // 7. الأدراج
   if (cab.drawerCount > 0) {
     const availableHeight = H - (cab.drawerCount + 1) * doorReveal;
     const drawerHeights: number[] = [];
 
     if (cab.drawerCount === 2) {
-      // 2 equal deep drawers
       const dh = Math.round(availableHeight / 2);
       drawerHeights.push(dh, dh);
     } else if (cab.drawerCount === 3) {
-      // 1 shallow top (e.g. 140mm) + 2 equal deep
       const topH = 140;
       const remH = Math.round((availableHeight - topH) / 2);
       drawerHeights.push(topH, remH, remH);
@@ -220,61 +214,58 @@ export function generateCabinetBreakout(
         id: `${cab.id}-DRW-FRONT-${idx + 1}`,
         cabinetId: cab.id,
         cabinetName: cab.name,
-        partName: `Drawer Front #${idx + 1}`,
+        partName: `وش درج واجهة #${idx + 1}`,
         quantity: 1,
         length: dh,
         width: W - doorReveal,
         thickness: boardThickness,
-        material: cab.materialFront || 'Front Finish',
+        material: cab.materialFront || 'خامة الواجهة',
         edgeBanding: { top: true, bottom: true, left: true, right: true },
       });
     });
 
-    // Drawer Slides
     hardware.push({
       id: `${cab.id}-HW-SLIDES`,
-      name: 'Soft-Close Full Extension Drawer Slides (500mm)',
+      name: 'طقم مجاري درج باستم سوفت كلوز سفلية (50 سم)',
       category: 'slide',
       quantity: cab.drawerCount,
-      unit: 'pairs',
-      description: 'Undermount synchronized 40kg soft-close runners',
+      unit: 'طقم',
+      description: 'مجاري هيدروليك سحب كامل حمولة 40 كجم',
     });
 
     if (cab.handleType && cab.handleType !== 'handleless' && cab.handleType !== 'none') {
       hardware.push({
         id: `${cab.id}-HW-DRW-HANDLE`,
-        name: `Handle (${cab.handleType})`,
+        name: `مقبض درج (${cab.handleType})`,
         category: 'handle',
         quantity: cab.drawerCount,
-        unit: 'pcs',
-        description: 'Drawer pull handle',
+        unit: 'قطعة',
+        description: 'مقبض سحب للدرج',
       });
     }
   }
 
-  // 8. Base Plinth Legs
+  // 8. أرجل الوزرة
   if (cab.category === 'base' || cab.category === 'tall' || cab.category === 'corner') {
     hardware.push({
       id: `${cab.id}-HW-LEGS`,
-      name: 'Adjustable Kitchen Plinth Legs (100-150mm)',
+      name: 'أرجل مطبخ بلاستيك رجلاش قابلة للتعديل (10-15 سم)',
       category: 'leg',
       quantity: 4,
-      unit: 'pcs',
-      description: 'Heavy duty levelling feet with plinth clip',
+      unit: 'قطعة',
+      description: 'أرجل ليفل مع كلبس تثبيت الوزرة',
     });
   }
 
-  // Hardware: Carcase assembly screws & cams
   hardware.push({
     id: `${cab.id}-HW-SCREWS`,
-    name: 'Confirmat Assembly Screws 7x50mm',
+    name: 'مسامير تجميع شاسيه كونفرمات 7×50 مم',
     category: 'screw',
     quantity: 16,
-    unit: 'pcs',
-    description: 'Carcase connecting screws',
+    unit: 'قطعة',
+    description: 'مسامير ربط وتجميع الألواح',
   });
 
-  // Calculate total panel area in m²
   const totalAreaM2 = panels.reduce((acc, p) => {
     return acc + (p.length * p.width * p.quantity) / 1000000;
   }, 0);
@@ -316,7 +307,6 @@ export function generateFullProjectBOM(
     });
   });
 
-  // Sheet estimate for standard 2800 x 2070 mm (5.796 m²) panel with 15% kerf/waste factor
   const standardSheetAreaM2 = (2800 * 2070) / 1000000; // ~5.8 m²
   const wasteFactor = 1.15;
   const sheetsNeeded = Math.max(1, Math.ceil((totalAreaM2 * wasteFactor) / standardSheetAreaM2));
@@ -326,7 +316,7 @@ export function generateFullProjectBOM(
     aggregatedHardware: Array.from(hwMap.values()),
     totalAreaM2: Number(totalAreaM2.toFixed(2)),
     sheetEstimates: {
-      standardSheetSize: '2800 x 2070 x 18 mm',
+      standardSheetSize: '2800 × 2070 × 18 مم',
       sheetsNeeded,
       sheetAreaM2: Number(standardSheetAreaM2.toFixed(2)),
       efficiencyPercentage: Math.min(92, Math.round((totalAreaM2 / (sheetsNeeded * standardSheetAreaM2)) * 100)),

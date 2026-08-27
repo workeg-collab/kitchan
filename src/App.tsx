@@ -10,6 +10,7 @@ import { ElevationViewer } from './components/elevations/ElevationViewer';
 import { TechnicalBlueprint } from './components/technical/TechnicalBlueprint';
 import { CabinetSchedule } from './components/schedule/CabinetSchedule';
 import { CuttingListView } from './components/manufacturing/CuttingListView';
+import { PricingCalculatorView } from './components/pricing/PricingCalculatorView';
 import { RoomConfigModal } from './components/modals/RoomConfigModal';
 import { RoomSketcherModal } from './components/modals/RoomSketcherModal';
 import { CustomCabinetModal } from './components/modals/CustomCabinetModal';
@@ -37,6 +38,7 @@ export const App: React.FC = () => {
           {activeTab === 'technical-drawings' && <TechnicalBlueprint />}
           {activeTab === 'cabinet-schedule' && <CabinetSchedule />}
           {activeTab === 'manufacturing-bom' && <CuttingListView />}
+          {activeTab === 'pricing-calculator' && <PricingCalculatorView />}
         </main>
 
         {/* Right Sidebar (Only in 2D and 3D views) */}

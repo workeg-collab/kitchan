@@ -1,14 +1,15 @@
-import { CabinetItem, CabinetCategory, CabinetType } from '../types';
+import { CabinetCategory, CabinetType } from '../types';
 
 export interface CabinetTemplate {
   category: CabinetCategory;
   type: CabinetType;
   name: string;
+  nameEn: string;
   description: string;
   defaultWidth: number;
   defaultHeight: number;
   defaultDepth: number;
-  defaultZ: number; // Elevation from floor
+  defaultZ: number;
   doorCount: number;
   drawerCount: number;
   shelfCount: number;
@@ -22,16 +23,17 @@ export interface CabinetTemplate {
 }
 
 export const CABINET_LIBRARY: CabinetTemplate[] = [
-  // --- BASE CABINETS ---
+  // --- وحدات سفلية (BASE CABINETS) ---
   {
     category: 'base',
     type: 'base-single-door',
-    name: 'Single Door Base',
-    description: 'Standard 1-door base cabinet with 1 adjustable shelf',
+    name: 'سفلي باب واحد',
+    nameEn: 'Single Door Base',
+    description: 'وحدة سفلية قياسية بباب واحد ورف داخلي قابل للتعديل',
     defaultWidth: 600,
-    defaultHeight: 720, // Carcase height (excluding plinth)
+    defaultHeight: 720,
     defaultDepth: 560,
-    defaultZ: 100, // Plinth height
+    defaultZ: 100,
     doorCount: 1,
     drawerCount: 0,
     shelfCount: 1,
@@ -42,8 +44,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-double-door',
-    name: 'Double Door Base',
-    description: 'Wide 2-door base cabinet with 1 adjustable shelf',
+    name: 'سفلي بابين مزدوج',
+    nameEn: 'Double Door Base',
+    description: 'وحدة سفلية عريضة ببابين ورف داخلي قابل لتعديل الارتفاع',
     defaultWidth: 800,
     defaultHeight: 720,
     defaultDepth: 560,
@@ -58,8 +61,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-drawers-3',
-    name: '3-Drawer Base',
-    description: '1 top shallow cutlery drawer + 2 deep pan drawers',
+    name: 'سفلي 3 أدراج (معالق وحلل)',
+    nameEn: '3-Drawer Base',
+    description: 'درج علوي للملاعق والسكاكين + درجين عميقين للأواني والحلل',
     defaultWidth: 600,
     defaultHeight: 720,
     defaultDepth: 560,
@@ -74,8 +78,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-drawers-2',
-    name: '2-Drawer Deep Base',
-    description: '2 deep pot & pan drawers with high load slides',
+    name: 'سفلي 2 درج حلل عميق',
+    nameEn: '2-Drawer Deep Base',
+    description: 'درجان عميقان مخصصان للأواني الكبيرة مع مجاري تحميل ثقيل',
     defaultWidth: 800,
     defaultHeight: 720,
     defaultDepth: 560,
@@ -90,8 +95,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-drawers-4',
-    name: '4-Drawer Base',
-    description: '4 multi-purpose storage drawers',
+    name: 'سفلي 4 أدراج متعددة',
+    nameEn: '4-Drawer Base',
+    description: '4 أدراج عملية لتخزين مستلزمات المطبخ والمفارش',
     defaultWidth: 600,
     defaultHeight: 720,
     defaultDepth: 560,
@@ -106,8 +112,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-sink',
-    name: 'Sink Base Unit',
-    description: 'Reinforced base cabinet for sink bowl with plumbing recess',
+    name: 'وحدة حوض غسيل',
+    nameEn: 'Sink Base Unit',
+    description: 'وحدة مجهزة لتثبيت الحوض وتمديدات السباكة مع عوارض تقوية',
     defaultWidth: 800,
     defaultHeight: 720,
     defaultDepth: 560,
@@ -123,8 +130,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-corner-l',
-    name: 'L-Corner Base (90°)',
-    description: 'L-shape 900x900 corner unit with bi-fold door or carousel',
+    name: 'وحدة ركنة زاوية L (90°)',
+    nameEn: 'L-Corner Base (90°)',
+    description: 'وحدة زاوية 900×900 مم مزودة ببابين أو سلة دوارة (Carousel)',
     defaultWidth: 900,
     defaultHeight: 720,
     defaultDepth: 900,
@@ -139,8 +147,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-corner-blind',
-    name: 'Blind Corner Base',
-    description: 'Straight corner unit with blind filler panel & pull-out basket',
+    name: 'وحدة ركنة مستقيمة (Blind)',
+    nameEn: 'Blind Corner Base',
+    description: 'وحدة زاوية مستقيمة مع بارتشن أعمى وسلة سحب ماجيك كورنر',
     defaultWidth: 1050,
     defaultHeight: 720,
     defaultDepth: 560,
@@ -155,8 +164,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'base',
     type: 'base-open-shelf',
-    name: 'Open Shelf Base',
-    description: 'Open decorative base unit with 2 fixed shelves',
+    name: 'سفلي رفوف مفتوحة',
+    nameEn: 'Open Shelf Base',
+    description: 'وحدة ديكورية سفلية برفوف مفتوحة لوضع الزيوت والبهارات',
     defaultWidth: 300,
     defaultHeight: 720,
     defaultDepth: 560,
@@ -169,16 +179,17 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
     icon: 'LayoutPanelTop',
   },
 
-  // --- WALL CABINETS ---
+  // --- وحدات علوية (WALL CABINETS) ---
   {
     category: 'wall',
     type: 'wall-single-door',
-    name: 'Single Door Wall Unit',
-    description: 'Upper wall cabinet with 2 adjustable shelves',
+    name: 'علوي باب واحد',
+    nameEn: 'Single Door Wall Unit',
+    description: 'وحدة جدارية علوية بباب واحد ورفين داخليين',
     defaultWidth: 600,
     defaultHeight: 720,
     defaultDepth: 350,
-    defaultZ: 1450, // Standard 1450mm from floor (leaving 550mm backsplash gap above 900mm worktop)
+    defaultZ: 1450,
     doorCount: 1,
     drawerCount: 0,
     shelfCount: 2,
@@ -189,8 +200,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'wall',
     type: 'wall-double-door',
-    name: 'Double Door Wall Unit',
-    description: 'Wide upper wall cabinet with 2 adjustable shelves',
+    name: 'علوي بابين مزدوج',
+    nameEn: 'Double Door Wall Unit',
+    description: 'وحدة جدارية علوية عريضة ببابين ورفين داخليين',
     defaultWidth: 800,
     defaultHeight: 720,
     defaultDepth: 350,
@@ -205,8 +217,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'wall',
     type: 'wall-lift-up',
-    name: 'Lift-Up Flap Wall Unit',
-    description: 'Horizontal flap cabinet with stay-lift gas springs',
+    name: 'علوي قلاب هيدروليك',
+    nameEn: 'Lift-Up Flap Wall Unit',
+    description: 'وحدة علوية بباب يفتح لأعلى بمساعدين غاز باستم',
     defaultWidth: 900,
     defaultHeight: 360,
     defaultDepth: 350,
@@ -221,8 +234,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'wall',
     type: 'wall-open-shelf',
-    name: 'Open Shelf Wall Unit',
-    description: 'Open upper unit for spices, cookbooks or cups',
+    name: 'علوي رفوف مفتوحة',
+    nameEn: 'Open Shelf Wall Unit',
+    description: 'وحدة علوية مفتوحة بدون أبواب للأكواب وكتب الطبخ',
     defaultWidth: 600,
     defaultHeight: 720,
     defaultDepth: 330,
@@ -237,8 +251,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'wall',
     type: 'wall-corner',
-    name: 'Corner Wall Unit (600x600)',
-    description: 'Diagonal or L-shaped wall corner storage',
+    name: 'علوي ركنة زاوية (600×600)',
+    nameEn: 'Corner Wall Unit',
+    description: 'وحدة زاوية علوية مثلثة أو مربعة لاستغلال أركان المطبخ',
     defaultWidth: 600,
     defaultHeight: 720,
     defaultDepth: 600,
@@ -251,12 +266,13 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
     icon: 'CornerUpRight',
   },
 
-  // --- TALL CABINETS ---
+  // --- وحدات طولية (TALL UNITS) ---
   {
     category: 'tall',
     type: 'tall-pantry',
-    name: 'Full Height Pantry',
-    description: 'Floor-to-ceiling pantry with 4 adjustable shelves and lower pullouts',
+    name: 'دولاب خزين طولي (Pantry)',
+    nameEn: 'Full Height Pantry',
+    description: 'دولاب تخزين كامل الارتفاع مع 4 رفوف قابلة للتعديل وسلال سحب',
     defaultWidth: 600,
     defaultHeight: 2050,
     defaultDepth: 560,
@@ -271,8 +287,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'tall',
     type: 'tall-oven-tower',
-    name: 'Built-in Oven Tower',
-    description: 'Tall unit with mid-height single oven cavity + storage doors/drawers',
+    name: 'برج فرن مدمج (Built-in)',
+    nameEn: 'Built-in Oven Tower',
+    description: 'وحدة طولية مزودة بتجويف لفرن بلت إن 60 سم على مستوى النظر',
     defaultWidth: 600,
     defaultHeight: 2050,
     defaultDepth: 560,
@@ -283,15 +300,16 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
     doorHinge: 'right',
     hasApplianceCavity: true,
     applianceCavityHeight: 600,
-    applianceCavityZ: 780, // Ergonomic eye-level oven height
+    applianceCavityZ: 780,
     standardWidths: [600],
     icon: 'Flame',
   },
   {
     category: 'tall',
     type: 'tall-microwave-tower',
-    name: 'Oven & Microwave Tower',
-    description: 'Double cavity tall unit for built-in oven + compact microwave',
+    name: 'برج فرن وميكروويف مدمج',
+    nameEn: 'Oven & Microwave Tower',
+    description: 'وحدة طولية مجهزة لفرن كهربائي + ميكروويف مدمج مع أدراج سفلية',
     defaultWidth: 600,
     defaultHeight: 2050,
     defaultDepth: 560,
@@ -309,8 +327,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'tall',
     type: 'tall-fridge-housing',
-    name: 'Integrated Fridge Housing',
-    description: 'Full-height unit designed to house built-in fridge freezer',
+    name: 'دولاب ثلاجة مدمجة',
+    nameEn: 'Integrated Fridge Housing',
+    description: 'دولاب كامل الارتفاع لتبييت الثلاجة البلت إن مع تهوية خلفية',
     defaultWidth: 600,
     defaultHeight: 2050,
     defaultDepth: 560,
@@ -325,8 +344,9 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
   {
     category: 'tall',
     type: 'tall-utility',
-    name: 'Utility / Broom Cabinet',
-    description: 'Tall unit with partition for vacuum cleaner, ironing board and mops',
+    name: 'دولاب خدمات ومكانس',
+    nameEn: 'Utility / Broom Cabinet',
+    description: 'دولاب طولي مع قاطع رأسي للمكنسة الكهربائية وطاولة الكي',
     defaultWidth: 600,
     defaultHeight: 2050,
     defaultDepth: 560,
@@ -339,12 +359,13 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
     icon: 'Wrench',
   },
 
-  // --- CUSTOM CABINET ---
+  // --- وحدات مخصصة (CUSTOM) ---
   {
     category: 'custom',
     type: 'custom-box',
-    name: 'Custom Dimension Cabinet',
-    description: 'Fully custom box with user-defined width, height, depth & shelves',
+    name: 'وحدة بمقاسات مخصصة',
+    nameEn: 'Custom Dimension Cabinet',
+    description: 'وحدة تصنيع خاصة بأبعاد ورفوف وأدراج حسب الطلب',
     defaultWidth: 600,
     defaultHeight: 720,
     defaultDepth: 560,

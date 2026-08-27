@@ -10,10 +10,11 @@ import {
   PlinthConfig, 
   BacksplashConfig, 
   MaterialFinishes, 
-  ManufacturingSettings 
+  ManufacturingSettings,
+  PricingSettings
 } from '../types';
 import { SAMPLE_PROJECT_MODERN_L } from '../constants/sampleProjects';
-import { DEFAULT_MANUFACTURING_SETTINGS, DEFAULT_COUNTERTOP_CONFIG, DEFAULT_PLINTH_CONFIG, DEFAULT_BACKSPLASH_CONFIG, DEFAULT_MATERIAL_FINISHES } from '../constants/standards';
+import { DEFAULT_MANUFACTURING_SETTINGS, DEFAULT_COUNTERTOP_CONFIG, DEFAULT_PLINTH_CONFIG, DEFAULT_BACKSPLASH_CONFIG, DEFAULT_MATERIAL_FINISHES, DEFAULT_PRICING_SETTINGS } from '../constants/standards';
 
 interface ProjectState {
   project: ProjectData;
@@ -70,6 +71,7 @@ interface ProjectState {
   updateBacksplash: (data: Partial<BacksplashConfig>) => void;
   updateMaterials: (data: Partial<MaterialFinishes>) => void;
   updateManufacturing: (data: Partial<ManufacturingSettings>) => void;
+  updateProjectPricing: (data: Partial<PricingSettings>) => void;
 
   // Auto ID Generators
   getNextCabinetId: (category: CabinetItem['category']) => string;
@@ -77,7 +79,7 @@ interface ProjectState {
   getNextElementId: (type: ArchitecturalElement['type']) => string;
 }
 
-const STORAGE_KEY = 'kitchan_cad_project_v1';
+const STORAGE_KEY = 'kitchan_cad_project_v2';
 
 function loadInitialProject(): ProjectData {
   try {
@@ -85,6 +87,7 @@ function loadInitialProject(): ProjectData {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed && parsed.metadata && parsed.room && parsed.cabinets) {
+        if (!parsed.pricing) parsed.pricing = DEFAULT_PRICING_SETTINGS;
         return parsed;
       }
     }
@@ -158,6 +161,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
   setProject: (project) => {
     get().pushHistory();
+    if (!project.pricing) project.pricing = DEFAULT_PRICING_SETTINGS;
     set({ project });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
   },
@@ -178,12 +182,12 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     const blank: ProjectData = {
       metadata: {
         id: `proj-${Date.now()}`,
-        name: 'New Kitchen Design',
+        name: 'تصميم مطبخ جديد',
         clientName: '',
         designerName: '',
         date: new Date().toISOString().split('T')[0],
         notes: '',
-        unit: 'mm',
+        unit: 'cm',
       },
       room: {
         shape: 'rectangular',
@@ -192,10 +196,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         ceilingHeight: 2600,
         wallThickness: 150,
         walls: [
-          { id: 'wall-a', name: 'Wall A (Back)', startX: 0, startY: 0, endX: 4000, endY: 0, thickness: 150, height: 2600 },
-          { id: 'wall-b', name: 'Wall B (Right)', startX: 4000, startY: 0, endX: 4000, endY: 3000, thickness: 150, height: 2600 },
-          { id: 'wall-c', name: 'Wall C (Front)', startX: 4000, startY: 3000, endX: 0, endY: 3000, thickness: 150, height: 2600 },
-          { id: 'wall-d', name: 'Wall D (Left)', startX: 0, startY: 3000, endX: 0, endY: 0, thickness: 150, height: 2600 },
+          { id: 'wall-a', name: 'الجدار أ (الخلفي)', startX: 0, startY: 0, endX: 4000, endY: 0, thickness: 150, height: 2600 },
+          { id: 'wall-b', name: 'الجدار ب (الأيمن)', startX: 4000, startY: 0, endX: 4000, endY: 3000, thickness: 150, height: 2600 },
+          { id: 'wall-c', name: 'الجدار ج (الأمامي)', startX: 4000, startY: 3000, endX: 0, endY: 3000, thickness: 150, height: 2600 },
+          { id: 'wall-d', name: 'الجدار د (الأيسر)', startX: 0, startY: 3000, endX: 0, endY: 0, thickness: 150, height: 2600 },
         ],
         elements: [],
       },
@@ -207,6 +211,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       backsplash: DEFAULT_BACKSPLASH_CONFIG,
       materials: DEFAULT_MATERIAL_FINISHES,
       manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
+      pricing: DEFAULT_PRICING_SETTINGS,
     };
     set({ project: blank, selectedId: null, selectedType: null });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(blank));
@@ -222,10 +227,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     get().pushHistory();
     set((state) => {
       const walls: Wall[] = [
-        { id: 'wall-a', name: 'Wall A (Back)', startX: 0, startY: 0, endX: width, endY: 0, thickness: wallThickness, height: ceilingHeight },
-        { id: 'wall-b', name: 'Wall B (Right)', startX: width, startY: 0, endX: width, endY: length, thickness: wallThickness, height: ceilingHeight },
-        { id: 'wall-c', name: 'Wall C (Front)', startX: width, startY: length, endX: 0, endY: length, thickness: wallThickness, height: ceilingHeight },
-        { id: 'wall-d', name: 'Wall D (Left)', startX: 0, startY: length, endX: 0, endY: 0, thickness: wallThickness, height: ceilingHeight },
+        { id: 'wall-a', name: 'الجدار أ (الخلفي)', startX: 0, startY: 0, endX: width, endY: 0, thickness: wallThickness, height: ceilingHeight },
+        { id: 'wall-b', name: 'الجدار ب (الأيمن)', startX: width, startY: 0, endX: width, endY: length, thickness: wallThickness, height: ceilingHeight },
+        { id: 'wall-c', name: 'الجدار ج (الأمامي)', startX: width, startY: length, endX: 0, endY: length, thickness: wallThickness, height: ceilingHeight },
+        { id: 'wall-d', name: 'الجدار د (الأيسر)', startX: 0, startY: length, endX: 0, endY: 0, thickness: wallThickness, height: ceilingHeight },
       ];
 
       const updated = {
@@ -363,7 +368,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     const cloned: CabinetItem = {
       ...target,
       id: newId,
-      name: `${target.name} (Copy)`,
+      name: `${target.name} (نسخة)`,
       x: target.x + 100,
       y: target.y + 100,
     };
@@ -453,7 +458,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     const cloned: ApplianceItem = {
       ...target,
       id: newId,
-      name: `${target.name} (Copy)`,
+      name: `${target.name} (نسخة)`,
       x: target.x + 100,
       y: target.y + 100,
     };
@@ -575,6 +580,15 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         ...state.project,
         manufacturing: { ...state.project.manufacturing, ...data },
       };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return { project: updated };
+    });
+  },
+
+  updateProjectPricing: (data) => {
+    set((state) => {
+      const updatedPricing = { ...state.project.pricing, ...data };
+      const updated = { ...state.project, pricing: updatedPricing };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated };
     });

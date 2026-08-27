@@ -3,6 +3,7 @@ import { ApplianceType } from '../types';
 export interface ApplianceTemplate {
   type: ApplianceType;
   name: string;
+  nameEn: string;
   category: 'cooling' | 'cooking' | 'cleaning' | 'ventilation' | 'sinks';
   description: string;
   defaultWidth: number;
@@ -18,12 +19,13 @@ export interface ApplianceTemplate {
 }
 
 export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
-  // --- REFRIGERATORS ---
+  // --- تبريد وثلاجات ---
   {
     type: 'fridge-freestanding',
-    name: 'Freestanding Refrigerator',
+    name: 'ثلاجة قائمة حرة (Freestanding)',
+    nameEn: 'Freestanding Refrigerator',
     category: 'cooling',
-    description: 'French door or bottom freezer freestanding fridge',
+    description: 'ثلاجة دولابي أو فريزر سفلي مع مسافات تهوية',
     defaultWidth: 900,
     defaultHeight: 1850,
     defaultDepth: 680,
@@ -37,9 +39,10 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
   },
   {
     type: 'fridge-builtin',
-    name: 'Built-in Refrigerator',
+    name: 'ثلاجة بلت إن مدمجة',
+    nameEn: 'Built-in Refrigerator',
     category: 'cooling',
-    description: 'Integrated flush panel refrigerator',
+    description: 'ثلاجة مخفية بالكامل خلف ضلف الخشب',
     defaultWidth: 600,
     defaultHeight: 1780,
     defaultDepth: 550,
@@ -52,28 +55,30 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
     isBuiltIn: true,
   },
 
-  // --- COOKING ---
+  // --- طهي وأفران ---
   {
     type: 'cooktop-induction',
-    name: 'Induction / Gas Cooktop',
+    name: 'مسطح بلت إن (غاز / كهرباء)',
+    nameEn: 'Induction / Gas Cooktop',
     category: 'cooking',
-    description: 'Countertop drop-in 4-zone cooktop',
+    description: 'مسطح 4 أو 5 شعلات ساقط بالرخام',
     defaultWidth: 600,
     defaultHeight: 50,
     defaultDepth: 520,
-    defaultZ: 850, // On top of base cabinet
+    defaultZ: 850,
     clearanceSides: 50,
     clearanceBack: 50,
-    clearanceTop: 650, // Minimum clearance to hood
+    clearanceTop: 650,
     standardWidths: [600, 750, 800, 900],
     icon: 'Flame',
     isBuiltIn: true,
   },
   {
     type: 'cooker-range',
-    name: 'Freestanding Range Cooker',
+    name: 'بوتجاز قائم حر بالفرن',
+    nameEn: 'Freestanding Range Cooker',
     category: 'cooking',
-    description: 'Pro-style stove with integrated double oven and 5-6 burners',
+    description: 'بوتجاز شيف متكامل 90 سم مع فرن سفلي كبير',
     defaultWidth: 900,
     defaultHeight: 900,
     defaultDepth: 600,
@@ -87,13 +92,14 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
   },
   {
     type: 'oven-builtin',
-    name: 'Built-in Single Oven',
+    name: 'فرن كهربائي مدمج (60 سم)',
+    nameEn: 'Built-in Single Oven',
     category: 'cooking',
-    description: 'Standard 60cm built-in electric convection oven',
+    description: 'فرن بلت إن قياسي بتبريد مروحة وشاشة ديجيتال',
     defaultWidth: 595,
     defaultHeight: 595,
     defaultDepth: 560,
-    defaultZ: 100, // Or elevated in tall unit
+    defaultZ: 100,
     clearanceSides: 0,
     clearanceBack: 40,
     clearanceTop: 0,
@@ -103,9 +109,10 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
   },
   {
     type: 'microwave-builtin',
-    name: 'Built-in Microwave',
+    name: 'ميكروويف مدمج (Built-in)',
+    nameEn: 'Built-in Microwave',
     category: 'cooking',
-    description: 'Integrated compact combi microwave oven',
+    description: 'ميكروويف وشواية مدمجة بالدولاب العلوي أو البرج',
     defaultWidth: 595,
     defaultHeight: 385,
     defaultDepth: 400,
@@ -118,12 +125,13 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
     isBuiltIn: true,
   },
 
-  // --- CLEANING ---
+  // --- غسيل وصحون ---
   {
     type: 'dishwasher',
-    name: 'Integrated Dishwasher',
+    name: 'غسالة صحون مدمجة',
+    nameEn: 'Integrated Dishwasher',
     category: 'cleaning',
-    description: '60cm standard fully integrated undercounter dishwasher',
+    description: 'غسالة صحون 60 سم تحت الرخام مخفية بالكامل',
     defaultWidth: 600,
     defaultHeight: 820,
     defaultDepth: 570,
@@ -137,9 +145,10 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
   },
   {
     type: 'washing-machine',
-    name: 'Front-load Washing Machine',
+    name: 'غسالة ملابس أمامية',
+    nameEn: 'Front-load Washing Machine',
     category: 'cleaning',
-    description: 'Undercounter or utility front loader',
+    description: 'غسالة ملابس بفتحة أمامية تسقط أسفل الكاونترتوب',
     defaultWidth: 600,
     defaultHeight: 850,
     defaultDepth: 600,
@@ -152,16 +161,17 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
     isBuiltIn: false,
   },
 
-  // --- VENTILATION ---
+  // --- شفاطات ---
   {
     type: 'hood-wall',
-    name: 'Wall Chimney Hood',
+    name: 'شفاط جداري ديكوري (هرمي/حرف T)',
+    nameEn: 'Wall Chimney Hood',
     category: 'ventilation',
-    description: 'Stainless steel / black box wall extractor hood',
+    description: 'شفاط ستانلس ستيل مع مدخنة رأسية وفلاتر كربونية',
     defaultWidth: 900,
     defaultHeight: 650,
     defaultDepth: 500,
-    defaultZ: 1550, // 650-750mm above cooktop
+    defaultZ: 1550,
     clearanceSides: 0,
     clearanceBack: 0,
     clearanceTop: 0,
@@ -171,9 +181,10 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
   },
   {
     type: 'hood-integrated',
-    name: 'Integrated Canopy Hood',
+    name: 'شفاط بلت إن مخفي داخل الوحدة',
+    nameEn: 'Integrated Canopy Hood',
     category: 'ventilation',
-    description: 'Concealed canopy hood built into wall cabinet',
+    description: 'شفاط غاطس بالكامل داخل الكابينة العلوية',
     defaultWidth: 600,
     defaultHeight: 300,
     defaultDepth: 320,
@@ -186,12 +197,13 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
     isBuiltIn: true,
   },
 
-  // --- SINKS ---
+  // --- أحواض وخلاطات ---
   {
     type: 'sink-single',
-    name: 'Single Bowl Sink & Mixer',
+    name: 'حوض عين واحدة مع خلاط شجرة',
+    nameEn: 'Single Bowl Sink & Mixer',
     category: 'sinks',
-    description: 'Undermount or drop-in single bowl with gooseneck faucet',
+    description: 'حوض ساقط تحت الرخام مع خلاط رقبة وزة نحاسي/كروم',
     defaultWidth: 550,
     defaultHeight: 200,
     defaultDepth: 450,
@@ -205,9 +217,10 @@ export const APPLIANCE_LIBRARY: ApplianceTemplate[] = [
   },
   {
     type: 'sink-double',
-    name: 'Double Bowl Sink & Mixer',
+    name: 'حوض عينين مع صفاية وخلاط',
+    nameEn: 'Double Bowl Sink & Mixer',
     category: 'sinks',
-    description: 'Large double bowl sink with drainer area and mixer tap',
+    description: 'حوض كبير عينين لغسيل الأواني والخضروات',
     defaultWidth: 860,
     defaultHeight: 220,
     defaultDepth: 500,

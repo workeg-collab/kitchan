@@ -4,18 +4,19 @@ import {
   DEFAULT_COUNTERTOP_CONFIG, 
   DEFAULT_PLINTH_CONFIG, 
   DEFAULT_BACKSPLASH_CONFIG, 
-  DEFAULT_MATERIAL_FINISHES 
+  DEFAULT_MATERIAL_FINISHES,
+  DEFAULT_PRICING_SETTINGS
 } from './standards';
 
 export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
   metadata: {
     id: 'proj-modern-l',
-    name: 'Modern L-Shape Residence',
-    clientName: 'Sarah & David Miller',
-    designerName: 'Studio ArchCAD Pro',
+    name: 'مطبخ مودرن حرف L مع برج أفران',
+    clientName: 'أ / أحمد ومريم السيد',
+    designerName: 'استوديو كيتشن كاد برو',
     date: '2026-08-27',
-    notes: 'Premium handleless kitchen with integrated appliances, Calacatta quartz countertops and custom tall oven towers.',
-    unit: 'mm',
+    notes: 'مطبخ مودرن هاندلس بدون مقابض، أسطح رخام كوارتز كلكتا جولد إيطالي، مع برج أفران وثلاجة بيلت إن متكاملة.',
+    unit: 'cm',
   },
   room: {
     shape: 'rectangular',
@@ -24,15 +25,15 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
     ceilingHeight: 2600,
     wallThickness: 150,
     walls: [
-      { id: 'wall-a', name: 'Wall A (Back)', startX: 0, startY: 0, endX: 4200, endY: 0, thickness: 150, height: 2600 },
-      { id: 'wall-b', name: 'Wall B (Right)', startX: 4200, startY: 0, endX: 4200, endY: 3600, thickness: 150, height: 2600 },
-      { id: 'wall-c', name: 'Wall C (Front)', startX: 4200, startY: 3600, endX: 0, endY: 3600, thickness: 150, height: 2600 },
-      { id: 'wall-d', name: 'Wall D (Left)', startX: 0, startY: 3600, endX: 0, endY: 0, thickness: 150, height: 2600 },
+      { id: 'wall-a', name: 'الجدار أ (الخلفي)', startX: 0, startY: 0, endX: 4200, endY: 0, thickness: 150, height: 2600 },
+      { id: 'wall-b', name: 'الجدار ب (الأيمن)', startX: 4200, startY: 0, endX: 4200, endY: 3600, thickness: 150, height: 2600 },
+      { id: 'wall-c', name: 'الجدار ج (الأمامي)', startX: 4200, startY: 3600, endX: 0, endY: 3600, thickness: 150, height: 2600 },
+      { id: 'wall-d', name: 'الجدار د (الأيسر)', startX: 0, startY: 3600, endX: 0, endY: 0, thickness: 150, height: 2600 },
     ],
     elements: [
       {
         id: 'win-01',
-        name: 'Garden Window',
+        name: 'نافذة المطبخ فوق الحوض',
         type: 'window',
         x: 1800,
         y: 0,
@@ -45,7 +46,7 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       },
       {
         id: 'door-01',
-        name: 'Terrace Glass Door',
+        name: 'باب التراس والحديقة',
         type: 'door',
         x: 3500,
         y: 3600,
@@ -59,7 +60,7 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       },
       {
         id: 'pipe-01',
-        name: 'Plumbing Supply / Drain',
+        name: 'ماسورة التغذية والصرف',
         type: 'pipe',
         x: 2300,
         y: 100,
@@ -73,10 +74,9 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
     ],
   },
   cabinets: [
-    // --- Wall A (Back wall: Base cabinets from left to right) ---
     {
       id: 'T01',
-      name: 'Integrated Fridge Housing',
+      name: 'دولاب ثلاجة مدمجة',
       category: 'tall',
       type: 'tall-fridge-housing',
       width: 600,
@@ -91,11 +91,11 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       doorCount: 2,
       drawerCount: 0,
       doorHinge: 'right',
-      customNotes: 'Houses 178cm Liebherr built-in fridge freezer',
+      customNotes: 'مخصص لتبييت ثلاجة بلت إن 178 سم',
     },
     {
       id: 'T02',
-      name: 'Oven & Microwave Tower',
+      name: 'برج أفران وميكروويف مدمج',
       category: 'tall',
       type: 'tall-oven-tower',
       width: 600,
@@ -113,11 +113,11 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       hasApplianceCavity: true,
       applianceCavityHeight: 600,
       applianceCavityZ: 780,
-      customNotes: 'Miele 60cm single oven cavity',
+      customNotes: 'تجويف فرن بلت إن 60 سم',
     },
     {
       id: 'B01',
-      name: '3-Drawer Base Unit',
+      name: 'سفلي 3 أدراج (معالق وحلل)',
       category: 'base',
       type: 'base-drawers-3',
       width: 600,
@@ -132,11 +132,11 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       doorCount: 0,
       drawerCount: 3,
       doorHinge: 'none',
-      customNotes: 'Cutlery insert top drawer, Blum Legrabox soft-close',
+      customNotes: 'درج ملاعق علوي + درجين باستم هيدروليك',
     },
     {
       id: 'B02',
-      name: 'Sink Base Unit',
+      name: 'وحدة حوض غسيل',
       category: 'base',
       type: 'base-sink',
       width: 800,
@@ -152,11 +152,11 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       drawerCount: 0,
       doorHinge: 'double',
       hasSinkCutout: true,
-      customNotes: 'Under-window sink placement, Blanco undermount basin',
+      customNotes: 'موقع الحوض أسفل النافذة مباشرة',
     },
     {
       id: 'B03',
-      name: 'Integrated Dishwasher',
+      name: 'غسالة صحون مدمجة',
       category: 'base',
       type: 'base-single-door',
       width: 600,
@@ -171,11 +171,11 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       doorCount: 1,
       drawerCount: 0,
       doorHinge: 'right',
-      customNotes: 'Fully integrated 60cm dishwasher front panel',
+      customNotes: 'واجهة خشبية لغسالة أطباق 60 سم',
     },
     {
       id: 'B04',
-      name: 'Corner Base Unit (90°)',
+      name: 'وحدة ركنة زاوية L (90°)',
       category: 'corner',
       type: 'base-corner-l',
       width: 900,
@@ -190,13 +190,13 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       doorCount: 2,
       drawerCount: 0,
       doorHinge: 'double',
-      customNotes: 'LeMans II pullout swivel baskets',
+      customNotes: 'سلال دوارة داخلية لومانز (LeMans II)',
     },
 
-    // --- Wall B (Right Wall: Cooktop zone) ---
+    // الجدار ب (الأيمن)
     {
       id: 'B05',
-      name: 'Induction Cooktop Base (Drawers)',
+      name: 'سفلي مسطح طهي وبوتجاز (أدراج)',
       category: 'base',
       type: 'base-drawers-2',
       width: 900,
@@ -211,11 +211,10 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       doorCount: 0,
       drawerCount: 2,
       doorHinge: 'none',
-      customNotes: 'Heavy-duty 70kg pan drawer slides',
     },
     {
       id: 'B06',
-      name: 'Single Door Base Unit',
+      name: 'سفلي باب واحد للتخزين',
       category: 'base',
       type: 'base-single-door',
       width: 600,
@@ -232,10 +231,10 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       doorHinge: 'left',
     },
 
-    // --- Wall Units on Wall B ---
+    // علوي الجدار ب
     {
       id: 'W01',
-      name: 'Double Door Wall Unit',
+      name: 'علوي بابين مدمج بالشفاط',
       category: 'wall',
       type: 'wall-double-door',
       width: 900,
@@ -250,11 +249,10 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
       doorCount: 2,
       drawerCount: 0,
       doorHinge: 'double',
-      customNotes: 'Concealed canopy extractor hood integrated inside',
     },
     {
       id: 'W02',
-      name: 'Single Door Wall Unit',
+      name: 'علوي باب واحد تخزين',
       category: 'wall',
       type: 'wall-single-door',
       width: 600,
@@ -274,7 +272,7 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
   appliances: [
     {
       id: 'A01',
-      name: 'Under-mount Sink & Brass Faucet',
+      name: 'حوض ساقط بالرخام وخلاط شجرة نحاسي',
       type: 'sink-single',
       width: 600,
       height: 200,
@@ -287,7 +285,7 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
     },
     {
       id: 'A02',
-      name: '80cm Induction Cooktop',
+      name: 'مسطح طهي بلت إن 80 سم',
       type: 'cooktop-induction',
       width: 800,
       height: 50,
@@ -300,7 +298,7 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
     },
     {
       id: 'A03',
-      name: 'Built-in Convection Oven',
+      name: 'فرن بلت إن كهربائي 60 سم',
       type: 'oven-builtin',
       width: 595,
       height: 595,
@@ -319,4 +317,5 @@ export const SAMPLE_PROJECT_MODERN_L: ProjectData = {
   backsplash: DEFAULT_BACKSPLASH_CONFIG,
   materials: DEFAULT_MATERIAL_FINISHES,
   manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
+  pricing: DEFAULT_PRICING_SETTINGS,
 };
