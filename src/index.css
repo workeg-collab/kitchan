@@ -2,64 +2,61 @@
 
 @layer base {
   :root {
-    --cad-bg: #0f172a;
-    --cad-grid: rgba(255, 255, 255, 0.05);
-    --cad-grid-major: rgba(255, 255, 255, 0.12);
-    --cad-accent: #3b82f6;
+    --cad-bg: #f8fafc;
+    --cad-grid: rgba(0, 0, 0, 0.05);
+    --cad-grid-major: rgba(37, 99, 235, 0.12);
+    --cad-accent: #2563eb;
   }
 
   body {
-    @apply bg-slate-950 text-slate-100 antialiased overflow-hidden select-none font-sans;
+    @apply bg-slate-100 text-slate-900 antialiased overflow-hidden select-none font-sans;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-/* Custom CAD grid backgrounds */
+/* Light Architectural Grid */
 .bg-cad-grid {
-  background-size: 20px 20px, 100px 100px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-}
-
-.bg-cad-grid-light {
+  background-color: #f8fafc;
   background-size: 20px 20px, 100px 100px;
   background-image: 
     linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(to right, rgba(0, 0, 0, 0.09) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.09) 1px, transparent 1px);
+    linear-gradient(to right, rgba(37, 99, 235, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 99, 235, 0.08) 1px, transparent 1px);
 }
 
-.bg-blueprint {
-  background-color: #0c2340;
+.bg-blueprint-light {
+  background-color: #f1f5f9;
   background-size: 20px 20px, 100px 100px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+    linear-gradient(to right, rgba(51, 65, 85, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(51, 65, 85, 0.06) 1px, transparent 1px),
+    linear-gradient(to right, rgba(37, 99, 235, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 99, 235, 0.15) 1px, transparent 1px);
 }
 
-/* Custom scrollbars */
+/* Custom light scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(241, 245, 249, 0.8);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.5);
+  background: rgba(148, 163, 184, 0.5);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.8);
+  background: rgba(100, 116, 139, 0.8);
+}
+
+/* RTL Typography support */
+[dir="rtl"] {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, system-ui;
 }
 
 @media print {
@@ -69,8 +66,5 @@
   }
   .no-print {
     display: none !important;
-  }
-  .print-only {
-    display: block !important;
   }
 }

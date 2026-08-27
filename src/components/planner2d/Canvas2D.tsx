@@ -1,12 +1,13 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useUIStore } from '../../store/useUIStore';
 import { CabinetNode2D } from './CabinetNode2D';
 import { ApplianceNode2D } from './ApplianceNode2D';
 import { ArchElementNode2D } from './ArchElementNode2D';
 import { DimensionLine } from './DimensionLine';
-import { calculateSnap, calculateAisleClearance, getRotatedDimensions } from '../../utils/cadGeometry';
+import { calculateSnap, calculateAisleClearance } from '../../utils/cadGeometry';
 import { formatDimension } from '../../utils/unitConversion';
+import { TRANSLATIONS } from '../../utils/i18n';
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -15,9 +16,9 @@ import {
   Copy, 
   Trash2, 
   Grid, 
-  Magnet, 
   Ruler, 
-  Eye 
+  Eye,
+  PencilRuler
 } from 'lucide-react';
 
 export const Canvas2D: React.FC = () => {
@@ -40,6 +41,7 @@ export const Canvas2D: React.FC = () => {
     rotateAppliance,
     removeAppliance,
     removeElement,
+    updateRoomDimensions,
   } = useProjectStore();
 
   const {
@@ -60,8 +62,11 @@ export const Canvas2D: React.FC = () => {
     setSnapToGridEnabled,
     setShowDimensions2D,
     setShowAisleClearance,
+    setIsRoomSketcherOpen,
+    language,
   } = useUIStore();
 
+  const t = TRANSLATIONS[language];
   const { room, cabinets, appliances, architecturalElements } = project;
 
   // Dragging / Panning State
@@ -78,6 +83,10 @@ export const Canvas2D: React.FC = () => {
     depth: number;
     rotation: number;
   } | null>(null);
+
+  // Interactive Room Resizing Handle
+  const [isResizingRoom, setIsResizingRoom] = useState(false);
+  const [roomResizeStart, setRoomResizeStart] = useState({ startX: 0, startY: 0, initialW: 0, initialL: 0 });
 
   const [activeGuides, setActiveGuides] = useState<{ x1: number; y1: number; x2: number; y2: number; label?: string }[]>([]);
 
@@ -96,7 +105,6 @@ export const Canvas2D: React.FC = () => {
     const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
     const newZoom = Math.min(Math.max(zoom2D * zoomFactor, 0.05), 1.5);
 
-    // Zoom towards mouse position
     if (svgRef.current) {
       const rect = svgRef.current.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
@@ -110,10 +118,10 @@ export const Canvas2D: React.FC = () => {
     }
   };
 
-  // Canvas Mouse Down (Start Panning or Clear Selection)
+  // Canvas Mouse Down
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
     if (e.target === svgRef.current || (e.target as HTMLElement).id === 'cad-canvas-bg') {
-      if (e.button === 0 || e.button === 1) { // Left or middle click on background
+      if (e.button === 0 || e.button === 1) {
         setIsPanning(true);
         setPanStart({ x: e.clientX - pan2D.x, y: e.clientY - pan2D.y });
         clearSelection();
@@ -149,6 +157,19 @@ export const Canvas2D: React.FC = () => {
     });
   };
 
+  // Start Resizing Room from Corner Handle
+  const handleRoomResizeMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const svgCoords = clientToSVG(e.clientX, e.clientY);
+    setIsResizingRoom(true);
+    setRoomResizeStart({
+      startX: svgCoords.x,
+      startY: svgCoords.y,
+      initialW: room.width,
+      initialL: room.length,
+    });
+  };
+
   // Mouse Move
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isPanning) {
@@ -156,6 +177,16 @@ export const Canvas2D: React.FC = () => {
         x: e.clientX - panStart.x,
         y: e.clientY - panStart.y,
       });
+      return;
+    }
+
+    if (isResizingRoom) {
+      const svgCoords = clientToSVG(e.clientX, e.clientY);
+      const dx = svgCoords.x - roomResizeStart.startX;
+      const dy = svgCoords.y - roomResizeStart.startY;
+      const newW = Math.max(2000, Math.round((roomResizeStart.initialW + dx) / 100) * 100);
+      const newL = Math.max(2000, Math.round((roomResizeStart.initialL + dy) / 100) * 100);
+      updateRoomDimensions(newW, newL, room.ceilingHeight, room.wallThickness);
       return;
     }
 
@@ -194,14 +225,13 @@ export const Canvas2D: React.FC = () => {
     }
   };
 
-  // Mouse Up
   const handleMouseUp = () => {
     setIsPanning(false);
     setDraggingItem(null);
+    setIsResizingRoom(false);
     setActiveGuides([]);
   };
 
-  // Selected item reference for floating mini-toolbar
   const selectedCabinet = cabinets.find((c) => c.id === selectedId);
   const selectedAppliance = appliances.find((a) => a.id === selectedId);
   const selectedElement = architecturalElements.find((e) => e.id === selectedId);
@@ -214,81 +244,89 @@ export const Canvas2D: React.FC = () => {
     ? { x: selectedElement.x, y: selectedElement.y, w: selectedElement.width, d: selectedElement.depth, rot: selectedElement.rotation }
     : null;
 
-  // Aisle clearances
   const aisleClearances = showAisleClearance ? calculateAisleClearance(cabinets, room.width, room.length) : [];
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full bg-slate-950 overflow-hidden flex flex-col select-none"
+      className="relative w-full h-full bg-slate-100 overflow-hidden flex flex-col select-none"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      {/* 2D Floating Toolbar */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 p-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl shadow-2xl">
+      {/* 2D Floating Toolbar (Light Mode) */}
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 p-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-lg">
         <button
           onClick={() => setZoom2D((z) => Math.min(z * 1.2, 1.5))}
-          className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition"
-          title="Zoom In (+)"
+          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
+          title={t.zoomIn}
         >
-          <ZoomIn size={18} />
+          <ZoomIn size={17} />
         </button>
         <button
           onClick={() => setZoom2D((z) => Math.max(z * 0.8, 0.05))}
-          className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition"
-          title="Zoom Out (-)"
+          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
+          title={t.zoomOut}
         >
-          <ZoomOut size={18} />
+          <ZoomOut size={17} />
         </button>
         <button
           onClick={resetView2D}
-          className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition"
-          title="Fit / Reset View"
+          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
+          title={t.fitView}
         >
-          <Maximize2 size={18} />
+          <Maximize2 size={17} />
         </button>
 
-        <div className="w-[1px] h-5 bg-slate-800 mx-1" />
+        <div className="w-[1px] h-5 bg-slate-200 mx-1" />
 
         <button
           onClick={() => setSnapToGridEnabled(!snapToGridEnabled)}
-          className={`p-2 rounded-lg transition flex items-center gap-1 text-xs font-semibold ${
-            snapToGridEnabled ? 'bg-blue-600/30 text-blue-400 border border-blue-500/40' : 'text-slate-400 hover:bg-slate-800'
+          className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold ${
+            snapToGridEnabled ? 'bg-blue-50 text-blue-600 border border-blue-200 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
           }`}
-          title="Toggle Grid Snap"
+          title={t.gridSnap}
         >
-          <Grid size={17} />
+          <Grid size={16} />
           <span>{gridSize}mm</span>
         </button>
 
         <button
           onClick={() => setShowDimensions2D(!showDimensions2D)}
-          className={`p-2 rounded-lg transition flex items-center gap-1 text-xs font-semibold ${
-            showDimensions2D ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-500/40' : 'text-slate-400 hover:bg-slate-800'
+          className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold ${
+            showDimensions2D ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
           }`}
-          title="Toggle Dimension Lines"
+          title={t.dimensions}
         >
-          <Ruler size={17} />
-          <span>Dims</span>
+          <Ruler size={16} />
+          <span>{t.dimensions}</span>
         </button>
 
         <button
           onClick={() => setShowAisleClearance(!showAisleClearance)}
-          className={`p-2 rounded-lg transition flex items-center gap-1 text-xs font-semibold ${
-            showAisleClearance ? 'bg-purple-600/30 text-purple-400 border border-purple-500/40' : 'text-slate-400 hover:bg-slate-800'
+          className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold ${
+            showAisleClearance ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
           }`}
-          title="Toggle Working Aisle Clearances"
+          title={t.aisles}
         >
-          <Eye size={17} />
-          <span>Aisles</span>
+          <Eye size={16} />
+          <span>{t.aisles}</span>
+        </button>
+
+        <button
+          onClick={() => setIsRoomSketcherOpen(true)}
+          className="p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 border border-transparent hover:border-indigo-200"
+          title={t.sketchRoom}
+        >
+          <PencilRuler size={16} />
+          <span>{language === 'ar' ? 'رسم الغرفة' : 'Sketch'}</span>
         </button>
       </div>
 
       {/* Floating Selection Quick Toolbar */}
       {selectedItemPos && selectedId && (
         <div
-          className="absolute z-20 flex items-center gap-1 p-1 bg-slate-900/95 border border-blue-500/50 rounded-lg shadow-xl"
+          className="absolute z-20 flex items-center gap-1 p-1 bg-white border border-blue-400 rounded-xl shadow-xl"
           style={{
             left: `${pan2D.x + selectedItemPos.x * zoom2D}px`,
             top: `${Math.max(16, pan2D.y + selectedItemPos.y * zoom2D - 45)}px`,
@@ -299,8 +337,8 @@ export const Canvas2D: React.FC = () => {
               if (selectedType === 'cabinet') rotateCabinet(selectedId, 90);
               else if (selectedType === 'appliance') rotateAppliance(selectedId, 90);
             }}
-            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded transition"
-            title="Rotate 90° (R)"
+            className="p-1.5 text-slate-700 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
+            title={t.rotate}
           >
             <RotateCw size={15} />
           </button>
@@ -309,8 +347,8 @@ export const Canvas2D: React.FC = () => {
               if (selectedType === 'cabinet') duplicateCabinet(selectedId);
               else if (selectedType === 'appliance') duplicateAppliance(selectedId);
             }}
-            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded transition"
-            title="Duplicate (D)"
+            className="p-1.5 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition"
+            title={t.duplicate}
           >
             <Copy size={15} />
           </button>
@@ -320,15 +358,15 @@ export const Canvas2D: React.FC = () => {
               else if (selectedType === 'appliance') removeAppliance(selectedId);
               else if (selectedType === 'element') removeElement(selectedId);
             }}
-            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-950/40 rounded transition"
-            title="Delete (Del)"
+            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
+            title={t.delete}
           >
             <Trash2 size={15} />
           </button>
         </div>
       )}
 
-      {/* Main SVG CAD Canvas */}
+      {/* Main SVG CAD Canvas (Light Mode) */}
       <svg
         ref={svgRef}
         id="cad-canvas-bg"
@@ -337,44 +375,39 @@ export const Canvas2D: React.FC = () => {
         onWheel={handleWheel}
       >
         <defs>
-          {/* CAD Background Grid Pattern */}
-          <pattern id="smallGrid" width="100" height="100" patternUnits="userSpaceOnUse">
-            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255, 255, 255, 0.04)" strokeWidth="1" />
+          <pattern id="cadGridLightSmall" width="100" height="100" patternUnits="userSpaceOnUse">
+            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(0, 0, 0, 0.04)" strokeWidth="1" />
           </pattern>
-          <pattern id="majorGrid" width="500" height="500" patternUnits="userSpaceOnUse">
-            <rect width="500" height="500" fill="url(#smallGrid)" />
-            <path d="M 500 0 L 0 0 0 500" fill="none" stroke="rgba(56, 189, 248, 0.12)" strokeWidth="1.5" />
-          </pattern>
-
-          {/* Wall Hatch Pattern */}
-          <pattern id="wallHatch" width="20" height="20" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-            <line x1="0" y1="0" x2="0" y2="20" stroke="rgba(148, 163, 184, 0.25)" strokeWidth="2" />
+          <pattern id="cadGridLightMajor" width="500" height="500" patternUnits="userSpaceOnUse">
+            <rect width="500" height="500" fill="url(#cadGridLightSmall)" />
+            <path d="M 500 0 L 0 0 0 500" fill="none" stroke="rgba(37, 99, 235, 0.12)" strokeWidth="1.5" />
           </pattern>
         </defs>
 
-        {/* Global Pan & Zoom Transform Group */}
         <g transform={`translate(${pan2D.x}, ${pan2D.y}) scale(${zoom2D})`}>
-          {/* CAD Background Grid */}
+          {/* Light Grid Background */}
           <rect
             x={-5000}
             y={-5000}
             width={15000}
             height={15000}
-            fill="url(#majorGrid)"
+            fill="url(#cadGridLightMajor)"
             className="pointer-events-none"
           />
 
-          {/* Room Interior Floor */}
+          {/* Room Interior Floor (Clean White) */}
           <rect
             x={0}
             y={0}
             width={room.width}
             height={room.length}
-            fill="#090d16"
-            stroke="none"
+            fill="#ffffff"
+            stroke="#cbd5e1"
+            strokeWidth="1.5"
+            rx="2"
           />
 
-          {/* Outer Wall Boundaries with architectural thickness */}
+          {/* Outer Wall Boundaries */}
           <g className="walls-group">
             {/* Top Wall A */}
             <rect
@@ -382,8 +415,8 @@ export const Canvas2D: React.FC = () => {
               y={-room.wallThickness}
               width={room.width + 2 * room.wallThickness}
               height={room.wallThickness}
-              fill="#1e293b"
-              stroke="#475569"
+              fill="#e2e8f0"
+              stroke="#64748b"
               strokeWidth="2"
             />
             {/* Right Wall B */}
@@ -392,8 +425,8 @@ export const Canvas2D: React.FC = () => {
               y={-room.wallThickness}
               width={room.wallThickness}
               height={room.length + 2 * room.wallThickness}
-              fill="#1e293b"
-              stroke="#475569"
+              fill="#e2e8f0"
+              stroke="#64748b"
               strokeWidth="2"
             />
             {/* Bottom Wall C */}
@@ -402,8 +435,8 @@ export const Canvas2D: React.FC = () => {
               y={room.length}
               width={room.width + 2 * room.wallThickness}
               height={room.wallThickness}
-              fill="#1e293b"
-              stroke="#475569"
+              fill="#e2e8f0"
+              stroke="#64748b"
               strokeWidth="2"
             />
             {/* Left Wall D */}
@@ -412,27 +445,37 @@ export const Canvas2D: React.FC = () => {
               y={-room.wallThickness}
               width={room.wallThickness}
               height={room.length + 2 * room.wallThickness}
-              fill="#1e293b"
-              stroke="#475569"
+              fill="#e2e8f0"
+              stroke="#64748b"
               strokeWidth="2"
             />
 
-            {/* Wall Labels (Wall A, Wall B, Wall C, Wall D) */}
-            <text x={room.width / 2} y={-room.wallThickness / 2} textAnchor="middle" dominantBaseline="central" fill="#94a3b8" fontSize="24" fontWeight="bold" fontFamily="monospace">
-              WALL A (BACK)
+            {/* Wall Labels */}
+            <text x={room.width / 2} y={-room.wallThickness / 2} textAnchor="middle" dominantBaseline="central" fill="#475569" fontSize="24" fontWeight="bold" fontFamily="monospace">
+              {t.wallA}
             </text>
-            <text x={room.width + room.wallThickness / 2} y={room.length / 2} textAnchor="middle" dominantBaseline="central" fill="#94a3b8" fontSize="24" fontWeight="bold" fontFamily="monospace" transform={`rotate(90, ${room.width + room.wallThickness / 2}, ${room.length / 2})`}>
-              WALL B (RIGHT)
+            <text x={room.width + room.wallThickness / 2} y={room.length / 2} textAnchor="middle" dominantBaseline="central" fill="#475569" fontSize="24" fontWeight="bold" fontFamily="monospace" transform={`rotate(90, ${room.width + room.wallThickness / 2}, ${room.length / 2})`}>
+              {t.wallB}
             </text>
-            <text x={room.width / 2} y={room.length + room.wallThickness / 2} textAnchor="middle" dominantBaseline="central" fill="#94a3b8" fontSize="24" fontWeight="bold" fontFamily="monospace">
-              WALL C (FRONT)
+            <text x={room.width / 2} y={room.length + room.wallThickness / 2} textAnchor="middle" dominantBaseline="central" fill="#475569" fontSize="24" fontWeight="bold" fontFamily="monospace">
+              {t.wallC}
             </text>
-            <text x={-room.wallThickness / 2} y={room.length / 2} textAnchor="middle" dominantBaseline="central" fill="#94a3b8" fontSize="24" fontWeight="bold" fontFamily="monospace" transform={`rotate(-90, ${-room.wallThickness / 2}, ${room.length / 2})`}>
-              WALL D (LEFT)
+            <text x={-room.wallThickness / 2} y={room.length / 2} textAnchor="middle" dominantBaseline="central" fill="#475569" fontSize="24" fontWeight="bold" fontFamily="monospace" transform={`rotate(-90, ${-room.wallThickness / 2}, ${room.length / 2})`}>
+              {t.wallD}
             </text>
           </g>
 
-          {/* Architectural Elements (Doors, Windows, Columns, Beams, Pipes) */}
+          {/* Interactive Room Corner Resize Handle */}
+          <g
+            transform={`translate(${room.width}, ${room.length})`}
+            onMouseDown={handleRoomResizeMouseDown}
+            className="cursor-nwse-resize group"
+          >
+            <circle cx="0" cy="0" r="16" fill="#2563eb" fillOpacity="0.8" stroke="#ffffff" strokeWidth="3" className="group-hover:scale-125 transition" />
+            <text x="0" y="0" textAnchor="middle" dominantBaseline="central" fill="#ffffff" fontSize="10" fontWeight="bold">↔</text>
+          </g>
+
+          {/* Architectural Elements (Doors & Windows) */}
           <g className="arch-elements-group">
             {architecturalElements.map((el) => (
               <ArchElementNode2D
@@ -496,15 +539,15 @@ export const Canvas2D: React.FC = () => {
                 y1={guide.y1}
                 x2={guide.x2}
                 y2={guide.y2}
-                stroke="#38bdf8"
-                strokeWidth="1.5"
+                stroke="#2563eb"
+                strokeWidth="2"
                 strokeDasharray="4,4"
               />
               {guide.label && (
                 <text
                   x={(guide.x1 + guide.x2) / 2}
                   y={(guide.y1 + guide.y2) / 2 - 8}
-                  fill="#38bdf8"
+                  fill="#2563eb"
                   fontSize="12"
                   fontWeight="bold"
                   textAnchor="middle"
@@ -518,10 +561,8 @@ export const Canvas2D: React.FC = () => {
           {/* Dimension Chains & Aisle Clearances */}
           {showDimensions2D && (
             <g className="dimension-chains-group pointer-events-none">
-              {/* Overall Room Dimensions */}
               {showWallDimensions && (
                 <>
-                  {/* Top Wall Dimension */}
                   <DimensionLine
                     x1={0}
                     y1={0}
@@ -530,11 +571,10 @@ export const Canvas2D: React.FC = () => {
                     value={room.width}
                     unit={unit}
                     offset={-room.wallThickness - 60}
-                    color="#93c5fd"
+                    color="#2563eb"
                     fontSize={14}
-                    prefix="ROOM W: "
+                    prefix={`${t.wallA}: `}
                   />
-                  {/* Right Wall Dimension */}
                   <DimensionLine
                     x1={room.width}
                     y1={0}
@@ -543,14 +583,13 @@ export const Canvas2D: React.FC = () => {
                     value={room.length}
                     unit={unit}
                     offset={-room.wallThickness - 60}
-                    color="#93c5fd"
+                    color="#2563eb"
                     fontSize={14}
-                    prefix="ROOM L: "
+                    prefix={`${t.wallB}: `}
                   />
                 </>
               )}
 
-              {/* Working Aisle Clearances */}
               {aisleClearances.map((aisle, i) => (
                 <DimensionLine
                   key={`aisle-${i}`}
@@ -560,9 +599,9 @@ export const Canvas2D: React.FC = () => {
                   y2={aisle.y2}
                   value={aisle.distance}
                   unit={unit}
-                  color="#c084fc" // purple-400
+                  color="#9333ea"
                   fontSize={12}
-                  prefix="AISLE: "
+                  prefix={`${t.aisles}: `}
                 />
               ))}
             </g>

@@ -1,9 +1,14 @@
 import { create } from 'zustand';
 import { ActiveTab, UnitType } from '../types';
+import { Language } from '../utils/i18n';
 
 interface UIState {
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
+
+  language: Language;
+  setLanguage: (language: Language) => void;
+  toggleLanguage: () => void;
 
   unit: UnitType;
   setUnit: (unit: UnitType) => void;
@@ -19,7 +24,7 @@ interface UIState {
   // Snapping & Guides
   snapToGridEnabled: boolean;
   setSnapToGridEnabled: (enabled: boolean) => void;
-  gridSize: number; // in mm (e.g. 50)
+  gridSize: number; // in mm
   setGridSize: (size: number) => void;
   snapToWallEnabled: boolean;
   setSnapToWallEnabled: (enabled: boolean) => void;
@@ -52,6 +57,8 @@ interface UIState {
   // Modals
   isRoomModalOpen: boolean;
   setIsRoomModalOpen: (open: boolean) => void;
+  isRoomSketcherOpen: boolean;
+  setIsRoomSketcherOpen: (open: boolean) => void;
   isExportModalOpen: boolean;
   setIsExportModalOpen: (open: boolean) => void;
   isCustomCabinetModalOpen: boolean;
@@ -60,11 +67,38 @@ interface UIState {
   setIsTemplateModalOpen: (open: boolean) => void;
 }
 
+const savedLang = (localStorage.getItem('kitchan_lang') as Language) || 'ar';
+if (typeof document !== 'undefined') {
+  document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = savedLang;
+}
+
 export const useUIStore = create<UIState>((set) => ({
   activeTab: '2d-plan',
   setActiveTab: (activeTab) => set({ activeTab }),
 
-  unit: 'mm',
+  language: savedLang,
+  setLanguage: (language) => {
+    localStorage.setItem('kitchan_lang', language);
+    if (typeof document !== 'undefined') {
+      document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.lang = language;
+    }
+    set({ language });
+  },
+  toggleLanguage: () => {
+    set((state) => {
+      const nextLang = state.language === 'en' ? 'ar' : 'en';
+      localStorage.setItem('kitchan_lang', nextLang);
+      if (typeof document !== 'undefined') {
+        document.documentElement.dir = nextLang === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.lang = nextLang;
+      }
+      return { language: nextLang };
+    });
+  },
+
+  unit: 'cm', // default cm for friendly usage
   setUnit: (unit) => set({ unit }),
   toggleUnit: () => set((state) => ({ unit: state.unit === 'mm' ? 'cm' : 'mm' })),
 
@@ -72,15 +106,15 @@ export const useUIStore = create<UIState>((set) => ({
   setZoom2D: (zoom) => set((state) => ({
     zoom2D: typeof zoom === 'function' ? zoom(state.zoom2D) : zoom,
   })),
-  pan2D: { x: 120, y: 100 },
+  pan2D: { x: 140, y: 110 },
   setPan2D: (pan) => set((state) => ({
     pan2D: typeof pan === 'function' ? pan(state.pan2D) : pan,
   })),
-  resetView2D: () => set({ zoom2D: 0.22, pan2D: { x: 120, y: 100 } }),
+  resetView2D: () => set({ zoom2D: 0.22, pan2D: { x: 140, y: 110 } }),
 
   snapToGridEnabled: true,
   setSnapToGridEnabled: (snapToGridEnabled) => set({ snapToGridEnabled }),
-  gridSize: 50, // 50 mm
+  gridSize: 50,
   setGridSize: (gridSize) => set({ gridSize }),
   snapToWallEnabled: true,
   setSnapToWallEnabled: (snapToWallEnabled) => set({ snapToWallEnabled }),
@@ -109,6 +143,8 @@ export const useUIStore = create<UIState>((set) => ({
 
   isRoomModalOpen: false,
   setIsRoomModalOpen: (isRoomModalOpen) => set({ isRoomModalOpen }),
+  isRoomSketcherOpen: false,
+  setIsRoomSketcherOpen: (isRoomSketcherOpen) => set({ isRoomSketcherOpen }),
   isExportModalOpen: false,
   setIsExportModalOpen: (isExportModalOpen) => set({ isExportModalOpen }),
   isCustomCabinetModalOpen: false,
