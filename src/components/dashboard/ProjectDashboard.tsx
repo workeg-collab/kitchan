@@ -181,28 +181,20 @@ export const ProjectDashboard: React.FC = () => {
             </button>
           ))}
         </div>
+      </div>
 
-        {/* 4. Bottom Agency Signature & Contact Footer */}
-        <div className="relative z-20 mt-4 flex flex-col sm:flex-row items-center justify-center gap-2.5 px-6 py-2.5 rounded-2xl bg-white/15 hover:bg-white/20 backdrop-blur-md border border-white/25 text-white shadow-xl transition animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex items-center gap-1.5 text-xs font-bold">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-slate-200">تطوير وبرمجة:</span>
-            <span className="font-extrabold tracking-wider text-blue-300 font-mono text-sm uppercase">POM Agency</span>
-          </div>
-
-          <span className="hidden sm:inline text-white/40">•</span>
-
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="text-slate-200">للتواصل أو أي استفسارات:</span>
-            <a
-              href="mailto:sales@pom-agency.online"
-              className="flex items-center gap-1 font-mono font-bold text-amber-300 hover:text-amber-200 underline underline-offset-4 transition"
-              title="إرسال بريد إلكتروني إلى sales@pom-agency.online"
-            >
-              <span>sales@pom-agency.online</span>
-            </a>
-          </div>
-        </div>
+      {/* Absolute Bottom Clean Minimalist Footer (بدون مربع وبخط صغير وناعم) */}
+      <div className="absolute bottom-3 inset-x-0 z-20 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-300/80 font-medium select-none pointer-events-auto text-center px-4">
+        <span>تطوير وبرمجة: <strong className="text-white font-mono font-bold">POM Agency</strong></span>
+        <span className="text-slate-400/50">•</span>
+        <span>للتواصل والاستفسارات:</span>
+        <a
+          href="mailto:sales@pom-agency.online"
+          className="font-mono text-amber-300/90 hover:text-amber-200 underline underline-offset-2 transition"
+          title="sales@pom-agency.online"
+        >
+          sales@pom-agency.online
+        </a>
       </div>
     </div>
   );

@@ -286,23 +286,22 @@ export const LoginScreen: React.FC = () => {
             </button>
           </form>
 
-          {/* Agency Signature & Contact */}
-          <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col items-center justify-center text-center space-y-1.5">
-            <div className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1.5 flex-wrap">
+          {/* Agency Signature & Contact (Borderless & Minimalist) */}
+          <div className="mt-6 flex flex-col items-center justify-center text-center space-y-1 text-[10.5px] text-slate-400">
+            <div className="flex items-center justify-center gap-1.5 flex-wrap">
               <span>تطوير وبرمجة:</span>
-              <span className="font-extrabold text-blue-600 font-mono text-xs">POM Agency</span>
+              <strong className="text-slate-700 font-mono font-bold">POM Agency</strong>
               <span className="text-slate-300">•</span>
               <span>للتواصل والاستفسارات:</span>
               <a
                 href="mailto:sales@pom-agency.online"
-                className="font-mono font-bold text-blue-600 hover:text-blue-700 underline underline-offset-2 flex items-center gap-1 transition"
-                title="إرسال بريد إلكتروني"
+                className="font-mono text-blue-600 hover:text-blue-700 underline underline-offset-2 transition font-semibold"
+                title="sales@pom-agency.online"
               >
-                <Mail size={12} />
-                <span>sales@pom-agency.online</span>
+                sales@pom-agency.online
               </a>
             </div>
-            <p className="text-[10px] text-slate-400 font-mono">
+            <p className="text-[10px] text-slate-400/70">
               منظومة فرنتشر كاد برو &copy; 2026 جميع الحقوق محفوظة
             </p>
           </div>
