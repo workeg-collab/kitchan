@@ -74,7 +74,8 @@ if (typeof document !== 'undefined') {
 }
 
 export const useUIStore = create<UIState>((set) => ({
-  activeTab: '2d-plan',
+  // Default to Dashboard immediately after login
+  activeTab: 'dashboard',
   setActiveTab: (activeTab) => set({ activeTab }),
 
   language: savedLang,
@@ -98,7 +99,7 @@ export const useUIStore = create<UIState>((set) => ({
     });
   },
 
-  unit: 'cm', // default cm for friendly usage
+  unit: 'cm',
   setUnit: (unit) => set({ unit }),
   toggleUnit: () => set((state) => ({ unit: state.unit === 'mm' ? 'cm' : 'mm' })),
 
