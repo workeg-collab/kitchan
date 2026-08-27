@@ -144,42 +144,83 @@ export function calculateSnap(
     }
   }
 
-  // 2. Adjacent Cabinet-to-Cabinet Snapping (Side-by-side)
+  // 2. MAGNETIC CABINET-TO-CABINET FLUSH DOCKING (التصاق العلب ببعضها بدقة 0 مم)
   // -------------------------------------------------------------
   for (const cab of otherCabinets) {
     const cabRot = ((cab.rotation % 360) + 360) % 360;
 
-    // Same wall alignment (along Top Wall A, rot = 0)
-    if (normRot === 0 && cabRot === 0 && Math.abs(snapY - cab.y) < 30) {
+    // A) Along Top Wall A (rot = 0, y = 0)
+    if (normRot === 0 && cabRot === 0 && Math.abs(snapY - cab.y) < 40) {
       snapY = cab.y;
-      // To the right of existing cabinet
+      // Snap to RIGHT of existing cabinet (cab.x + cab.width)
       if (Math.abs(snapX - (cab.x + cab.width)) < snapThreshold) {
         snapX = cab.x + cab.width;
         snappedCab = cab.id;
-        guideLines.push({ x1: snapX, y1: 0, x2: snapX, y2: depth + 100, label: 'محاذاة كابينة' });
+        guideLines.push({ x1: snapX, y1: 0, x2: snapX, y2: depth + 80, label: `التصاق بـ ${cab.id} (0 مم)` });
       }
-      // To the left of existing cabinet
+      // Snap to LEFT of existing cabinet (cab.x - width)
       else if (Math.abs((snapX + width) - cab.x) < snapThreshold) {
         snapX = cab.x - width;
         snappedCab = cab.id;
-        guideLines.push({ x1: snapX + width, y1: 0, x2: snapX + width, y2: depth + 100, label: 'محاذاة كابينة' });
+        guideLines.push({ x1: snapX + width, y1: 0, x2: snapX + width, y2: depth + 80, label: `التصاق بـ ${cab.id} (0 مم)` });
       }
     }
 
-    // Same wall alignment (along Right Wall B, rot = 90)
-    if (normRot === 90 && cabRot === 90 && Math.abs(snapX - cab.x) < 30) {
+    // B) Along Right Wall B (rot = 90, x = roomWidth)
+    if (normRot === 90 && cabRot === 90 && Math.abs(snapX - cab.x) < 40) {
       snapX = cab.x;
-      // Below existing cabinet
+      // Snap to BELOW existing cabinet (cab.y + cab.width)
       if (Math.abs(snapY - (cab.y + cab.width)) < snapThreshold) {
         snapY = cab.y + cab.width;
         snappedCab = cab.id;
-        guideLines.push({ x1: roomWidth - depth - 100, y1: snapY, x2: roomWidth, y2: snapY, label: 'محاذاة كابينة' });
+        guideLines.push({ x1: roomWidth - depth - 80, y1: snapY, x2: roomWidth, y2: snapY, label: `التصاق بـ ${cab.id} (0 مم)` });
       }
-      // Above existing cabinet
+      // Snap to ABOVE existing cabinet (cab.y - width)
       else if (Math.abs((snapY + width) - cab.y) < snapThreshold) {
         snapY = cab.y - width;
         snappedCab = cab.id;
-        guideLines.push({ x1: roomWidth - depth - 100, y1: snapY + width, x2: roomWidth, y2: snapY + width, label: 'محاذاة كابينة' });
+        guideLines.push({ x1: roomWidth - depth - 80, y1: snapY + width, x2: roomWidth, y2: snapY + width, label: `التصاق بـ ${cab.id} (0 مم)` });
+      }
+    }
+
+    // C) Along Bottom Wall C (rot = 180, y = roomLength)
+    if (normRot === 180 && cabRot === 180 && Math.abs(snapY - cab.y) < 40) {
+      snapY = cab.y;
+      // Snap side-by-side along bottom wall
+      if (Math.abs(snapX - (cab.x - cab.width)) < snapThreshold) {
+        snapX = cab.x - cab.width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: snapX, y1: roomLength - depth - 80, x2: snapX, y2: roomLength, label: `التصاق بـ ${cab.id} (0 مم)` });
+      } else if (Math.abs((snapX - width) - cab.x) < snapThreshold) {
+        snapX = cab.x + width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: snapX - width, y1: roomLength - depth - 80, x2: snapX - width, y2: roomLength, label: `التصاق بـ ${cab.id} (0 مم)` });
+      }
+    }
+
+    // D) Along Left Wall D (rot = 270, x = 0)
+    if (normRot === 270 && cabRot === 270 && Math.abs(snapX - cab.x) < 40) {
+      snapX = cab.x;
+      if (Math.abs(snapY - (cab.y - cab.width)) < snapThreshold) {
+        snapY = cab.y - cab.width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: 0, y1: snapY, x2: depth + 80, y2: snapY, label: `التصاق بـ ${cab.id} (0 مم)` });
+      } else if (Math.abs((snapY - width) - cab.y) < snapThreshold) {
+        snapY = cab.y + width;
+        snappedCab = cab.id;
+        guideLines.push({ x1: 0, y1: snapY - width, x2: depth + 80, y2: snapY - width, label: `التصاق بـ ${cab.id} (0 مم)` });
+      }
+    }
+
+    // E) Corner Unit Attachment (e.g. Corner unit on Wall A connecting to Wall B)
+    if (cab.type === 'base-corner-l' && normRot === 90 && cabRot === 0) {
+      // Wall B unit connecting to bottom face of corner unit on Wall A
+      const cornerBottomY = cab.y + cab.depth;
+      if (Math.abs(snapY - cornerBottomY) < snapThreshold) {
+        snapY = cornerBottomY;
+        snapX = roomWidth;
+        snappedCab = cab.id;
+        guideLines.push({ x1: roomWidth - depth - 80, y1: snapY, x2: roomWidth, y2: snapY, label: `التصاق بالركنة L` });
       }
     }
   }

@@ -26,6 +26,7 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
   const groupRef = useRef<THREE.Group>(null);
   const leftDoorRef = useRef<THREE.Group>(null);
   const rightDoorRef = useRef<THREE.Group>(null);
+  const flapDoorRef = useRef<THREE.Group>(null);
 
   const W = cabinet.width / 1000;
   const H = cabinet.height / 1000;
@@ -42,15 +43,22 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
   const isWardrobe = cabinet.category === 'wardrobe' || cabinet.category === 'closet-internals';
   const isLibrary = cabinet.category === 'library-full' || cabinet.category === 'bookshelf' || cabinet.category === 'tv-media';
   const isKitchenBase = cabinet.category === 'base';
+  const isFlapDoor = cabinet.flipUpDoor || cabinet.doorHinge === 'top' || cabinet.type.includes('loft') || cabinet.type.includes('lift-up') || cabinet.type.includes('aventos');
+  const isGlassVitrine = cabinet.hasGlassDoors || cabinet.type === 'wall-glass-vitrine';
 
-  // Smooth Door Opening Animation
+  // Smooth Door Opening Animation (Hinged Doors & Flip-up Flap Doors)
   useFrame((_, delta) => {
     const targetAngle = isOpenDoors ? Math.PI / 2.2 : 0;
+    const targetFlapAngle = isOpenDoors ? -Math.PI / 2.5 : 0;
+
     if (leftDoorRef.current) {
       leftDoorRef.current.rotation.y = THREE.MathUtils.damp(leftDoorRef.current.rotation.y, -targetAngle, 6, delta);
     }
     if (rightDoorRef.current) {
       rightDoorRef.current.rotation.y = THREE.MathUtils.damp(rightDoorRef.current.rotation.y, targetAngle, 6, delta);
+    }
+    if (flapDoorRef.current) {
+      flapDoorRef.current.rotation.x = THREE.MathUtils.damp(flapDoorRef.current.rotation.x, targetFlapAngle, 6, delta);
     }
   });
 
@@ -91,40 +99,25 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
           </mesh>
 
           {/* Pillows */}
-          <mesh position={[-W / 4, -H / 2 + 0.52, -D / 2 + 0.4]} rotation={[0.2, 0, 0]} castShadow>
-            <boxGeometry args={[0.55, 0.12, 0.4]} />
-            <meshStandardMaterial color="#f1f5f9" roughness={0.8} />
+          <mesh position={[-W / 4, -H / 2 + 0.52, -D / 2 + 0.35]} rotation={[0.2, 0, 0]} castShadow>
+            <boxGeometry args={[W / 2.5, 0.12, 0.4]} />
+            <meshStandardMaterial color="#f1f5f9" />
           </mesh>
-          <mesh position={[W / 4, -H / 2 + 0.52, -D / 2 + 0.4]} rotation={[0.2, 0, 0]} castShadow>
-            <boxGeometry args={[0.55, 0.12, 0.4]} />
-            <meshStandardMaterial color="#f1f5f9" roughness={0.8} />
-          </mesh>
-        </group>
-      ) : isDresser && cabinet.hasMirror ? (
-        /* 2. DRESSER WITH VERTICAL MIRROR */
-        <group>
-          {/* Dresser Cabinet Body */}
-          <mesh position={[0, -H / 2 + 0.425, 0]} castShadow receiveShadow>
-            <boxGeometry args={[W, 0.85, D]} />
-            <meshStandardMaterial color={bodyColor} roughness={0.6} />
-          </mesh>
-
-          {/* Mirror Frame & Glass */}
-          <mesh position={[0, 0.45, -D / 2 + 0.02]} castShadow>
-            <boxGeometry args={[W * 0.75, 0.9, 0.03]} />
-            <meshStandardMaterial color="#e2e8f0" metalness={0.9} roughness={0.1} />
+          <mesh position={[W / 4, -H / 2 + 0.52, -D / 2 + 0.35]} rotation={[0.2, 0, 0]} castShadow>
+            <boxGeometry args={[W / 2.5, 0.12, 0.4]} />
+            <meshStandardMaterial color="#f1f5f9" />
           </mesh>
         </group>
       ) : (
-        /* 3. STANDARD MODULAR CARCASE (Kitchen, Wardrobes, Libraries) */
+        /* 2. STANDARD CABINET / DRESSING / LOFT / DRAWER 3D MODEL */
         <group>
-          {/* Left Side Panel */}
+          {/* Left Carcase Side */}
           <mesh position={[-W / 2 + 0.009, 0, 0]} castShadow receiveShadow>
             <boxGeometry args={[0.018, H, D]} />
             <meshStandardMaterial color={bodyColor} roughness={0.6} />
           </mesh>
 
-          {/* Right Side Panel */}
+          {/* Right Carcase Side */}
           <mesh position={[W / 2 - 0.009, 0, 0]} castShadow receiveShadow>
             <boxGeometry args={[0.018, H, D]} />
             <meshStandardMaterial color={bodyColor} roughness={0.6} />
@@ -136,7 +129,7 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             <meshStandardMaterial color={bodyColor} roughness={0.6} />
           </mesh>
 
-          {/* Top Panel (or Rails) */}
+          {/* Top Panel */}
           <mesh position={[0, H / 2 - 0.009, 0]} castShadow receiveShadow>
             <boxGeometry args={[W - 0.036, 0.018, D]} />
             <meshStandardMaterial color={bodyColor} roughness={0.6} />
@@ -176,30 +169,93 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             </mesh>
           )}
 
-          {/* Doors & Fronts */}
-          {cabinet.doorCount === 1 && (
+          {/* --- A) FLIP-UP / LIFT-UP CEILING LOFT DOORS (أبواب قلابة للأعلى) --- */}
+          {isFlapDoor && (
+            <group ref={flapDoorRef} position={[0, H / 2 - 0.009, D / 2 + 0.009]}>
+              <mesh position={[0, -H / 2 + 0.009, 0]} castShadow receiveShadow>
+                <boxGeometry args={[W - 0.004, H - 0.004, 0.018]} />
+                <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+              </mesh>
+              {/* Bottom Edge Metal Pull Handle */}
+              <mesh position={[0, -H + 0.04, 0.012]} castShadow>
+                <boxGeometry args={[W * 0.4, 0.015, 0.018]} />
+                <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
+              </mesh>
+            </group>
+          )}
+
+          {/* --- B) MULTIPLE DRAWERS FRONT FACADES (واجهات الأدراج 3D) --- */}
+          {cabinet.drawerCount > 0 && !isFlapDoor && (
+            <group position={[0, 0, D / 2 + 0.009]}>
+              {Array.from({ length: cabinet.drawerCount }).map((_, i) => {
+                const drawerH = (H - 0.004 * cabinet.drawerCount) / cabinet.drawerCount;
+                const drawerY = -H / 2 + drawerH / 2 + i * (drawerH + 0.004);
+                return (
+                  <group key={i} position={[0, drawerY, 0]}>
+                    <mesh castShadow receiveShadow>
+                      <boxGeometry args={[W - 0.004, drawerH - 0.003, 0.018]} />
+                      <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                    </mesh>
+                    {/* Metal Handle on Drawer */}
+                    <mesh position={[0, 0, 0.012]} castShadow>
+                      <boxGeometry args={[Math.min(W * 0.35, 0.2), 0.012, 0.018]} />
+                      <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
+                    </mesh>
+                  </group>
+                );
+              })}
+            </group>
+          )}
+
+          {/* --- C) SINGLE HINGED DOOR --- */}
+          {cabinet.doorCount === 1 && cabinet.drawerCount === 0 && !isFlapDoor && (
             <group ref={leftDoorRef} position={[-W / 2 + 0.009, 0, D / 2 + 0.009]}>
               <mesh position={[W / 2 - 0.009, 0, 0]} castShadow receiveShadow>
                 <boxGeometry args={[W - 0.004, H - 0.004, 0.018]} />
                 <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
               </mesh>
+              {/* Handle */}
+              <mesh position={[W - 0.05, 0, 0.012]} castShadow>
+                <boxGeometry args={[0.015, 0.18, 0.018]} />
+                <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
+              </mesh>
             </group>
           )}
 
-          {cabinet.doorCount >= 2 && cabinet.doorType !== 'open' && (
+          {/* --- D) DOUBLE HINGED DOORS / GLASS VITRINE --- */}
+          {cabinet.doorCount >= 2 && cabinet.drawerCount === 0 && !isFlapDoor && cabinet.doorType !== 'open' && (
             <>
               {/* Left Door */}
               <group ref={leftDoorRef} position={[-W / 2 + 0.009, 0, D / 2 + 0.009]}>
                 <mesh position={[W / 4 - 0.009, 0, 0]} castShadow receiveShadow>
                   <boxGeometry args={[W / 2 - 0.004, H - 0.004, 0.018]} />
-                  <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                  {isGlassVitrine ? (
+                    <meshPhysicalMaterial color="#94a3b8" transmission={0.7} opacity={0.6} transparent roughness={0.1} />
+                  ) : (
+                    <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                  )}
+                </mesh>
+                {/* Left Door Handle */}
+                <mesh position={[W / 2 - 0.035, 0, 0.012]} castShadow>
+                  <boxGeometry args={[0.012, 0.16, 0.018]} />
+                  <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
                 </mesh>
               </group>
+
               {/* Right Door */}
               <group ref={rightDoorRef} position={[W / 2 - 0.009, 0, D / 2 + 0.009]}>
                 <mesh position={[-W / 4 + 0.009, 0, 0]} castShadow receiveShadow>
                   <boxGeometry args={[W / 2 - 0.004, H - 0.004, 0.018]} />
-                  <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                  {isGlassVitrine ? (
+                    <meshPhysicalMaterial color="#94a3b8" transmission={0.7} opacity={0.6} transparent roughness={0.1} />
+                  ) : (
+                    <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                  )}
+                </mesh>
+                {/* Right Door Handle */}
+                <mesh position={[-W / 2 + 0.035, 0, 0.012]} castShadow>
+                  <boxGeometry args={[0.012, 0.16, 0.018]} />
+                  <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
                 </mesh>
               </group>
             </>

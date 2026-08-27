@@ -53,7 +53,10 @@ export type CabinetType =
   | 'wall-open-shelves'
   | 'wall-corner'
   | 'wall-aventos-bi-fold'
+  | 'wall-aventos-hf'
   | 'wall-glass-vitrine'
+  | 'wall-loft-lift-up'
+  | 'wall-loft-deep'
   | 'tall-pantry'
   | 'tall-pantry-pullout'
   | 'tall-cleaning-cabinet'
@@ -150,6 +153,8 @@ export interface CabinetItem {
   hasApplianceCavity?: boolean;
   applianceCavityHeight?: number;
   applianceCavityZ?: number;
+  isCeilingUnit?: boolean;
+  flipUpDoor?: boolean;
 
   // Dressing Specific
   hasHangingRail?: boolean;

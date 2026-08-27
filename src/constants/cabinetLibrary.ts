@@ -22,6 +22,8 @@ export interface CabinetTemplate {
   applianceCavityZ?: number;
   hasIntegratedLed?: boolean;
   verticalDividersCount?: number;
+  isCeilingUnit?: boolean;
+  flipUpDoor?: boolean;
   tag?: string;
 }
 
@@ -384,6 +386,50 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
     standardWidths: [300, 450, 600, 800, 900],
     icon: 'Layers',
     tag: 'مفتوح',
+  },
+
+  // =========================================================================
+  // 4.5. علب علوية ممتدة للسقف بأبواب قلابة (CEILING LOFT & SOFFIT FLAP CABINETS)
+  // =========================================================================
+  {
+    category: 'wall',
+    type: 'wall-loft-lift-up',
+    name: 'علوي سقفي قلاب باكم هيدروليك (Soffit Loft Flap)',
+    nameEn: 'Top Ceiling Soffit Flap Cabinet (Lift-Up)',
+    description: 'كابينة علوية تمتد حتى السقف بباب قلاب يفتح للأعلى بباكم غاز هيدروليكي للتخزين الموسمي',
+    defaultWidth: 600,
+    defaultHeight: 360,
+    defaultDepth: 350,
+    defaultZ: 2170,
+    doorCount: 1,
+    drawerCount: 0,
+    shelfCount: 0,
+    doorHinge: 'top',
+    standardWidths: [450, 600, 800, 900, 1000, 1200],
+    icon: 'ChevronUp',
+    isCeilingUnit: true,
+    flipUpDoor: true,
+    tag: 'سقفي قلاب',
+  },
+  {
+    category: 'wall',
+    type: 'wall-loft-deep',
+    name: 'علوي سقفي عميق فوق برج الثلاجة والأفران (Deep Loft Bridge)',
+    nameEn: 'Deep Loft Bridge Cabinet (58cm Depth)',
+    description: 'كابينة سقفية عميقة (58 سم) تركب أعلى برج الأفران أو الثلاجة بباب قلاب أفنتوس للأعلى',
+    defaultWidth: 600,
+    defaultHeight: 450,
+    defaultDepth: 580,
+    defaultZ: 2150,
+    doorCount: 1,
+    drawerCount: 0,
+    shelfCount: 0,
+    doorHinge: 'top',
+    standardWidths: [600, 800, 900, 1000, 1200],
+    icon: 'FolderUp',
+    isCeilingUnit: true,
+    flipUpDoor: true,
+    tag: 'سقفي عميق',
   },
 
   // =========================================================================

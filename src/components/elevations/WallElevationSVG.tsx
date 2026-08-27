@@ -226,8 +226,24 @@ export const WallElevationSVG: React.FC<WallElevationSVGProps> = ({
                 />
               )}
 
-              {/* Door Swing V-Lines */}
-              {cab.doorCount === 1 && cab.drawerCount === 0 && (
+              {/* Lift-up Flap Door Swing Indicator (أبواب قلابة علوية وسقفية) */}
+              {(cab.doorHinge === 'top' || cab.flipUpDoor || cab.type.includes('loft') || cab.type.includes('lift-up') || cab.type.includes('aventos')) && (
+                <g stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4,3" fill="none" opacity="0.85">
+                  <polyline points={`${cabX},${cabY + cab.height} ${cabX + cab.width / 2},${cabY} ${cabX + cab.width},${cabY + cab.height}`} />
+                  {/* Bottom Horizontal Pull Handle */}
+                  <line
+                    x1={cabX + cab.width * 0.25}
+                    y1={cabY + cab.height - 18}
+                    x2={cabX + cab.width * 0.75}
+                    y2={cabY + cab.height - 18}
+                    stroke="#0f172a"
+                    strokeWidth="3"
+                  />
+                </g>
+              )}
+
+              {/* Door Swing V-Lines (Single Door) */}
+              {cab.doorCount === 1 && cab.drawerCount === 0 && !(cab.doorHinge === 'top' || cab.flipUpDoor || cab.type.includes('loft') || cab.type.includes('lift-up') || cab.type.includes('aventos')) && (
                 <g stroke={strokeColor} strokeWidth="1.2" strokeDasharray="4,3" fill="none" opacity="0.7">
                   {cab.doorHinge === 'left' ? (
                     <polyline points={`${cabX},${cabY} ${cabX + cab.width},${cabY + cab.height / 2} ${cabX},${cabY + cab.height}`} />
@@ -245,7 +261,7 @@ export const WallElevationSVG: React.FC<WallElevationSVGProps> = ({
                 </g>
               )}
 
-              {cab.doorCount === 2 && cab.drawerCount === 0 && (
+              {cab.doorCount === 2 && cab.drawerCount === 0 && !(cab.doorHinge === 'top' || cab.flipUpDoor || cab.type.includes('loft') || cab.type.includes('lift-up') || cab.type.includes('aventos')) && (
                 <g stroke={strokeColor} strokeWidth="1.2" strokeDasharray="4,3" fill="none" opacity="0.7">
                   <polyline points={`${cabX},${cabY} ${cabX + cab.width / 2},${cabY + cab.height / 2} ${cabX},${cabY + cab.height}`} />
                   <polyline points={`${cabX + cab.width},${cabY} ${cabX + cab.width / 2},${cabY + cab.height / 2} ${cabX + cab.width},${cabY + cab.height}`} />
