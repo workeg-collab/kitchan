@@ -5,6 +5,8 @@ const DB_NAME = 'FurnitureCAD_Enterprise_DB';
 const DB_VERSION = 1;
 const TENANTS_STORE = 'tenants';
 const PROJECTS_STORE = 'projects';
+const LOCAL_TENANTS_KEY = 'fc_tenants_v2';
+const LOCAL_PROJECTS_KEY = 'fc_projects_v2';
 
 // Default Demo Companies / Subscriptions
 const DEFAULT_TENANTS: CompanyTenant[] = [
@@ -46,92 +48,154 @@ const DEFAULT_TENANTS: CompanyTenant[] = [
 
 class DatabaseService {
   private db: IDBDatabase | null = null;
-  private isInitialized = false;
+  private isOpening = false;
 
-  private async openDB(): Promise<IDBDatabase> {
+  private async openDB(): Promise<IDBDatabase | null> {
     if (this.db) return this.db;
+    if (typeof indexedDB === 'undefined') return null;
 
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
+    return new Promise((resolve) => {
+      try {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-      request.onupgradeneeded = (event: any) => {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains(TENANTS_STORE)) {
-          db.createObjectStore(TENANTS_STORE, { keyPath: 'id' });
-        }
-        if (!db.objectStoreNames.contains(PROJECTS_STORE)) {
-          const projStore = db.createObjectStore(PROJECTS_STORE, { keyPath: 'id' });
-          projStore.createIndex('tenantId', 'tenantId', { unique: false });
-        }
-      };
+        request.onupgradeneeded = (event: any) => {
+          try {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(TENANTS_STORE)) {
+              db.createObjectStore(TENANTS_STORE, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(PROJECTS_STORE)) {
+              const projStore = db.createObjectStore(PROJECTS_STORE, { keyPath: 'id' });
+              projStore.createIndex('tenantId', 'tenantId', { unique: false });
+            }
+          } catch {
+            // Ignore upgrade errors
+          }
+        };
 
-      request.onsuccess = (event: any) => {
-        this.db = event.target.result;
-        this.isInitialized = true;
-        this.seedInitialData();
-        resolve(this.db!);
-      };
+        request.onsuccess = (event: any) => {
+          this.db = event.target.result;
+          resolve(this.db);
+        };
 
-      request.onerror = (event: any) => {
-        console.error('IndexedDB error:', event.target.error);
-        reject(event.target.error);
-      };
-    });
-  }
+        request.onerror = () => {
+          resolve(null);
+        };
 
-  private async seedInitialData() {
-    const tenants = await this.getAllTenants();
-    if (tenants.length === 0) {
-      for (const t of DEFAULT_TENANTS) {
-        await this.saveTenant(t);
+        request.onblocked = () => {
+          resolve(null);
+        };
+      } catch {
+        resolve(null);
       }
-    }
+    });
   }
 
   // --- TENANTS / COMPANIES MANAGEMENT ---
 
+  private getLocalTenants(): CompanyTenant[] {
+    try {
+      const saved = localStorage.getItem(LOCAL_TENANTS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // Fallback
+    }
+    // Initialize with default demo tenants
+    localStorage.setItem(LOCAL_TENANTS_KEY, JSON.stringify(DEFAULT_TENANTS));
+    return DEFAULT_TENANTS;
+  }
+
+  private saveLocalTenants(tenants: CompanyTenant[]): void {
+    try {
+      localStorage.setItem(LOCAL_TENANTS_KEY, JSON.stringify(tenants));
+    } catch {
+      // Ignore storage quota errors
+    }
+  }
+
   async getAllTenants(): Promise<CompanyTenant[]> {
+    const localList = this.getLocalTenants();
+
+    // Async background sync with IndexedDB
     try {
       const db = await this.openDB();
-      return new Promise((resolve) => {
+      if (db) {
         const tx = db.transaction(TENANTS_STORE, 'readonly');
         const store = tx.objectStore(TENANTS_STORE);
         const req = store.getAll();
-        req.onsuccess = () => resolve(req.result || []);
-        req.onerror = () => resolve([]);
-      });
+        return new Promise((resolve) => {
+          req.onsuccess = () => {
+            const idbTenants = req.result || [];
+            if (idbTenants.length > localList.length) {
+              this.saveLocalTenants(idbTenants);
+              resolve(idbTenants);
+            } else {
+              resolve(localList);
+            }
+          };
+          req.onerror = () => resolve(localList);
+        });
+      }
     } catch {
-      return JSON.parse(localStorage.getItem('fc_tenants') || JSON.stringify(DEFAULT_TENANTS));
+      // Return local cache on any error
     }
+
+    return localList;
   }
 
   async saveTenant(tenant: CompanyTenant): Promise<void> {
+    // 1. Synchronously save to localStorage
+    const current = this.getLocalTenants();
+    const updated = [...current.filter((t) => t.id !== tenant.id), tenant];
+    this.saveLocalTenants(updated);
+
+    // 2. Asynchronously save to IndexedDB
     try {
       const db = await this.openDB();
-      const tx = db.transaction(TENANTS_STORE, 'readwrite');
-      tx.objectStore(TENANTS_STORE).put(tenant);
+      if (db) {
+        const tx = db.transaction(TENANTS_STORE, 'readwrite');
+        tx.objectStore(TENANTS_STORE).put(tenant);
+      }
     } catch (e) {
-      console.error('Error saving tenant:', e);
+      console.warn('Could not save tenant to IndexedDB:', e);
     }
-    // Backup in localStorage
-    const current = await this.getAllTenants();
-    const updated = [...current.filter(t => t.id !== tenant.id), tenant];
-    localStorage.setItem('fc_tenants', JSON.stringify(updated));
   }
 
   async deleteTenant(id: string): Promise<void> {
+    const current = this.getLocalTenants();
+    const updated = current.filter((t) => t.id !== id);
+    this.saveLocalTenants(updated);
+
     try {
       const db = await this.openDB();
-      const tx = db.transaction(TENANTS_STORE, 'readwrite');
-      tx.objectStore(TENANTS_STORE).delete(id);
+      if (db) {
+        const tx = db.transaction(TENANTS_STORE, 'readwrite');
+        tx.objectStore(TENANTS_STORE).delete(id);
+      }
     } catch (e) {
-      console.error('Error deleting tenant:', e);
+      console.warn('Could not delete tenant from IndexedDB:', e);
     }
   }
 
   async findTenantByUsername(username: string): Promise<CompanyTenant | null> {
-    const tenants = await this.getAllTenants();
-    return tenants.find(t => t.username.toLowerCase() === username.toLowerCase()) || null;
+    if (!username) return null;
+    const clean = username.trim().toLowerCase();
+
+    // Check local storage immediately (zero lag, 0ms)
+    const local = this.getLocalTenants();
+    const match = local.find((t) => t.username.toLowerCase() === clean);
+    if (match) return match;
+
+    // Check IndexedDB
+    try {
+      const all = await this.getAllTenants();
+      return all.find((t) => t.username.toLowerCase() === clean) || null;
+    } catch {
+      return null;
+    }
   }
 
   // --- PROJECTS MULTI-TENANT STORAGE ---
@@ -147,48 +211,87 @@ class DatabaseService {
       data: projectData,
     };
 
+    // Save in LocalStorage
     try {
-      const db = await this.openDB();
-      const tx = db.transaction(PROJECTS_STORE, 'readwrite');
-      tx.objectStore(PROJECTS_STORE).put(record);
-    } catch (e) {
-      console.error('Error saving project to IndexedDB:', e);
+      const storageKey = `fc_proj_${tenantId}_${projectData.metadata.id}`;
+      localStorage.setItem(storageKey, JSON.stringify(record));
+    } catch {
+      // Storage quota
     }
 
-    // Secondary backup
-    const storageKey = `fc_proj_${tenantId}_${projectData.metadata.id}`;
-    localStorage.setItem(storageKey, JSON.stringify(record));
+    // Save in IndexedDB
+    try {
+      const db = await this.openDB();
+      if (db) {
+        const tx = db.transaction(PROJECTS_STORE, 'readwrite');
+        tx.objectStore(PROJECTS_STORE).put(record);
+      }
+    } catch (e) {
+      console.warn('Error saving project to IndexedDB:', e);
+    }
   }
 
   async getProjectsForTenant(tenantId: string): Promise<StoredProjectRecord[]> {
+    const localProjects: StoredProjectRecord[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(`fc_proj_`)) {
+          const item = localStorage.getItem(key);
+          if (item) {
+            const parsed = JSON.parse(item);
+            if (tenantId === 'admin' || parsed.tenantId === tenantId) {
+              localProjects.push(parsed);
+            }
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+
     try {
       const db = await this.openDB();
-      return new Promise((resolve) => {
+      if (db) {
         const tx = db.transaction(PROJECTS_STORE, 'readonly');
         const store = tx.objectStore(PROJECTS_STORE);
         const req = store.getAll();
-        req.onsuccess = () => {
-          const all: StoredProjectRecord[] = req.result || [];
-          if (tenantId === 'admin') {
-            resolve(all);
-          } else {
-            resolve(all.filter(p => p.tenantId === tenantId));
-          }
-        };
-        req.onerror = () => resolve([]);
-      });
+        return new Promise((resolve) => {
+          req.onsuccess = () => {
+            const all: StoredProjectRecord[] = req.result || [];
+            const filtered = tenantId === 'admin' ? all : all.filter((p) => p.tenantId === tenantId);
+            resolve(filtered.length > 0 ? filtered : localProjects);
+          };
+          req.onerror = () => resolve(localProjects);
+        });
+      }
     } catch {
-      return [];
+      // Ignore
     }
+
+    return localProjects;
   }
 
   async deleteProject(id: string): Promise<void> {
     try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.includes(id)) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch {
+      // Ignore
+    }
+
+    try {
       const db = await this.openDB();
-      const tx = db.transaction(PROJECTS_STORE, 'readwrite');
-      tx.objectStore(PROJECTS_STORE).delete(id);
+      if (db) {
+        const tx = db.transaction(PROJECTS_STORE, 'readwrite');
+        tx.objectStore(PROJECTS_STORE).delete(id);
+      }
     } catch (e) {
-      console.error('Error deleting project:', e);
+      console.warn('Error deleting project from IndexedDB:', e);
     }
   }
 }

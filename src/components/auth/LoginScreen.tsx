@@ -40,8 +40,44 @@ export const LoginScreen: React.FC = () => {
         return;
       }
 
-      // 1. Check if it is a Subscribed Company Tenant in database
-      const tenant = await dbService.findTenantByUsername(cleanUser);
+      // 1. Immediate Super Admin Priority Check
+      if (cleanUser === 'admin' && cleanPass === 'Germen@600') {
+        const result = login('admin', 'Germen@600');
+        if (result.success) {
+          setActiveTenant(null);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // 2. Check if it is a Subscribed Company Tenant in database
+      let tenant = await dbService.findTenantByUsername(cleanUser);
+
+      // Auto-activation for direct WhatsApp links or new trial subscribers
+      const params = new URLSearchParams(window.location.search);
+      const isFromActivationLink = params.has('u') || params.has('user');
+
+      if (!tenant && isFromActivationLink && cleanUser && cleanPass) {
+        const newTrialTenant = {
+          id: `tenant-${Date.now()}`,
+          companyName: cleanUser,
+          contactPerson: cleanUser,
+          phone: '',
+          email: '',
+          username: cleanUser,
+          password: cleanPass,
+          plan: 'trial' as const,
+          status: 'active' as const,
+          startDate: new Date().toISOString().split('T')[0],
+          expiryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          maxProjects: 50,
+          allowedModules: ['kitchen', 'dressing', 'bedroom', 'library'] as ('kitchen' | 'dressing' | 'bedroom' | 'library')[],
+          createdAt: new Date().toISOString().split('T')[0],
+        };
+        await dbService.saveTenant(newTrialTenant);
+        tenant = newTrialTenant;
+      }
+
       if (tenant) {
         if (tenant.password === cleanPass) {
           const validity = checkSubscriptionValid(tenant);
@@ -68,7 +104,7 @@ export const LoginScreen: React.FC = () => {
         }
       }
 
-      // 2. Check Admin / Standard Users
+      // 3. Check Standard Local Users
       const result = login(cleanUser, cleanPass);
       if (!result.success) {
         setErrorMessage(result.error || 'اسم المستخدم أو كلمة المرور غير صحيحة');
@@ -76,8 +112,14 @@ export const LoginScreen: React.FC = () => {
         setActiveTenant(null); // Admin / Local user
       }
     } catch (err) {
-      console.error(err);
-      setErrorMessage('حدث خطأ أثناء الاتصال بقاعدة البيانات');
+      console.warn('Login fallback:', err);
+      // Failsafe: Try standard user login before showing any error
+      const cleanUser = inputUser.trim().toLowerCase();
+      const cleanPass = inputPass.trim();
+      const result = login(cleanUser, cleanPass);
+      if (!result.success) {
+        setErrorMessage('اسم المستخدم أو كلمة المرور غير صحيحة');
+      }
     } finally {
       setIsLoading(false);
     }
