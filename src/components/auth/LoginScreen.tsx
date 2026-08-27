@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSubscriptionStore } from '../../store/useSubscriptionStore';
 import { dbService } from '../../services/dbService';
-import { Lock, User, Eye, EyeOff, ShieldCheck, CheckCircle2, AlertCircle, Building2 } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, ShieldCheck, CheckCircle2, AlertCircle, Building2, Mail } from 'lucide-react';
 
 export const LoginScreen: React.FC = () => {
   const { login, loginAsTenant } = useAuthStore();
@@ -286,9 +286,26 @@ export const LoginScreen: React.FC = () => {
             </button>
           </form>
 
-          <p className="text-[11px] text-slate-400 text-center mt-6">
-            منظومة فرنتشر كاد برو &copy; 2026 جميع الحقوق محفوظة
-          </p>
+          {/* Agency Signature & Contact */}
+          <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col items-center justify-center text-center space-y-1.5">
+            <div className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1.5 flex-wrap">
+              <span>تطوير وبرمجة:</span>
+              <span className="font-extrabold text-blue-600 font-mono text-xs">POM Agency</span>
+              <span className="text-slate-300">•</span>
+              <span>للتواصل والاستفسارات:</span>
+              <a
+                href="mailto:sales@pom-agency.online"
+                className="font-mono font-bold text-blue-600 hover:text-blue-700 underline underline-offset-2 flex items-center gap-1 transition"
+                title="إرسال بريد إلكتروني"
+              >
+                <Mail size={12} />
+                <span>sales@pom-agency.online</span>
+              </a>
+            </div>
+            <p className="text-[10px] text-slate-400 font-mono">
+              منظومة فرنتشر كاد برو &copy; 2026 جميع الحقوق محفوظة
+            </p>
+          </div>
         </div>
       </div>
     </div>
