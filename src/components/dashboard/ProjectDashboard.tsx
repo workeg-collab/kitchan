@@ -117,10 +117,10 @@ export const ProjectDashboard: React.FC = () => {
           <button
             onClick={() => setIsUserModalOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/30 rounded-xl text-xs font-bold transition shadow-md"
-            title="إدارة الحساب"
+            title={currentUser?.role === 'admin' ? 'إدارة المستخدمين' : 'بيانات حسابي واشتراكي'}
           >
             <Users size={14} />
-            <span>{currentUser?.username || 'admin'}</span>
+            <span>{currentUser?.name || currentUser?.username || 'المستخدم'}</span>
           </button>
 
           <button
