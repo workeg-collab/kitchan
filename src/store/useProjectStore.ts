@@ -184,6 +184,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         id: `proj-${Date.now()}`,
         name: 'تصميم مطبخ جديد',
         projectType: 'kitchen',
+        materialSystem: 'wood',
         clientName: '',
         designerName: '',
         date: new Date().toISOString().split('T')[0],

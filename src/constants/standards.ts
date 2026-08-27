@@ -1,6 +1,7 @@
 import { ManufacturingSettings, CountertopConfig, PlinthConfig, BacksplashConfig, MaterialFinishes, PricingSettings } from '../types';
 
 export const DEFAULT_MANUFACTURING_SETTINGS: ManufacturingSettings = {
+  systemType: 'wood',
   boardThickness: 18, // 18mm standard
   backPanelThickness: 6, // 6mm
   backPanelRecess: 15, // 15mm void

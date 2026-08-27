@@ -25,7 +25,8 @@ import {
   Shirt,
   BedDouble,
   BookOpen,
-  LayoutDashboard
+  LayoutDashboard,
+  Settings2
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
@@ -41,6 +42,7 @@ export const TopNavbar: React.FC = () => {
     setIsRoomSketcherOpen,
     setIsExportModalOpen,
     setIsTemplateModalOpen,
+    setIsManufacturingSystemModalOpen,
   } = useUIStore();
 
   const t = TRANSLATIONS[language];
@@ -184,6 +186,16 @@ export const TopNavbar: React.FC = () => {
 
       {/* Actions Right Toolbar */}
       <div className="flex items-center gap-2">
+        {/* Manufacturing Systems & Profiles Builder */}
+        <button
+          onClick={() => setIsManufacturingSystemModalOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold transition border border-slate-200"
+          title="قواعد وأنظمة التصنيع والقطاعات"
+        >
+          <Settings2 size={14} className="text-blue-600" />
+          <span className="hidden xl:inline">أنظمة التصنيع</span>
+        </button>
+
         {/* User Management */}
         <button
           onClick={() => setIsUserModalOpen(true)}
@@ -192,9 +204,6 @@ export const TopNavbar: React.FC = () => {
         >
           <Users size={14} className="text-blue-600" />
           <span className="hidden md:inline">{currentUser?.username || 'admin'}</span>
-          <span className="text-[10px] bg-blue-200/70 text-blue-900 px-1 py-0.2 rounded font-mono font-bold hidden sm:inline">
-            +مستخدم
-          </span>
         </button>
 
         {/* Language Switcher */}
@@ -224,17 +233,7 @@ export const TopNavbar: React.FC = () => {
           title="رسم وتعديل أبعاد الغرفة"
         >
           <PencilRuler size={14} className="text-indigo-600" />
-          <span className="hidden xl:inline">{t.sketchRoom}</span>
-        </button>
-
-        {/* Templates */}
-        <button
-          onClick={() => setIsTemplateModalOpen(true)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
-          title="نماذج جاهزة"
-        >
-          <LayoutTemplate size={14} />
-          <span className="hidden xl:inline">{t.templates}</span>
+          <span className="hidden 2xl:inline">{t.sketchRoom}</span>
         </button>
 
         {/* Export Technical Package Modal */}

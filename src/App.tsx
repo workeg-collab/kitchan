@@ -20,9 +20,14 @@ import { CustomCabinetModal } from './components/modals/CustomCabinetModal';
 import { TemplateModal } from './components/modals/TemplateModal';
 import { ExportModal } from './components/modals/ExportModal';
 import { UserManagementModal } from './components/modals/UserManagementModal';
+import { ManufacturingSystemModal } from './components/modals/ManufacturingSystemModal';
 
 export const App: React.FC = () => {
-  const { activeTab } = useUIStore();
+  const { 
+    activeTab, 
+    isManufacturingSystemModalOpen, 
+    setIsManufacturingSystemModalOpen 
+  } = useUIStore();
   const { isAuthenticated } = useAuthStore();
 
   // If not authenticated, show login screen
@@ -66,6 +71,10 @@ export const App: React.FC = () => {
       <TemplateModal />
       <ExportModal />
       <UserManagementModal />
+      <ManufacturingSystemModal
+        isOpen={isManufacturingSystemModalOpen}
+        onClose={() => setIsManufacturingSystemModalOpen(false)}
+      />
     </div>
   );
 };

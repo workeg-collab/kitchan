@@ -65,6 +65,8 @@ interface UIState {
   setIsCustomCabinetModalOpen: (open: boolean) => void;
   isTemplateModalOpen: boolean;
   setIsTemplateModalOpen: (open: boolean) => void;
+  isManufacturingSystemModalOpen: boolean;
+  setIsManufacturingSystemModalOpen: (open: boolean) => void;
 }
 
 const savedLang = (localStorage.getItem('kitchan_lang') as Language) || 'ar';
@@ -74,7 +76,6 @@ if (typeof document !== 'undefined') {
 }
 
 export const useUIStore = create<UIState>((set) => ({
-  // Default to Dashboard immediately after login
   activeTab: 'dashboard',
   setActiveTab: (activeTab) => set({ activeTab }),
 
@@ -152,4 +153,6 @@ export const useUIStore = create<UIState>((set) => ({
   setIsCustomCabinetModalOpen: (isCustomCabinetModalOpen) => set({ isCustomCabinetModalOpen }),
   isTemplateModalOpen: false,
   setIsTemplateModalOpen: (isTemplateModalOpen) => set({ isTemplateModalOpen }),
+  isManufacturingSystemModalOpen: false,
+  setIsManufacturingSystemModalOpen: (isManufacturingSystemModalOpen) => set({ isManufacturingSystemModalOpen }),
 }));

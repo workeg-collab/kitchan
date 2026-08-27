@@ -1,3 +1,16 @@
+import { 
+  MaterialSystemType, 
+  AluminiumProfileSector, 
+  ProfileCutPiece, 
+  InfillSheetPiece, 
+  BarNestingAllocation, 
+  SheetNestingAllocation, 
+  ManufacturingSystemTemplate, 
+  CompleteManufacturingPackage 
+} from './manufacturingSystems';
+
+export * from './manufacturingSystems';
+
 export type UnitType = 'mm' | 'cm';
 
 export type ProjectType = 'kitchen' | 'dressing' | 'bedroom' | 'library';
@@ -102,6 +115,7 @@ export interface CabinetItem {
   category: FurnitureCategory;
   type: CabinetType;
   projectType?: ProjectType;
+  materialSystemOverride?: MaterialSystemType; // Override global project material
   width: number;
   height: number;
   depth: number;
@@ -255,6 +269,7 @@ export interface MaterialFinishes {
 }
 
 export interface ManufacturingSettings {
+  systemType: MaterialSystemType; // Wood, Aluminium, Cladding, Fibre, Khashmounium
   boardThickness: number;
   backPanelThickness: number;
   backPanelRecess: number;
@@ -263,8 +278,8 @@ export interface ManufacturingSettings {
   doorReveal: number;
   drawerSlideLoss: number;
   shelfSetback: number;
-  constructionMethod: 'sides-full-height' | 'top-bottom-full-width';
-  backPanelMount: 'grooved' | 'surface-mounted';
+  constructionMethod: 'sides-full-height' | 'top-bottom-full-width' | 'aluminium-box-frame';
+  backPanelMount: 'grooved' | 'surface-mounted' | 'infill-channel';
 }
 
 export interface CuttingPanel {
@@ -289,7 +304,7 @@ export interface CuttingPanel {
 export interface HardwareItem {
   id: string;
   name: string;
-  category: 'hinge' | 'slide' | 'handle' | 'leg' | 'bracket' | 'screw' | 'shelf-pin' | 'rail' | 'hydraulic';
+  category: 'hinge' | 'slide' | 'handle' | 'leg' | 'bracket' | 'screw' | 'shelf-pin' | 'rail' | 'hydraulic' | 'corner-bracket';
   quantity: number;
   unit: string;
   description: string;
@@ -313,6 +328,7 @@ export interface ProjectMetadata {
   id: string;
   name: string;
   projectType: ProjectType;
+  materialSystem: MaterialSystemType;
   clientName: string;
   designerName: string;
   date: string;
