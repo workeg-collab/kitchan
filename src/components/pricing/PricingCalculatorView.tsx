@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useProjectStore } from '../../store/useProjectStore';
-import { calculateKitchenMeterageAndPrice } from '../../utils/pricing';
+import { calculateKitchenMeterageAndPrice, getMaterialTypeLabel } from '../../utils/pricing';
 import { 
   Calculator, 
   Coins, 
@@ -16,7 +16,11 @@ import {
   Table,
   Info,
   Square,
-  ArrowRight
+  ShieldCheck,
+  Package,
+  ArrowRight,
+  Flame,
+  Droplets
 } from 'lucide-react';
 
 export const PricingCalculatorView: React.FC = () => {
@@ -27,6 +31,7 @@ export const PricingCalculatorView: React.FC = () => {
 
   const currentMethod = pricing.pricingMethod || 'square-fronts';
   const isSquareMode = currentMethod === 'square-fronts';
+  const currentMaterial = pricing.selectedMaterialType || 'wood';
 
   const meterage = calculateKitchenMeterageAndPrice(
     cabinets,
@@ -40,7 +45,79 @@ export const PricingCalculatorView: React.FC = () => {
     window.print();
   };
 
-  const projectType = project.metadata.projectType || 'kitchen';
+  // Material Presets Handler
+  const handleMaterialChange = (mat: string) => {
+    let presetSquarePrice = pricing.pricePerSquareMeterFronts;
+    let presetLinearBase = pricing.pricePerLinearMeterBase;
+    let presetLinearWall = pricing.pricePerLinearMeterWall;
+    let presetLinearTall = pricing.pricePerLinearMeterTall;
+    let notes = '';
+
+    switch (mat) {
+      case 'cladding':
+        presetSquarePrice = 4600;
+        presetLinearBase = 3600;
+        presetLinearWall = 2900;
+        presetLinearTall = 5800;
+        notes = 'كلادينج ألوميتال Alubond كوري معتمد دبل 4 مم، مقاوم للحرارة والرطوبة والمياه 100% مع شاسيه ألوميتال مقوى';
+        break;
+      case 'khashmounium':
+        presetSquarePrice = 4800;
+        presetLinearBase = 3800;
+        presetLinearWall = 3100;
+        presetLinearTall = 6200;
+        notes = 'خشمونيوم دبل بتجزيعات خشبية مجسمة، قطاعات جامبو ثقيلة مع شاسيه ألوميتال مقاوم للمياه والبكتيريا';
+        break;
+      case 'acrylic':
+        presetSquarePrice = 4500;
+        presetLinearBase = 3500;
+        presetLinearWall = 2800;
+        presetLinearTall = 5600;
+        notes = 'خشب أكريليك تركي نقي عالي اللمعان 18 مم مع شاسيه خشب داخلي معالج مقاوم للرطوبة وشريط حرف 2 مم';
+        break;
+      case 'polygloss':
+        presetSquarePrice = 4900;
+        presetLinearBase = 3900;
+        presetLinearWall = 3200;
+        presetLinearTall = 6300;
+        notes = 'خشب بولي لاك / يو في لاك Alvic Luxe إسباني فائق اللمعان ومقاوم للخدوش مع شاسيه داخلي معتمد';
+        break;
+      case 'hpl':
+        presetSquarePrice = 3900;
+        presetLinearBase = 3100;
+        presetLinearWall = 2500;
+        presetLinearTall = 5000;
+        notes = 'خشب MDF مكسو بطبقات HPL هندية/ألمانية شديدة التحمل ومقاومة للصدمات والحرارة';
+        break;
+      case 'fibre':
+        presetSquarePrice = 5200;
+        presetLinearBase = 4100;
+        presetLinearWall = 3300;
+        presetLinearTall = 6600;
+        notes = 'فايبر جلاس وكومباكت لامينيت عالي الكثافة Compact Laminate، مقاوم للأحماض والمياه والمنظفات بنسبة 100%';
+        break;
+      case 'wood':
+      default:
+        presetSquarePrice = 4200;
+        presetLinearBase = 3200;
+        presetLinearWall = 2600;
+        presetLinearTall = 5400;
+        notes = 'خشب إيجر Egger تركي/نمساوي MDF معالج، مكسو بطبقات حماية متطورة وشاسيه داخلي 18 مم';
+        break;
+    }
+
+    updateProjectPricing({
+      selectedMaterialType: mat as any,
+      pricePerSquareMeterFronts: presetSquarePrice,
+      pricePerSquareMeterBaseFronts: presetSquarePrice,
+      pricePerSquareMeterWallFronts: Math.round(presetSquarePrice * 0.85),
+      pricePerSquareMeterTallFronts: Math.round(presetSquarePrice * 1.15),
+      pricePerLinearMeterBase: presetLinearBase,
+      pricePerLinearMeterWall: presetLinearWall,
+      pricePerLinearMeterTall: presetLinearTall,
+      materialSpecificationNotes: notes,
+    });
+  };
 
   return (
     <div className="w-full h-full flex flex-col bg-slate-100 overflow-auto p-4 sm:p-6 font-sans select-none">
@@ -51,10 +128,10 @@ export const PricingCalculatorView: React.FC = () => {
         <div>
           <h1 className="text-lg font-black text-slate-900 flex items-center gap-2.5">
             <Calculator className="text-blue-600" size={24} />
-            <span>حاسبة التكاليف وحصر المسطحات والمتر الطولي</span>
+            <span>حاسبة التكاليف وعرض السعر مع تحديد خامات التصنيع</span>
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            حساب دقيق لوش الوحدات (العرض × الارتفاع) بالمتر المربع أو بالمتر الطولي مع تقرير أسعار تفصيلي
+            تسعير دقيق بحسب نوع الخامة (خشب / كلادينج / خشمونيوم) بالمتر المربع لوش الوحدات (W × H) أو بالمتر الطولي
           </p>
         </div>
 
@@ -88,7 +165,148 @@ export const PricingCalculatorView: React.FC = () => {
 
       <div className="max-w-6xl w-full mx-auto space-y-6">
         {/* ========================================================================= */}
-        {/* 2. PRICING METHOD SELECTOR SWITCH (المتر المربع vs المتر الطولي)           */}
+        {/* 2. MATERIAL SPECIFICATION SELECTOR (تحديد خامة التصنيع: خشب vs كلادينج)     */}
+        {/* ========================================================================= */}
+        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={18} className="text-emerald-600" />
+              <h2 className="text-sm font-black text-slate-900">تحديد خامة المشروع ونظام التصنيع لعرض السعر</h2>
+            </div>
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              الخامة النشطة: {getMaterialTypeLabel(currentMaterial)}
+            </span>
+          </div>
+
+          {/* Material Quick Selection Chips */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            {/* خشب طبيعي / إيجر */}
+            <button
+              onClick={() => handleMaterialChange('wood')}
+              className={`p-3 rounded-2xl border-2 text-right transition flex flex-col justify-between ${
+                currentMaterial === 'wood'
+                  ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
+                  : 'border-slate-200 bg-slate-50/60 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-base">🪵</span>
+                {currentMaterial === 'wood' && <CheckCircle2 size={15} className="text-emerald-600" />}
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-900">خشب إيجر MDF</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">شاسيه 18 مم معتمد</p>
+              </div>
+            </button>
+
+            {/* كلادينج ألوميتال Alubond */}
+            <button
+              onClick={() => handleMaterialChange('cladding')}
+              className={`p-3 rounded-2xl border-2 text-right transition flex flex-col justify-between ${
+                currentMaterial === 'cladding'
+                  ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
+                  : 'border-slate-200 bg-slate-50/60 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-base">🛡️</span>
+                {currentMaterial === 'cladding' && <CheckCircle2 size={15} className="text-emerald-600" />}
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-900">كلادينج ألوميتال</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">Alubond مقاوم للمياه</p>
+              </div>
+            </button>
+
+            {/* خشمونيوم دبل */}
+            <button
+              onClick={() => handleMaterialChange('khashmounium')}
+              className={`p-3 rounded-2xl border-2 text-right transition flex flex-col justify-between ${
+                currentMaterial === 'khashmounium'
+                  ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
+                  : 'border-slate-200 bg-slate-50/60 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-base">🪟</span>
+                {currentMaterial === 'khashmounium' && <CheckCircle2 size={15} className="text-emerald-600" />}
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-900">خشمونيوم دبل</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">تجزيعات خشبية ثقيلة</p>
+              </div>
+            </button>
+
+            {/* أكريليك تركي */}
+            <button
+              onClick={() => handleMaterialChange('acrylic')}
+              className={`p-3 rounded-2xl border-2 text-right transition flex flex-col justify-between ${
+                currentMaterial === 'acrylic'
+                  ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
+                  : 'border-slate-200 bg-slate-50/60 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-base">✨</span>
+                {currentMaterial === 'acrylic' && <CheckCircle2 size={15} className="text-emerald-600" />}
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-900">خشب أكريليك</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">High Gloss تركي</p>
+              </div>
+            </button>
+
+            {/* بولي لاك / يو في لاك */}
+            <button
+              onClick={() => handleMaterialChange('polygloss')}
+              className={`p-3 rounded-2xl border-2 text-right transition flex flex-col justify-between ${
+                currentMaterial === 'polygloss'
+                  ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
+                  : 'border-slate-200 bg-slate-50/60 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-base">💎</span>
+                {currentMaterial === 'polygloss' && <CheckCircle2 size={15} className="text-emerald-600" />}
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-900">بولي لاك Alvic</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">UV مقاوم للخدش</p>
+              </div>
+            </button>
+
+            {/* فايبر جلاس وكومباكت */}
+            <button
+              onClick={() => handleMaterialChange('fibre')}
+              className={`p-3 rounded-2xl border-2 text-right transition flex flex-col justify-between ${
+                currentMaterial === 'fibre'
+                  ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
+                  : 'border-slate-200 bg-slate-50/60 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-base">⚡</span>
+                {currentMaterial === 'fibre' && <CheckCircle2 size={15} className="text-emerald-600" />}
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-900">فايبر وكومباكت</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">مقاومة كيميائية 100%</p>
+              </div>
+            </button>
+          </div>
+
+          {/* Material Spec Live Note */}
+          <div className="mt-3 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs text-slate-700 flex items-start gap-2">
+            <Info size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold text-slate-900">المواصفات الفنية المعتمدة للخامة: </span>
+              <span>{pricing.materialSpecificationNotes || meterage.materialSpec.notes}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 3. PRICING METHOD SELECTOR SWITCH (المتر المربع vs المتر الطولي)           */}
         {/* ========================================================================= */}
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -97,7 +315,7 @@ export const PricingCalculatorView: React.FC = () => {
               <h2 className="text-sm font-black text-slate-900">طريقة المحاسبة والتسعير الرئيسية</h2>
             </div>
             <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
-              الطريقة المطبقة حالياً: {isSquareMode ? 'المتر المربع لوش الوحدات' : 'المتر الطولي'}
+              الطريقة المطبقة: {isSquareMode ? 'المتر المربع لوش الوحدات' : 'المتر الطولي'}
             </span>
           </div>
 
@@ -126,7 +344,7 @@ export const PricingCalculatorView: React.FC = () => {
                 </div>
 
                 <p className="text-[11px] text-slate-600 leading-relaxed mt-2 bg-white/80 p-2.5 rounded-xl border border-purple-100">
-                  يتم حساب مساحة واجهة كل وحدة بضرب <strong>(عرض الوحدة × ارتفاعها)</strong> وجمع مسطح واجهات كل الوحدات معاً ليعطي <strong>إجمالي المتر المربع ({meterage.totalFrontsAreaM2} م²)</strong>، مع تجاهل العمق تماماً في الحساب.
+                  يتم حساب مساحة واجهة كل وحدة بضرب <strong>(عرض الوحدة × ارتفاعها)</strong> وجمع مسطح واجهات كل الوحدات معاً ليعطي <strong>إجمالي المتر المربع ({meterage.totalFrontsAreaM2} م²)</strong> لخامة <strong>{getMaterialTypeLabel(currentMaterial)}</strong>.
                 </p>
               </div>
 
@@ -160,7 +378,7 @@ export const PricingCalculatorView: React.FC = () => {
                 </div>
 
                 <p className="text-[11px] text-slate-600 leading-relaxed mt-2 bg-white/80 p-2.5 rounded-xl border border-blue-100">
-                  يتم حساب مجموع أطوال الكبائن السفلية والعلوية والدواليب الطولية بالمتر الطولي المستعرض، مع إمكانية تسعير كل مستوى (سفلي / علوي / طولي) بسعر مستقل.
+                  يتم حساب مجموع أطوال الكبائن السفلية والعلوية والدواليب الطولية بالمتر الطولي المستعرض لخامة <strong>{getMaterialTypeLabel(currentMaterial)}</strong>.
                 </p>
               </div>
 
@@ -173,40 +391,36 @@ export const PricingCalculatorView: React.FC = () => {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. METERAGE STATS CARDS                                                   */}
+        {/* 4. METERAGE STATS CARDS                                                   */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {/* إجمالي المتر المربع لوش الوحدات */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
             <div className="text-[11px] text-slate-500 font-bold">مسطح وش الوحدات (W × H)</div>
             <div className="text-2xl font-black text-purple-600 mt-1">{meterage.totalFrontsAreaM2} م²</div>
-            <div className="text-[10px] text-slate-400 mt-1">سفلي: {meterage.baseFrontsAreaM2}م² • علوي: {meterage.wallFrontsAreaM2}م²</div>
+            <div className="text-[10px] text-slate-400 mt-1">خامة: {currentMaterial === 'cladding' ? 'كلادينج' : currentMaterial === 'khashmounium' ? 'خشمونيوم' : 'خشب'}</div>
           </div>
 
-          {/* إجمالي المتر الطولي */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
             <div className="text-[11px] text-slate-500 font-bold">إجمالي الأمتار الطولية</div>
             <div className="text-2xl font-black text-blue-600 mt-1">{meterage.totalLinearM} م.ط</div>
             <div className="text-[10px] text-slate-400 mt-1">سفلي: {meterage.baseLinearM}م.ط • علوي: {meterage.wallLinearM}م.ط</div>
           </div>
 
-          {/* مسطح الرخام */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
             <div className="text-[11px] text-slate-500 font-bold">مسطح الرخام / الكوارتز</div>
             <div className="text-2xl font-black text-emerald-600 mt-1">{meterage.countertopAreaM2} م²</div>
             <div className="text-[10px] text-slate-400 mt-1">طول المسطح: {meterage.countertopLinearM} م.ط</div>
           </div>
 
-          {/* عدد الوحدات بالمشروع */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
             <div className="text-[11px] text-slate-500 font-bold">عدد الوحدات والقطع</div>
             <div className="text-2xl font-black text-slate-800 mt-1">{cabinets.length} وحدة</div>
-            <div className="text-[10px] text-slate-400 mt-1">مساحة ألواح الخشب: {meterage.totalWoodPanelsAreaM2} م²</div>
+            <div className="text-[10px] text-slate-400 mt-1">مساحة الألواح: {meterage.totalWoodPanelsAreaM2} م²</div>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. PRICING PARAMETERS & LIVE QUOTATION FORM                               */}
+        {/* 5. PRICING PARAMETERS & OFFICIAL PRINTABLE RECEIPT                        */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* INPUTS COLUMN (2 COLS) */}
@@ -214,7 +428,7 @@ export const PricingCalculatorView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <Sliders size={18} className="text-blue-600" />
-                <span>إعدادات أسعار المتر وتكاليف التشطيب</span>
+                <span>إعدادات أسعار المتر لخامة ({getMaterialTypeLabel(currentMaterial)})</span>
               </h3>
 
               {isSquareMode && (
@@ -225,7 +439,7 @@ export const PricingCalculatorView: React.FC = () => {
                     onChange={(e) => updateProjectPricing({ useDetailedSquareMeterPricing: e.target.checked })}
                     className="w-4 h-4 rounded text-purple-600"
                   />
-                  <span>تخصيص سعر متر مربع لكل مستوى (سفلي / علوي / طولي)</span>
+                  <span>تخصيص سعر متر مربع لكل مستوى</span>
                 </label>
               )}
             </div>
@@ -235,7 +449,7 @@ export const PricingCalculatorView: React.FC = () => {
               {isSquareMode && !pricing.useDetailedSquareMeterPricing && (
                 <div className="sm:col-span-2 bg-purple-50/60 p-4 rounded-2xl border border-purple-200">
                   <label className="font-bold text-purple-900 block mb-1">
-                    سعر المتر المربع الموحد لوش الوحدات ({pricing.currency} / م²)
+                    سعر المتر المربع لوش الوحدات ({getMaterialTypeLabel(currentMaterial)}) ({pricing.currency} / م²)
                   </label>
                   <input
                     type="number"
@@ -253,7 +467,7 @@ export const PricingCalculatorView: React.FC = () => {
                 <>
                   <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                     <label className="font-semibold text-slate-700 block mb-1">
-                      سعر م² وش الوحدات السفلية ({pricing.currency} / م²)
+                      سعر م² وش السفلي ({pricing.currency} / م²)
                     </label>
                     <input
                       type="number"
@@ -268,7 +482,7 @@ export const PricingCalculatorView: React.FC = () => {
 
                   <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                     <label className="font-semibold text-slate-700 block mb-1">
-                      سعر م² وش الوحدات العلوية ({pricing.currency} / م²)
+                      سعر م² وش العلوي ({pricing.currency} / م²)
                     </label>
                     <input
                       type="number"
@@ -283,7 +497,7 @@ export const PricingCalculatorView: React.FC = () => {
 
                   <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 sm:col-span-2">
                     <label className="font-semibold text-slate-700 block mb-1">
-                      سعر م² وش الدواليب الطولية والخزائن ({pricing.currency} / م²)
+                      سعر م² وش الدواليب الطولية ({pricing.currency} / م²)
                     </label>
                     <input
                       type="number"
@@ -367,7 +581,7 @@ export const PricingCalculatorView: React.FC = () => {
               {/* تكلفة الإكسسوارات والمفصلات */}
               <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                 <label className="font-semibold text-slate-700 block mb-1">
-                  تكلفة الإكسسوارات والمفصلات الهيدروليك ({pricing.currency})
+                  تكلفة الإكسسوارات والمفصلات ({pricing.currency})
                 </label>
                 <input
                   type="number"
@@ -405,7 +619,7 @@ export const PricingCalculatorView: React.FC = () => {
             </div>
           </div>
 
-          {/* FINAL QUOTATION RECEIPT CARD (1 COL) */}
+          {/* OFFICIAL PRINTABLE QUOTATION RECEIPT (1 COL) */}
           <div
             ref={printRef}
             className="bg-white p-6 rounded-3xl border-2 border-slate-900 shadow-xl flex flex-col justify-between"
@@ -414,7 +628,7 @@ export const PricingCalculatorView: React.FC = () => {
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <div>
                   <span className="text-[10px] font-mono uppercase bg-slate-900 text-white px-2 py-0.5 rounded font-bold">
-                    عرض سعر رسمي
+                    عرض سعر رسمي معتمد
                   </span>
                   <h4 className="text-base font-bold text-slate-900 mt-1.5">{metadata.name}</h4>
                   <p className="text-[11px] text-slate-500">العميل: {metadata.clientName || 'عميل نقدي'}</p>
@@ -424,11 +638,22 @@ export const PricingCalculatorView: React.FC = () => {
                 </div>
               </div>
 
+              {/* Material Spec Highlight Badge */}
+              <div className="mt-3 p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs">
+                <div className="font-bold text-emerald-900 flex items-center gap-1.5 mb-1">
+                  <ShieldCheck size={14} className="text-emerald-700" />
+                  <span>الخامة المعتمدة: {getMaterialTypeLabel(currentMaterial)}</span>
+                </div>
+                <p className="text-[10px] text-emerald-800 leading-relaxed font-sans">
+                  {pricing.materialSpecificationNotes || meterage.materialSpec.notes}
+                </p>
+              </div>
+
               {/* Price Breakdown List */}
-              <div className="space-y-3 my-5 text-xs">
+              <div className="space-y-2.5 my-4 text-xs">
                 <div className="flex justify-between items-center text-slate-600 bg-slate-50 p-2 rounded-xl">
                   <div>
-                    <span className="font-bold text-slate-800">الوحدات والخزائن:</span>
+                    <span className="font-bold text-slate-800">الوحدات ({getMaterialTypeLabel(currentMaterial)}):</span>
                     <span className="text-[10px] text-slate-500 block font-mono">
                       {isSquareMode ? `مسطح وش: ${meterage.totalFrontsAreaM2} م²` : `أطوال: ${meterage.totalLinearM} م.ط`}
                     </span>
@@ -439,7 +664,7 @@ export const PricingCalculatorView: React.FC = () => {
                 {meterage.countertopCost > 0 && (
                   <div className="flex justify-between items-center text-slate-600 bg-slate-50 p-2 rounded-xl">
                     <div>
-                      <span className="font-bold text-slate-800">الرخام / الكوارتز:</span>
+                      <span className="font-bold text-slate-800">الرخام / الكوارتز ({meterage.materialSpec.countertopMaterial}):</span>
                       <span className="text-[10px] text-slate-500 block font-mono">{meterage.countertopAreaM2} م²</span>
                     </div>
                     <strong className="text-slate-900 font-mono text-sm">{meterage.countertopCost.toLocaleString()} {pricing.currency}</strong>
@@ -477,24 +702,25 @@ export const PricingCalculatorView: React.FC = () => {
                   {meterage.finalTotal.toLocaleString()} {pricing.currency}
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 text-center mt-2">
-                طريقة المحاسبة المعتمدة: <strong>{isSquareMode ? 'المتر المربع لوش الوحدات' : 'المتر الطولي'}</strong>
-              </p>
+              <div className="text-[10px] text-slate-500 text-center mt-2 space-y-0.5">
+                <p>طريقة المحاسبة: <strong>{isSquareMode ? 'المتر المربع لوش الوحدات (W × H)' : 'المتر الطولي'}</strong></p>
+                <p>خامة التصنيع: <strong>{getMaterialTypeLabel(currentMaterial)}</strong></p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 5. ITEMIZED CABINET-BY-CABINET BREAKDOWN TABLE (جدول حصر كل وحدة بالواجهة) */}
+        {/* 6. ITEMIZED CABINET-BY-CABINET BREAKDOWN TABLE (جدول حصر كل وحدة بالخامة) */}
         {/* ========================================================================= */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <Table size={18} className="text-purple-600" />
-              <span>جدول تفصيل مسطحات وش الوحدات لكل قطعة (W × H) والتكلفة</span>
+              <span>جدول تفصيل مسطحات وش الوحدات لكل قطعة (W × H) والخامة والتكلفة</span>
             </h3>
             <span className="text-xs font-mono font-bold text-slate-500">
-              إجمالي {meterage.breakdownItems.length} وحدة
+              إجمالي {meterage.breakdownItems.length} وحدة • الخامة: {getMaterialTypeLabel(currentMaterial)}
             </span>
           </div>
 
@@ -505,6 +731,7 @@ export const PricingCalculatorView: React.FC = () => {
                   <th className="py-2.5 px-3">الكود</th>
                   <th className="py-2.5 px-3">اسم الوحدة</th>
                   <th className="py-2.5 px-3">النوع</th>
+                  <th className="py-2.5 px-3 bg-emerald-50/70 text-emerald-900">الخامة / نظام التصنيع</th>
                   <th className="py-2.5 px-3 font-mono text-center">العرض (W)</th>
                   <th className="py-2.5 px-3 font-mono text-center">الارتفاع (H)</th>
                   <th className="py-2.5 px-3 font-mono text-center text-slate-400">العمق (D)</th>
@@ -518,7 +745,7 @@ export const PricingCalculatorView: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {meterage.breakdownItems.map((item, idx) => (
+                {meterage.breakdownItems.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/70 transition">
                     <td className="py-2.5 px-3 font-mono font-bold text-purple-700">{item.id}</td>
                     <td className="py-2.5 px-3 font-bold text-slate-900">{item.name}</td>
@@ -526,6 +753,9 @@ export const PricingCalculatorView: React.FC = () => {
                       <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">
                         {item.category}
                       </span>
+                    </td>
+                    <td className="py-2.5 px-3 font-bold text-emerald-800 bg-emerald-50/30">
+                      {item.materialName}
                     </td>
                     <td className="py-2.5 px-3 font-mono text-center font-bold text-slate-800">{item.widthMm / 10} سم</td>
                     <td className="py-2.5 px-3 font-mono text-center font-bold text-slate-800">{item.heightMm / 10} سم</td>
@@ -544,7 +774,7 @@ export const PricingCalculatorView: React.FC = () => {
               </tbody>
               <tfoot>
                 <tr className="bg-slate-900 text-white font-bold text-xs border-t-2 border-slate-900">
-                  <td colSpan={3} className="py-3 px-3">المجموع الكلي:</td>
+                  <td colSpan={4} className="py-3 px-3">المجموع الكلي:</td>
                   <td colSpan={3} className="py-3 px-3 text-center text-slate-300 font-mono">
                     {meterage.breakdownItems.length} قطعة
                   </td>

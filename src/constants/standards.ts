@@ -56,6 +56,8 @@ export const DEFAULT_MATERIAL_FINISHES: MaterialFinishes = {
 export const DEFAULT_PRICING_SETTINGS: PricingSettings = {
   currency: 'ج.م',
   pricingMethod: 'square-fronts',
+  selectedMaterialType: 'wood',
+  materialSpecificationNotes: 'خشب تركي إيجر MDF ملبوس HPL/أكريليك عالي الجودة مع شاسيه داخلي معتمد',
   pricePerSquareMeterFronts: 4200,
   pricePerSquareMeterBaseFronts: 4200,
   pricePerSquareMeterWallFronts: 3800,

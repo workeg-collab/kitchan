@@ -430,6 +430,10 @@ export interface PricingSettings {
   currency: string;
   pricingMethod: PricingMethod; // 'linear' (بالمتر الطولي) أو 'square-fronts' (بالمتر المربع لوش الوحدات)
   
+  // Material Specification for Pricing (الخامة المحددة للتسعير: خشب، كلادينج، خشمونيوم، فايبر...)
+  selectedMaterialType?: 'wood' | 'cladding' | 'khashmounium' | 'fibre' | 'acrylic' | 'polygloss' | 'hpl' | 'custom';
+  materialSpecificationNotes?: string;
+  
   // Square Meters (المتر المربع لوش الواجهات: العرض x الارتفاع)
   pricePerSquareMeterFronts: number; // سعر المتر المربع الموحد لوش الوحدات
   pricePerSquareMeterBaseFronts?: number; // سعر المتر المربع لوش الوحدات السفلية

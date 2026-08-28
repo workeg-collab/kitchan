@@ -5,6 +5,7 @@ export interface CabinetPricingBreakdownItem {
   id: string;
   name: string;
   category: CabinetItem['category'];
+  materialName: string; // خامة الوحدة (خشب / كلادينج / خشمونيوم / ...)
   widthMm: number;
   heightMm: number;
   depthMm: number;
@@ -14,9 +15,22 @@ export interface CabinetPricingBreakdownItem {
   totalCost: number;  // التكلفة الإجمالية للوحدة
 }
 
+export interface MaterialSpecificationSummary {
+  materialType: string;
+  materialNameAr: string;
+  frontFinish: string;
+  countertopMaterial: string;
+  carcassType: string;
+  hardwareSpec: string;
+  notes: string;
+}
+
 export interface KitchenMeterageSummary {
   // Method
   pricingMethod: PricingMethod;
+
+  // Material Specification (تفاصيل الخامات في عرض السعر)
+  materialSpec: MaterialSpecificationSummary;
 
   // 1. Linear Meters (الأمتار الطولية: مجموع الأطوال W)
   baseLinearM: number;
@@ -54,6 +68,27 @@ export interface KitchenMeterageSummary {
   finalTotal: number;
 }
 
+export function getMaterialTypeLabel(type: string): string {
+  switch (type) {
+    case 'wood':
+      return 'خشب طبيعي / مسطحات MDF معالجة';
+    case 'acrylic':
+      return 'خشب أكريليك عالي اللمعان (High Gloss Acrylic)';
+    case 'polygloss':
+      return 'خشب بولي لاك / يو في لاك (Polygloss UV)';
+    case 'hpl':
+      return 'خشب مغطى بطبقات HPL المقاومة للخدش والحرارة';
+    case 'cladding':
+      return 'كلادينج ألوميتال Alubond (مقاوم للمياه والحريق 100%)';
+    case 'khashmounium':
+      return 'خشمونيوم دبل بتجزيعات خشبية وشاسيه مقوى';
+    case 'fibre':
+      return 'فايبر جلاس وكومباكت لامينيت (Compact Laminate)';
+    default:
+      return 'خشب مصنع عالي الجودة';
+  }
+}
+
 export function calculateKitchenMeterageAndPrice(
   cabinets: CabinetItem[],
   room: { width: number; length: number },
@@ -63,6 +98,7 @@ export function calculateKitchenMeterageAndPrice(
 ): KitchenMeterageSummary {
   const method = pricing.pricingMethod || 'square-fronts';
   const isSquareMode = method === 'square-fronts';
+  const matType = pricing.selectedMaterialType || manufacturing.systemType || 'wood';
 
   let baseWidthMm = 0;
   let wallWidthMm = 0;
@@ -140,10 +176,15 @@ export function calculateKitchenMeterageAndPrice(
       }
     }
 
+    const itemMat = cab.materialSystemOverride 
+      ? getMaterialTypeLabel(cab.materialSystemOverride)
+      : getMaterialTypeLabel(matType);
+
     breakdownItems.push({
       id: cab.id,
       name: cab.name,
       category: cab.category,
+      materialName: itemMat,
       widthMm: W,
       heightMm: H,
       depthMm: D,
@@ -211,8 +252,19 @@ export function calculateKitchenMeterageAndPrice(
   const tax = (taxableAmount * (pricing.taxPercentage || 0)) / 100;
   const finalTotal = Math.round(taxableAmount + tax);
 
+  const materialSpec: MaterialSpecificationSummary = {
+    materialType: matType,
+    materialNameAr: getMaterialTypeLabel(matType),
+    frontFinish: matType === 'cladding' ? 'شيت كلادينج ألوميتال دبل 4 مم معالج' : matType === 'khashmounium' ? 'خشمونيوم دبل تجزيعات خشبية' : 'ألواح MDF مكسوة HPL / أكريليك تركي',
+    countertopMaterial: countertop?.material || 'رخام كلكتا جولد طبيعي / كوارتز',
+    carcassType: matType === 'cladding' || matType === 'khashmounium' ? 'شاسيه ألوميتال مقوى مقاوم للمياه' : 'خشب شاسيه داخلي معالج 18 مم',
+    hardwareSpec: 'مفصلات ومجاري أدراج هيدروليك سوفت كلوز بلوم',
+    notes: pricing.materialSpecificationNotes || 'الخامة مطابقة للمواصفات القياسية للجودة والمتانة ومقاومة الرطوبة.',
+  };
+
   return {
     pricingMethod: method,
+    materialSpec,
     baseLinearM,
     wallLinearM,
     tallLinearM,
