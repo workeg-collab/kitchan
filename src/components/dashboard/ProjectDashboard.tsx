@@ -21,8 +21,6 @@ import {
   Building2,
   Armchair,
   Sparkles,
-  Footprints,
-  Camera,
   Layers
 } from 'lucide-react';
 
@@ -197,30 +195,14 @@ export const ProjectDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Quick Hub Shortcuts */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+        {/* Centered Luxury Projects Catalog Shortcut */}
+        <div className="flex items-center justify-center pt-3">
           <button
             onClick={() => setActiveTab('templates-catalog')}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl text-xs font-black shadow-xl shadow-blue-500/30 transition transform hover:scale-105 cursor-pointer border border-blue-400/40"
+            className="flex items-center gap-2.5 px-7 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-2xl text-sm font-black shadow-2xl shadow-blue-500/40 transition transform hover:-translate-y-0.5 hover:scale-105 active:scale-95 cursor-pointer border border-white/30 backdrop-blur-md"
           >
-            <Sparkles size={16} />
+            <Sparkles size={18} className="text-amber-300 animate-pulse" />
             <span>كتالوج المشاريع الجاهزة والمواءمة الذكية</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('visualization-studio')}
-            className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-2xl text-xs font-black shadow-xl transition transform hover:scale-105 cursor-pointer border border-white/30"
-          >
-            <Camera size={16} />
-            <span>استوديو الرندر والتصوير الواقعي</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('walkthrough-vr')}
-            className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-2xl text-xs font-black shadow-xl transition transform hover:scale-105 cursor-pointer border border-white/30"
-          >
-            <Footprints size={16} />
-            <span>جولة التجول الافتراضي VR</span>
           </button>
         </div>
       </div>
