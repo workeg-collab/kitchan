@@ -1,4 +1,4 @@
-import { ProjectData, ArchitecturalElement, DesignOption } from '../types';
+import { ProjectData, ArchitecturalElement, DesignOption, ProjectType } from '../types';
 import { 
   DEFAULT_MANUFACTURING_SETTINGS, 
   DEFAULT_COUNTERTOP_CONFIG, 
@@ -49,265 +49,244 @@ export const PROJECT_KITCHEN_LUXURY_ISLAND: ProjectData = {
     ],
   },
   cabinets: [
-    // Wall A Tall Towers
     { id: 'T01', name: 'دولاب ثلاجة بيلت إن فخم', category: 'tall', type: 'tall-fridge-housing', projectType: 'kitchen', width: 700, height: 2400, depth: 600, x: 0, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 0, doorHinge: 'right' },
     { id: 'T02', name: 'برج أفران وميكروويف بيلت إن', category: 'tall', type: 'tall-oven-tower', projectType: 'kitchen', width: 600, height: 2400, depth: 600, x: 700, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 1, doorHinge: 'right', hasApplianceCavity: true },
     { id: 'T03', name: 'بانترى تخزين مؤن سحاب (Pantry)', category: 'tall', type: 'tall-pantry-pullout', projectType: 'kitchen', width: 450, height: 2400, depth: 600, x: 1300, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 5, doorCount: 1, drawerCount: 0, doorHinge: 'right' },
-    
-    // Wall A Main Prep Base Units
-    { id: 'B01', name: 'سفلي أدراج تخزين حلل عريضة', category: 'base', type: 'base-drawers-2', projectType: 'kitchen', width: 800, height: 720, depth: 580, x: 1750, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
-    { id: 'B02', name: 'وحدة حوض غسيل ساقط تحت الرخام', category: 'base', type: 'base-sink', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 2550, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 2, drawerCount: 0, doorHinge: 'double', hasSinkCutout: true },
+    { id: 'B01', name: 'سفلي أدراج تخزين عريضة', category: 'base', type: 'base-drawers-2', projectType: 'kitchen', width: 800, height: 720, depth: 580, x: 1750, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
+    { id: 'B02', name: 'وحدة حوض غسيل ساقط', category: 'base', type: 'base-sink', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 2550, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 2, drawerCount: 0, doorHinge: 'double', hasSinkCutout: true },
     { id: 'B03', name: 'غسالة صحون مدمجة بالكامل', category: 'base', type: 'base-single-door', projectType: 'kitchen', width: 600, height: 720, depth: 580, x: 3450, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 1, drawerCount: 0, doorHinge: 'right' },
-    { id: 'B04', name: 'سفلي ترولي بهارات وزيوت سحاب', category: 'base', type: 'base-spice-pullout', projectType: 'kitchen', width: 350, height: 720, depth: 580, x: 4050, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 1, drawerCount: 0, doorHinge: 'right' },
-    { id: 'B05', name: 'سفلي 3 أدراج معالق وتنظيم', category: 'base', type: 'base-drawers-3', projectType: 'kitchen', width: 600, height: 720, depth: 580, x: 4400, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 3, doorHinge: 'none' },
-
-    // Wall A Upper Vitrines
-    { id: 'W01', name: 'علوي زجاج فوميه فخم مع ليد مخفي', category: 'wall', type: 'wall-glass-vitrine', projectType: 'kitchen', width: 900, height: 800, depth: 360, x: 1750, y: 0, z: 1550, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 0, doorHinge: 'double', hasGlassDoors: true, hasIntegratedLed: true },
-    { id: 'W02', name: 'علوي ضلف قلاب هيدروليك أفينتوس', category: 'wall', type: 'wall-lift-up', projectType: 'kitchen', width: 900, height: 800, depth: 360, x: 3450, y: 0, z: 1550, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 1, drawerCount: 0, doorHinge: 'top', flipUpDoor: true },
-    { id: 'W03', name: 'علوي زجاج فوميه مضيء', category: 'wall', type: 'wall-glass-vitrine', projectType: 'kitchen', width: 950, height: 800, depth: 360, x: 4350, y: 0, z: 1550, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 0, doorHinge: 'double', hasGlassDoors: true, hasIntegratedLed: true },
-
-    // Central Island Units
-    { id: 'IS01', name: 'جزيرة سفلي مسطح طهي 90 سم بلت إن', category: 'island', type: 'base-island-cabinet', projectType: 'kitchen', width: 1000, height: 720, depth: 900, x: 2200, y: 1900, z: 100, rotation: 0, shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
-    { id: 'IS02', name: 'جزيرة سفلي أدراج تقديم وصحون', category: 'island', type: 'base-island-cabinet', projectType: 'kitchen', width: 1000, height: 720, depth: 900, x: 3200, y: 1900, z: 100, rotation: 0, shelfCount: 0, doorCount: 0, drawerCount: 3, doorHinge: 'none' },
+    { id: 'B04', name: 'سفلي أدراج بهارات وتوابل', category: 'base', type: 'base-drawers-3', projectType: 'kitchen', width: 450, height: 720, depth: 580, x: 4050, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 3, doorHinge: 'none' },
+    { id: 'W01', name: 'علوي ضلفة قلاب هيدروليك بلوم', category: 'wall', type: 'wall-lift-up-blum', projectType: 'kitchen', width: 800, height: 720, depth: 350, x: 1750, y: 0, z: 1520, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 1, drawerCount: 0, flipUpDoor: true },
+    { id: 'W02', name: 'علوي فيترينة زجاج فوميه مضيء', category: 'wall', type: 'wall-glass-vitrine', projectType: 'kitchen', width: 900, height: 720, depth: 350, x: 2550, y: 0, z: 1520, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 0, hasGlassDoors: true },
+    { id: 'IS01', name: 'جزيرة مطبخ مع طباخ غاز بلت إن', category: 'island', type: 'base-cooktop-housing', projectType: 'kitchen', width: 900, height: 720, depth: 600, x: 2200, y: 2200, z: 100, rotation: 180, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none', hasCooktopCutout: true },
+    { id: 'IS02', name: 'جزيرة أدراج تخزين كلكتا', category: 'island', type: 'base-drawers-3', projectType: 'kitchen', width: 900, height: 720, depth: 600, x: 3100, y: 2200, z: 100, rotation: 180, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 3, doorHinge: 'none' },
   ],
   appliances: [
-    { id: 'A01', name: 'حوض ساقط رخام أسود جرانيت', type: 'sink-double', width: 850, height: 220, depth: 480, x: 2575, y: 50, z: 850, rotation: 0, wallId: 'wall-a', finish: 'black' },
-    { id: 'A02', name: 'مسطح حث كهرومغناطيسي 5 عيون على الجزيرة', type: 'cooktop-induction', width: 900, height: 50, depth: 520, x: 2250, y: 2090, z: 850, rotation: 0 },
-    { id: 'A03', name: 'فرن بلت إن رقمي 60 سم', type: 'oven-builtin', width: 595, height: 595, depth: 560, x: 700, y: 10, z: 950, rotation: 0, wallId: 'wall-a', finish: 'black' },
-    { id: 'A04', name: 'ميكروويف بلت إن شاشة لمس', type: 'microwave-builtin', width: 595, height: 380, depth: 400, x: 700, y: 10, z: 1600, rotation: 0, wallId: 'wall-a', finish: 'black' },
-    { id: 'A05', name: 'شفاط جزيرة إيلاند معلق ستانلس أسود', type: 'hood-wall', width: 900, height: 600, depth: 500, x: 2250, y: 2090, z: 1800, rotation: 0, finish: 'black' },
+    { id: 'app-fridge-01', name: 'ثلاجة دولابي فاخرة', type: 'refrigerator', category: 'cooling', brand: 'Bosch Serie 8', model: 'KAN93VIFP', width: 700, height: 1800, depth: 600, x: 0, y: 0, z: 100, rotation: 0, finish: 'black-glass' },
+    { id: 'app-cooktop-01', name: 'مسطح حثي 5 شعلة', type: 'cooktop', category: 'cooking', brand: 'Siemens iQ700', model: 'EX875KYW1E', width: 800, height: 60, depth: 520, x: 2250, y: 2200, z: 860, rotation: 180, finish: 'black-glass' },
+    { id: 'app-sink-01', name: 'حوض جرانيت أسود ساقط', type: 'sink', category: 'sanitary', brand: 'Franke Maris', model: 'MRG 110-72', width: 760, height: 200, depth: 440, x: 2620, y: 0, z: 820, rotation: 0, finish: 'black-glass' },
   ],
   architecturalElements: [],
-  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, thickness: 40, overhangFront: 40, material: 'كوارتز كلكتا جولد إيطالي' },
-  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 100, material: 'أسود مطفي' },
-  backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, height: 650, material: 'كوارتز كلكتا جولد إيطالي' },
+  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, material: 'رخام كوارتز كلكتا جولد إيطالي', thickness: 40, color: '#f5f5f0' },
+  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 100, material: 'ألومنيوم بروفايل أسود مطفي' },
+  backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, enabled: true, material: 'كوارتز كلكتا مطابق للسطح', height: 600, color: '#fafafa' },
   materials: {
     ...DEFAULT_MATERIAL_FINISHES,
-    frontFinish: 'خشب جوز أمريكي مدخن (Smoked Walnut)',
-    frontColor: '#594433',
-    bodyColor: '#27272a',
-    countertopColor: '#f8fafc',
-    backsplashColor: '#f8fafc',
-    floorColor: '#475569',
-    handleStyle: 'handleless',
-    handleColor: '#d97706',
+    frontFinish: 'خشب جوز أمريكي مدخن فاخر (Smoked American Walnut)',
+    frontColor: '#4a3728',
+    carcaseFinish: 'رمادي حجري معتم (Stone Grey MFC)',
+    bodyColor: '#334155',
+    handleStyle: 'بروفايل جولا أسود مدمج بدون مقابض (Gola Profile)',
+    plinthFinish: 'أسود مطفي',
+    countertopColor: '#fbfbfb',
   },
   manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
-  pricing: { ...DEFAULT_PRICING_SETTINGS, pricePerLinearMeterTall: 5500, pricePerLinearMeterBase: 4200 },
+  pricing: DEFAULT_PRICING_SETTINGS,
   designOptions: [
     {
-      id: 'opt-a',
-      name: 'Option A: Smoked Walnut & Calacatta Gold',
-      description: 'جوز أمريكي مدخن فاخر مع كوارتز كلكتا جولد وبروفايل جولا نحاسي',
+      id: 'opt-1-walnut',
+      name: 'الخيار أ: خشب جوز أمريكي مدخن مع كلكتا جولد',
+      description: 'طراز عصري فاخر ودافئ مع عروق رخام ذهبية وإضاءة خافتة',
       materials: {
+        ...DEFAULT_MATERIAL_FINISHES,
         frontFinish: 'خشب جوز أمريكي مدخن (Smoked Walnut)',
-        frontColor: '#594433',
-        bodyColor: '#27272a',
-        countertopMaterial: 'كوارتز كلكتا جولد إيطالي',
-        countertopColor: '#f8fafc',
-        backsplashMaterial: 'كوارتز كلكتا جولد إيطالي',
-        backsplashColor: '#f8fafc',
-        wallColor: '#f8fafc',
-        floorMaterial: 'بورسلين رمادي حجر طبيعي',
-        floorColor: '#475569',
-        handleStyle: 'handleless',
-        handleColor: '#d97706',
-      },
-      isDefault: true,
-    },
-    {
-      id: 'opt-b',
-      name: 'Option B: Matte Anthracite & Natural Oak',
-      description: 'رمادي فحمي سوبر مات مع خشب أرو طبيعي دافئ وجرانيت نيرو ماركينا أسود',
-      materials: {
-        frontFinish: 'رمادي فحمي شاركول (Anthracite)',
-        frontColor: '#27272a',
-        bodyColor: '#18181b',
-        countertopMaterial: 'جرانيت نيرو ماركينا أسود',
-        countertopColor: '#18181b',
-        backsplashMaterial: 'جرانيت نيرو ماركينا أسود',
-        backsplashColor: '#18181b',
-        wallColor: '#e5e0d8',
-        floorMaterial: 'باركيه خشب أرو شيفرون',
-        floorColor: '#8c6843',
-        handleStyle: 'bar-black',
-        handleColor: '#09090b',
+        frontColor: '#4a3728',
+        bodyColor: '#1e293b',
+        countertopColor: '#fbfbfb',
+        handleStyle: 'بروفايل جولا أسود خفي',
       },
     },
     {
-      id: 'opt-c',
-      name: 'Option C: Warm Cashmere & Carrara White',
-      description: 'كشمير بيج هادئ مع رخام كرارة أبيض كلاسيكي ومقابض نحاس مصقول',
+      id: 'opt-2-anthracite',
+      name: 'الخيار ب: أنثراسيت سوبر مات مع خشب أرو طبيعي',
+      description: 'طراز مودرن مونوكروم ذو طابع أوروبي جريء ومقاوم للبصمات',
       materials: {
-        frontFinish: 'كشمير بيج دافئ (Warm Cashmere)',
-        frontColor: '#d6cec4',
-        bodyColor: '#cbd5e1',
-        countertopMaterial: 'رخام كرارة تركي فاخر',
+        ...DEFAULT_MATERIAL_FINISHES,
+        frontFinish: 'أنثراسيت سوبر مات ناعم (Anthracite Soft Touch)',
+        frontColor: '#1e232a',
+        bodyColor: '#0f172a',
         countertopColor: '#e2e8f0',
-        backsplashMaterial: 'رخام كرارة تركي فاخر',
-        backsplashColor: '#e2e8f0',
-        wallColor: '#f8fafc',
-        floorMaterial: 'رخام أبيض كلكتا مصقول',
-        floorColor: '#f1f5f9',
-        handleStyle: 'bar-brass',
-        handleColor: '#d97706',
+        handleStyle: 'مقابض خطية مدمجة سوداء',
+      },
+    },
+    {
+      id: 'opt-3-cashmere',
+      name: 'الخيار ج: كاشمير بيج دافئ مع بروفايل برونز نحاسي',
+      description: 'ألوان ناعمة مريحة للعين مع لمسات نحاسية وإضاءة ليد دافئة',
+      materials: {
+        ...DEFAULT_MATERIAL_FINISHES,
+        frontFinish: 'كاشمير بيج مطفي (Warm Cashmere Velvet)',
+        frontColor: '#cfc4b6',
+        bodyColor: '#334155',
+        countertopColor: '#ffffff',
+        handleStyle: 'بروفايل جولا نحاسي برونز',
       },
     },
   ],
 };
 
-// 1.2 COMPACT PARALLEL GALLEY KITCHEN (3.2m x 2.4m)
-export const PROJECT_KITCHEN_COMPACT_GALLEY: ProjectData = {
+// 1.2 CLASSIC SHAKER U-SHAPE KITCHEN (4.8m x 3.6m)
+export const PROJECT_KITCHEN_CLASSIC_SHAKER: ProjectData = {
   metadata: {
-    id: 'proj-kitchen-galley-01',
-    name: 'مطبخ متوازي مدمج للشقق العصرية (Compact Galley Kitchen)',
+    id: 'proj-kitchen-classic-shaker-01',
+    name: 'مطبخ كلاسيك شيكر أبيض مع بانترى وأفران مدمجة (Classic Shaker U-Shape)',
     projectType: 'kitchen',
     materialSystem: 'wood',
-    clientName: 'شقة مودرن جاردينيا',
+    clientName: 'فيلا الربيع',
     designerName: 'استوديو كيتشن كاد برو',
     date: '2026-08-28',
-    notes: 'استغلال مثالي للمساحات الضيقة بنظام خطين متوازيين مع مثلث حركة مريح وسعة تخزين رأسية كاملة.',
+    notes: 'مطبخ حرف U كلاسيكي فاخر بأبواب شيكر فريم وكورنيشة سقفية ورخام كرارة.',
     unit: 'cm',
   },
   room: {
     shape: 'rectangular',
-    width: 3200,
-    length: 2400,
-    ceilingHeight: 2600,
+    width: 4800,
+    length: 3600,
+    ceilingHeight: 2800,
     wallThickness: 150,
     walls: [
-      { id: 'wall-a', name: 'الجدار أ (خط الطهي والتحضير)', startX: 0, startY: 0, endX: 3200, endY: 0, thickness: 150, height: 2600 },
-      { id: 'wall-b', name: 'الجدار ب (النافذة)', startX: 3200, startY: 0, endX: 3200, endY: 2400, thickness: 150, height: 2600 },
-      { id: 'wall-c', name: 'الجدار ج (خط الحوض والثلاجة)', startX: 3200, startY: 2400, endX: 0, endY: 2400, thickness: 150, height: 2600 },
-      { id: 'wall-d', name: 'الجدار د (المدخل)', startX: 0, startY: 2400, endX: 0, endY: 0, thickness: 150, height: 2600 },
+      { id: 'w1', name: 'الجدار أ', startX: 0, startY: 0, endX: 4800, endY: 0, thickness: 150, height: 2800 },
+      { id: 'w2', name: 'الجدار ب', startX: 4800, startY: 0, endX: 4800, endY: 3600, thickness: 150, height: 2800 },
+      { id: 'w3', name: 'الجدار ج', startX: 4800, startY: 3600, endX: 0, endY: 3600, thickness: 150, height: 2800 },
+      { id: 'w4', name: 'الجدار د', startX: 0, startY: 3600, endX: 0, endY: 0, thickness: 150, height: 2800 },
     ],
     elements: [
-      { id: 'win-g', name: 'نافذة تهوية المطبخ', type: 'window', x: 3200, y: 800, z: 1000, width: 800, height: 1000, depth: 150, rotation: 90, wallId: 'wall-b' },
-      { id: 'door-g', name: 'باب المطبخ السحاب', type: 'door', x: 0, y: 800, z: 0, width: 800, height: 2100, depth: 150, rotation: 270, wallId: 'wall-d' },
+      { id: 'win-sh', name: 'نافذة كلاسيك مقسمة', type: 'window', x: 1800, y: 0, z: 1000, width: 1400, height: 1200, depth: 150, rotation: 0, wallId: 'w1' },
     ],
   },
   cabinets: [
-    // Wall A (Cook Line)
-    { id: 'B01', name: 'سفلي أدراج بهارات وأواني', category: 'base', type: 'base-drawers-3', projectType: 'kitchen', width: 600, height: 720, depth: 560, x: 200, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 3, doorHinge: 'none' },
-    { id: 'B02', name: 'سفلي مسطح طهي 4 عيون', category: 'base', type: 'base-drawers-2', projectType: 'kitchen', width: 800, height: 720, depth: 560, x: 800, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
-    { id: 'B03', name: 'سفلي تخزين بابين', category: 'base', type: 'base-double-door', projectType: 'kitchen', width: 800, height: 720, depth: 560, x: 1600, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 2, drawerCount: 0, doorHinge: 'double' },
-    { id: 'T01', name: 'برج أفران ومؤن مدمج', category: 'tall', type: 'tall-oven-tower', projectType: 'kitchen', width: 600, height: 2100, depth: 580, x: 2400, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 1, doorHinge: 'right', hasApplianceCavity: true },
-
-    // Wall A Wall Cabinets
-    { id: 'W01', name: 'علوي بابين مدمج الشفاط', category: 'wall', type: 'wall-double-door', projectType: 'kitchen', width: 800, height: 720, depth: 340, x: 800, y: 0, z: 1450, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 0, doorHinge: 'double' },
-    { id: 'W02', name: 'علوي أرفف تخزين أكواب', category: 'wall', type: 'wall-double-door', projectType: 'kitchen', width: 800, height: 720, depth: 340, x: 1600, y: 0, z: 1450, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 0, doorHinge: 'double' },
-
-    // Wall C (Sink & Fridge Line)
-    { id: 'T02', name: 'دولاب ثلاجة مدمجة', category: 'tall', type: 'tall-fridge-housing', projectType: 'kitchen', width: 650, height: 2100, depth: 580, x: 850, y: 2400, z: 100, rotation: 180, wallId: 'wall-c', shelfCount: 1, doorCount: 2, drawerCount: 0, doorHinge: 'left' },
-    { id: 'B04', name: 'سفلي حوض غسيل ستانلس', category: 'base', type: 'base-sink', projectType: 'kitchen', width: 900, height: 720, depth: 560, x: 1750, y: 2400, z: 100, rotation: 180, wallId: 'wall-c', shelfCount: 0, doorCount: 2, drawerCount: 0, doorHinge: 'double', hasSinkCutout: true },
-    { id: 'B05', name: 'غسالة صحون مدمجة 45 سم', category: 'base', type: 'base-single-door', projectType: 'kitchen', width: 450, height: 720, depth: 560, x: 2200, y: 2400, z: 100, rotation: 180, wallId: 'wall-c', shelfCount: 0, doorCount: 1, drawerCount: 0, doorHinge: 'left' },
+    { id: 'SH-T1', name: 'برج ثلاجة شيكر أبيض', category: 'tall', type: 'tall-fridge-housing', projectType: 'kitchen', width: 700, height: 2400, depth: 600, x: 0, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 2, doorCount: 2, drawerCount: 0 },
+    { id: 'SH-T2', name: 'برج أفران كلاسيك مع أدراج', category: 'tall', type: 'tall-oven-tower', projectType: 'kitchen', width: 600, height: 2400, depth: 600, x: 700, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 2, doorCount: 2, drawerCount: 2 },
+    { id: 'SH-B1', name: 'وحدة حوض كلاسيك ساقط', category: 'base', type: 'base-sink', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 2000, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 2, drawerCount: 0 },
+    { id: 'SH-B2', name: 'سفلي أدراج 3 أدراج شيكر', category: 'base', type: 'base-drawers-3', projectType: 'kitchen', width: 800, height: 720, depth: 580, x: 2900, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 0, drawerCount: 3 },
   ],
-  appliances: [
-    { id: 'A01', name: 'مسطح غاز 4 عيون بلت إن', type: 'cooktop-induction', width: 600, height: 50, depth: 520, x: 900, y: 20, z: 850, rotation: 0, wallId: 'wall-a' },
-    { id: 'A02', name: 'فرن كهربائي مدمج', type: 'oven-builtin', width: 595, height: 595, depth: 560, x: 2400, y: 10, z: 900, rotation: 0, wallId: 'wall-a' },
-    { id: 'A03', name: 'حوض غسيل ستانلس مدمج', type: 'sink-single', width: 600, height: 200, depth: 450, x: 1900, y: 2350, z: 850, rotation: 180, wallId: 'wall-c' },
-  ],
+  appliances: [],
   architecturalElements: [],
-  countertop: DEFAULT_COUNTERTOP_CONFIG,
+  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, material: 'رخام كرارة أبيض إيطالي', thickness: 40, color: '#f8fafc' },
+  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 100 },
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
+  materials: {
+    ...DEFAULT_MATERIAL_FINISHES,
+    frontFinish: 'أبيض شيكر كلاسيك مطفي (Classic White Shaker)',
+    frontColor: '#f1f5f9',
+    handleStyle: 'مقابض كوب نحاسية كلاسيكية (Brass Cup Pulls)',
+  },
+  manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
+  pricing: DEFAULT_PRICING_SETTINGS,
+};
+
+// 1.3 MODERN L-SHAPE CASHMERE KITCHEN (4.2m x 3.2m)
+export const PROJECT_KITCHEN_MODERN_L_CASHMERE: ProjectData = {
+  metadata: {
+    id: 'proj-kitchen-l-cashmere-01',
+    name: 'مطبخ مودرن حرف L كاشمير مع ليد بانل (Modern L-Shape Cashmere)',
+    projectType: 'kitchen',
+    materialSystem: 'wood',
+    clientName: 'شقة المهندسين',
+    designerName: 'استوديو كيتشن كاد برو',
+    date: '2026-08-28',
+    notes: 'مطبخ حرف L ناعم وأنيق للمساحات المتوسطة مع إضاءة ليد مخفية ولمسات برونز.',
+    unit: 'cm',
+  },
+  room: {
+    shape: 'rectangular',
+    width: 4200,
+    length: 3200,
+    ceilingHeight: 2700,
+    wallThickness: 150,
+    walls: [
+      { id: 'w1', name: 'جدار أ', startX: 0, startY: 0, endX: 4200, endY: 0, thickness: 150, height: 2700 },
+      { id: 'w2', name: 'جدار ب', startX: 4200, startY: 0, endX: 4200, endY: 3200, thickness: 150, height: 2700 },
+      { id: 'w3', name: 'جدار ج', startX: 4200, startY: 3200, endX: 0, endY: 3200, thickness: 150, height: 2700 },
+      { id: 'w4', name: 'جدار د', startX: 0, startY: 3200, endX: 0, endY: 0, thickness: 150, height: 2700 },
+    ],
+    elements: [],
+  },
+  cabinets: [
+    { id: 'LC-T1', name: 'دولاب ثلاجة بيلت إن', category: 'tall', type: 'tall-fridge-housing', projectType: 'kitchen', width: 700, height: 2400, depth: 600, x: 0, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 2, doorCount: 2, drawerCount: 0 },
+    { id: 'LC-B1', name: 'سفلي أدراج حلل', category: 'base', type: 'base-drawers-2', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 700, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 0, drawerCount: 2 },
+    { id: 'LC-B2', name: 'سفلي حوض ساقط', category: 'base', type: 'base-sink', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 1600, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 2, drawerCount: 0 },
+    { id: 'LC-W1', name: 'علوي قلاب هيدروليك', category: 'wall', type: 'wall-lift-up-blum', projectType: 'kitchen', width: 900, height: 720, depth: 350, x: 1600, y: 0, z: 1520, rotation: 0, wallId: 'w1', shelfCount: 1, doorCount: 1, drawerCount: 0, flipUpDoor: true },
+  ],
+  appliances: [],
+  architecturalElements: [],
+  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, material: 'كوارتز بيج كاشمير ناعم', thickness: 30, color: '#f5efe6' },
   plinth: DEFAULT_PLINTH_CONFIG,
   backsplash: DEFAULT_BACKSPLASH_CONFIG,
   materials: {
     ...DEFAULT_MATERIAL_FINISHES,
-    frontFinish: 'أبيض ألباين ناصع مطفي',
-    frontColor: '#f8fafc',
-    bodyColor: '#cbd5e1',
-    countertopColor: '#e2e8f0',
+    frontFinish: 'كاشمير بيج سوبر مات (Warm Cashmere Soft-Touch)',
+    frontColor: '#d6cbbe',
+    bodyColor: '#334155',
+    handleStyle: 'بروفايل جولا نحاسي مدمج',
   },
   manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
   pricing: DEFAULT_PRICING_SETTINGS,
 };
 
-// 1.3 CLASSIC SHAKER U-SHAPE KITCHEN (4.5m x 3.8m)
-export const PROJECT_KITCHEN_SHAKER_U: ProjectData = {
+// 1.4 COMPACT PARALLEL GALLEY KITCHEN (3.6m x 2.4m)
+export const PROJECT_KITCHEN_PARALLEL_GALLEY: ProjectData = {
   metadata: {
-    id: 'proj-kitchen-shaker-u-01',
-    name: 'مطبخ كلاسيك شيكر حرف U مع كورنيش وبانترى (Classic Shaker U-Shape)',
+    id: 'proj-kitchen-parallel-01',
+    name: 'مطبخ متوازي للشقق العصرية (Urban Parallel Galley Kitchen)',
     projectType: 'kitchen',
     materialSystem: 'wood',
-    clientName: 'أ / محمود عبد العال',
+    clientName: 'شقة العاصمة الإدارية',
     designerName: 'استوديو كيتشن كاد برو',
     date: '2026-08-28',
-    notes: 'تصميم كلاسيك شيكر أمريكي بحرف U متصل مع تجليد بانوهات، مسطح طهي عريض وشفاط كلاسيك معتق.',
+    notes: 'مطبخ متوازي ذكي بصفين متقابلين للمساحات الضيقة مع استغلال أمثل لمثلث الحركة.',
     unit: 'cm',
   },
   room: {
-    shape: 'u-shape',
-    width: 4500,
-    length: 3800,
-    ceilingHeight: 2750,
+    shape: 'rectangular',
+    width: 3600,
+    length: 2400,
+    ceilingHeight: 2700,
     wallThickness: 150,
     walls: [
-      { id: 'wall-a', name: 'الجدار أ (الرئيسي - الطهي)', startX: 0, startY: 0, endX: 4500, endY: 0, thickness: 150, height: 2750 },
-      { id: 'wall-b', name: 'الجدار ب (الأيمن - الأبراج)', startX: 4500, startY: 0, endX: 4500, endY: 3800, thickness: 150, height: 2750 },
-      { id: 'wall-c', name: 'الجدار ج (المدخل)', startX: 4500, startY: 3800, endX: 0, endY: 3800, thickness: 150, height: 2750 },
-      { id: 'wall-d', name: 'الجدار د (الأيسر - الحوض والنافذة)', startX: 0, startY: 3800, endX: 0, endY: 0, thickness: 150, height: 2750 },
+      { id: 'w1', name: 'جدار الطبخ والأبراج', startX: 0, startY: 0, endX: 3600, endY: 0, thickness: 150, height: 2700 },
+      { id: 'w2', name: 'جدار النافذة', startX: 3600, startY: 0, endX: 3600, endY: 2400, thickness: 150, height: 2700 },
+      { id: 'w3', name: 'جدار الحوض والتحضير', startX: 3600, startY: 2400, endX: 0, endY: 2400, thickness: 150, height: 2700 },
+      { id: 'w4', name: 'جدار الباب', startX: 0, startY: 2400, endX: 0, endY: 0, thickness: 150, height: 2700 },
     ],
-    elements: [
-      { id: 'win-shk', name: 'نافذة كلاسيك مقسمة', type: 'window', x: 0, y: 1600, z: 950, width: 1200, height: 1100, depth: 150, rotation: 270, wallId: 'wall-d' },
-    ],
+    elements: [],
   },
   cabinets: [
-    // Corner Units connecting the U
-    { id: 'C01', name: 'ركنة زاوية شيكر L يسار', category: 'corner', type: 'base-corner-l', projectType: 'kitchen', width: 900, height: 720, depth: 900, x: 0, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 2, drawerCount: 0, doorHinge: 'double' },
-    { id: 'C02', name: 'ركنة زاوية شيكر L يمين', category: 'corner', type: 'base-corner-l', projectType: 'kitchen', width: 900, height: 720, depth: 900, x: 3600, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 2, drawerCount: 0, doorHinge: 'double' },
-
-    // Wall A Center Range Cooktop
-    { id: 'B01', name: 'سفلي بوتجاز ومسطح 90 سم', category: 'base', type: 'base-drawers-2', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 1800, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
-    { id: 'B02', name: 'سفلي أدراج توابل 45 سم', category: 'base', type: 'base-drawers-3', projectType: 'kitchen', width: 450, height: 720, depth: 580, x: 1350, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 3, doorHinge: 'none' },
-    { id: 'B03', name: 'سفلي أدراج توابل 45 سم', category: 'base', type: 'base-drawers-3', projectType: 'kitchen', width: 450, height: 720, depth: 580, x: 2700, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 3, doorHinge: 'none' },
-    { id: 'B04', name: 'سفلي تخزين بابين شيكر', category: 'base', type: 'base-double-door', projectType: 'kitchen', width: 450, height: 720, depth: 580, x: 900, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 1, drawerCount: 0, doorHinge: 'right' },
-    { id: 'B05', name: 'سفلي تخزين بابين شيكر', category: 'base', type: 'base-double-door', projectType: 'kitchen', width: 450, height: 720, depth: 580, x: 3150, y: 0, z: 100, rotation: 0, wallId: 'wall-a', shelfCount: 1, doorCount: 1, drawerCount: 0, doorHinge: 'left' },
-
-    // Wall D (Sink Line)
-    { id: 'B06', name: 'وحدة حوض شيكر فارم هاوس مزدوج', category: 'base', type: 'base-sink', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 0, y: 1600, z: 100, rotation: 270, wallId: 'wall-d', shelfCount: 0, doorCount: 2, drawerCount: 0, doorHinge: 'double', hasSinkCutout: true },
-    { id: 'B07', name: 'غسالة صحون مدمجة', category: 'base', type: 'base-single-door', projectType: 'kitchen', width: 600, height: 720, depth: 580, x: 0, y: 2500, z: 100, rotation: 270, wallId: 'wall-d', shelfCount: 0, doorCount: 1, drawerCount: 0, doorHinge: 'right' },
-
-    // Wall B (Tall Pantry Line)
-    { id: 'T01', name: 'برج أفران وميكروويف شيكر', category: 'tall', type: 'tall-oven-tower', projectType: 'kitchen', width: 600, height: 2300, depth: 600, x: 4500, y: 900, z: 100, rotation: 90, wallId: 'wall-b', shelfCount: 2, doorCount: 2, drawerCount: 1, doorHinge: 'left', hasApplianceCavity: true },
-    { id: 'T02', name: 'دولاب ثلاجة بيلت إن شيكر', category: 'tall', type: 'tall-fridge-housing', projectType: 'kitchen', width: 700, height: 2300, depth: 600, x: 4500, y: 1500, z: 100, rotation: 90, wallId: 'wall-b', shelfCount: 2, doorCount: 2, drawerCount: 0, doorHinge: 'left' },
-    { id: 'T03', name: 'دولاب بانترى مؤن شيكر واسع', category: 'tall', type: 'tall-pantry', projectType: 'kitchen', width: 600, height: 2300, depth: 600, x: 4500, y: 2200, z: 100, rotation: 90, wallId: 'wall-b', shelfCount: 5, doorCount: 2, drawerCount: 0, doorHinge: 'double' },
+    { id: 'PG-T1', name: 'دولاب ثلاجة بيلت إن', category: 'tall', type: 'tall-fridge-housing', projectType: 'kitchen', width: 600, height: 2300, depth: 600, x: 0, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 2, doorCount: 2, drawerCount: 0 },
+    { id: 'PG-B1', name: 'سفلي مسطح طباخ وأدراج', category: 'base', type: 'base-drawers-3', projectType: 'kitchen', width: 900, height: 720, depth: 580, x: 600, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 0, drawerCount: 3 },
+    { id: 'PG-B2', name: 'سفلي حوض غسيل', category: 'base', type: 'base-sink', projectType: 'kitchen', width: 800, height: 720, depth: 580, x: 800, y: 1820, z: 100, rotation: 180, wallId: 'w3', shelfCount: 0, doorCount: 2, drawerCount: 0 },
   ],
-  appliances: [
-    { id: 'A01', name: 'مسطح طهي غاز 90 سم شيكر', type: 'cooktop-induction', width: 900, height: 50, depth: 520, x: 1800, y: 20, z: 850, rotation: 0, wallId: 'wall-a' },
-    { id: 'A02', name: 'حوض فارم هاوس رخام أبيض كلاسيك', type: 'sink-double', width: 850, height: 250, depth: 500, x: 20, y: 1650, z: 850, rotation: 270, wallId: 'wall-d' },
-  ],
+  appliances: [],
   architecturalElements: [],
-  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, thickness: 40, material: 'رخام كرارة تركي فاخر' },
-  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 100 },
-  backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, height: 600 },
+  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, material: 'كوارتز رمادي ناعم', thickness: 30, color: '#e2e8f0' },
+  plinth: DEFAULT_PLINTH_CONFIG,
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
   materials: {
     ...DEFAULT_MATERIAL_FINISHES,
-    frontFinish: 'أخضر سيج نورديك هادئ (Nordic Sage)',
-    frontColor: '#65786a',
-    bodyColor: '#f1f5f9',
-    countertopColor: '#e2e8f0',
-    handleStyle: 'bar-brass',
-    handleColor: '#d97706',
+    frontFinish: 'رمادي أنثراسيت سوبر مات (Anthracite Matte)',
+    frontColor: '#2b2d42',
+    bodyColor: '#1e293b',
+    handleStyle: 'مقابض بلت-إن مدمجة',
   },
   manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
   pricing: DEFAULT_PRICING_SETTINGS,
 };
 
 // =========================================================================
-// 2. DRESSING ROOMS COLLECTION (مجموعة غرف الملابس الجاهزة)
+// 2. DRESSING ROOMS COLLECTION (مجموعة غرف الملابس والدريسينج)
 // =========================================================================
 
-// 2.1 MASTER U-SHAPED WALK-IN DRESSING SUITE (4.4m x 3.8m)
+// 2.1 ROYAL MASTER U-DRESSING SUITE (4.4m x 3.8m)
 export const PROJECT_DRESSING_MASTER_U: ProjectData = {
   metadata: {
-    id: 'proj-dressing-master-u',
-    name: 'غرفة ملابس ماستر ملكية حرف U مع جزيرة وساعات (Master U-Walk-in)',
+    id: 'proj-dressing-master-u-01',
+    name: 'غرفة ملابس ماستر ملكية حرف U مع جزيرة وساعات (Royal Master U-Dressing)',
     projectType: 'dressing',
     materialSystem: 'wood',
-    clientName: 'جناح فيلا الندى',
+    clientName: 'جناح الماستر - فيلا الشيخ زايد',
     designerName: 'استوديو كيتشن كاد برو',
     date: '2026-08-28',
-    notes: 'غرفة ملابس فاخرة بحرف U متصل تضم فيترينات زجاج فوميه مضاءة، أرفف أحذية مائلة، ماسورات تعليق بدل وفساتين، وجزيرة ساعات وإكسسوارات.',
+    notes: 'غرفة دريسينج متكاملة فاخرة حرف U بأبواب زجاج فوميه مضيء، جزيرة ساعات ومجوهرات، ووحدات تعليق بناطيل وفساتين طويلة.',
     unit: 'cm',
   },
   room: {
@@ -317,66 +296,101 @@ export const PROJECT_DRESSING_MASTER_U: ProjectData = {
     ceilingHeight: 2800,
     wallThickness: 150,
     walls: [
-      { id: 'wall-a', name: 'الجدار أ (الخلفي - التعليق الرئيسي)', startX: 0, startY: 0, endX: 4400, endY: 0, thickness: 150, height: 2800 },
-      { id: 'wall-b', name: 'الجدار ب (الأيمن - الأحذية والبناطيل)', startX: 4400, startY: 0, endX: 4400, endY: 3800, thickness: 150, height: 2800 },
-      { id: 'wall-c', name: 'الجدار ج (المدخل)', startX: 4400, startY: 3800, endX: 0, endY: 3800, thickness: 150, height: 2800 },
-      { id: 'wall-d', name: 'الجدار د (الأيسر - الفساتين والفيترينات)', startX: 0, startY: 3800, endX: 0, endY: 0, thickness: 150, height: 2800 },
+      { id: 'w-dr-a', name: 'جدار الخزائن الرئيسي', startX: 0, startY: 0, endX: 4400, endY: 0, thickness: 150, height: 2800 },
+      { id: 'w-dr-b', name: 'جدار الفيترينات الأيمن', startX: 4400, startY: 0, endX: 4400, endY: 3800, thickness: 150, height: 2800 },
+      { id: 'w-dr-c', name: 'جدار المدخل', startX: 4400, startY: 3800, endX: 0, endY: 3800, thickness: 150, height: 2800 },
+      { id: 'w-dr-d', name: 'جدار الأحذية والحقائب الأيسر', startX: 0, startY: 3800, endX: 0, endY: 0, thickness: 150, height: 2800 },
     ],
     elements: [
-      { id: 'door-dr-m', name: 'باب دريسنج زجاج سحاب فوميه', type: 'door', x: 1750, y: 3800, z: 0, width: 900, height: 2400, depth: 150, rotation: 180, wallId: 'wall-c' },
+      { id: 'door-dr', name: 'باب سلايدنج زجاجي فاخر', type: 'door', x: 1800, y: 3800, z: 0, width: 1000, height: 2400, depth: 150, rotation: 180, wallId: 'w-dr-c' },
     ],
   },
   cabinets: [
-    // Wall A (Back Center Wall)
-    { id: 'WD01', name: 'دولاب ركنة L زاوية مفتوحة يسار', category: 'wardrobe', type: 'wardrobe-corner-open', projectType: 'dressing', width: 1000, height: 2700, depth: 1000, x: 0, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 4, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true },
-    { id: 'WD02', name: 'وحدة تعليق مزدوج للبدل والقمصان', category: 'closet-internals', type: 'wardrobe-hanging-double', projectType: 'dressing', width: 1000, height: 2700, depth: 580, x: 1000, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true, hangingRailCount: 2 },
-    { id: 'WD03', name: 'برج أدراج مجوهرات ومطبق ملابس', category: 'closet-internals', type: 'wardrobe-shelves-drawers', projectType: 'dressing', width: 900, height: 2700, depth: 580, x: 2000, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 4, doorCount: 0, drawerCount: 4, doorHinge: 'none', doorType: 'open', hasJewelryDrawer: true },
-    { id: 'WD04', name: 'وحدة تعليق طويل للعبايات والفساتين', category: 'wardrobe', type: 'wardrobe-walkin-open', projectType: 'dressing', width: 1000, height: 2700, depth: 580, x: 2900, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true, hangingRailCount: 1 },
-    { id: 'WD05', name: 'دولاب ركنة L زاوية مفتوحة يمين', category: 'wardrobe', type: 'wardrobe-corner-open', projectType: 'dressing', width: 1000, height: 2700, depth: 1000, x: 3900, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 4, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasHangingRail: true },
-
-    // Wall B (Right Wall - Shoes & Trousers)
-    { id: 'WD06', name: 'فيترينة أحذية مائلة مع حاجز ستانلس وليد', category: 'accessories', type: 'wardrobe-shoe-rack', projectType: 'dressing', width: 900, height: 2700, depth: 450, x: 4400, y: 1000, z: 0, rotation: 90, wallId: 'wall-b', shelfCount: 8, doorCount: 0, drawerCount: 0, doorHinge: 'none', doorType: 'open', hasShoeShelves: true, hasIntegratedLed: true },
-    { id: 'WD07', name: 'وحدة حامل بناطيل وسلال غسيل هيدروليك', category: 'accessories', type: 'wardrobe-trouser-rack', projectType: 'dressing', width: 800, height: 2700, depth: 550, x: 4400, y: 1900, z: 0, rotation: 90, wallId: 'wall-b', shelfCount: 3, doorCount: 0, drawerCount: 2, doorHinge: 'none', doorType: 'open', hasTrouserRack: true },
-
-    // Wall D (Left Wall - Glass Vitrines)
-    { id: 'WD08', name: 'فيترينة حقائب وشنط بضلف زجاج فوميه وفريم أسود', category: 'wardrobe', type: 'wardrobe-glass-doors', projectType: 'dressing', width: 900, height: 2700, depth: 550, x: 0, y: 1000, z: 0, rotation: 270, wallId: 'wall-d', shelfCount: 5, doorCount: 2, drawerCount: 0, doorHinge: 'double', doorType: 'glass-frame', hasGlassDoors: true, hasIntegratedLed: true },
-    { id: 'WD09', name: 'فيترينة عبايات بضلف زجاج ليد مخفي', category: 'wardrobe', type: 'wardrobe-glass-doors', projectType: 'dressing', width: 900, height: 2700, depth: 550, x: 0, y: 1900, z: 0, rotation: 270, wallId: 'wall-d', shelfCount: 2, doorCount: 2, drawerCount: 0, doorHinge: 'double', doorType: 'glass-frame', hasGlassDoors: true, hasIntegratedLed: true },
-
-    // Central Island
-    { id: 'WD10', name: 'جزيرة دريسنج مركزية مع درج إكسسوارات وساعات وسطح زجاج', category: 'accessories', type: 'wardrobe-jewelry-vanity', projectType: 'dressing', width: 1400, height: 900, depth: 800, x: 1500, y: 1600, z: 0, rotation: 0, shelfCount: 0, doorCount: 0, drawerCount: 8, doorHinge: 'none', doorType: 'open', hasJewelryDrawer: true },
+    { id: 'DR01', name: 'دولاب تعليق فساتين وبدلات طويلة', category: 'wardrobe', type: 'wardrobe-double-hanging', projectType: 'dressing', width: 1000, height: 2600, depth: 600, x: 0, y: 0, z: 100, rotation: 0, wallId: 'w-dr-a', shelfCount: 2, doorCount: 2, drawerCount: 0, hasHangingRail: true },
+    { id: 'DR02', name: 'فيترينة زجاج فوميه بإضاءة سنسور', category: 'wardrobe', type: 'wardrobe-glass-vitrine', projectType: 'dressing', width: 900, height: 2600, depth: 600, x: 1000, y: 0, z: 100, rotation: 0, wallId: 'w-dr-a', shelfCount: 5, doorCount: 2, drawerCount: 0, hasGlassDoors: true },
+    { id: 'DR03', name: 'وحدة أدراج مجوهرات وساعات داخلية', category: 'wardrobe', type: 'wardrobe-shelves-drawers', projectType: 'dressing', width: 900, height: 2600, depth: 600, x: 1900, y: 0, z: 100, rotation: 0, wallId: 'w-dr-a', shelfCount: 3, doorCount: 2, drawerCount: 4 },
+    { id: 'DR04', name: 'برج حقائب يد وأحذية مضيء', category: 'wardrobe', type: 'wardrobe-glass-vitrine', projectType: 'dressing', width: 900, height: 2600, depth: 600, x: 2800, y: 0, z: 100, rotation: 0, wallId: 'w-dr-a', shelfCount: 6, doorCount: 2, drawerCount: 0, hasGlassDoors: true },
+    { id: 'IS-DR', name: 'جزيرة مجوهرات وإكسسوارات بسطح زجاجي', category: 'accessories', type: 'dressing-jewelry-island', projectType: 'dressing', width: 1400, height: 900, depth: 800, x: 1500, y: 1500, z: 100, rotation: 0, wallId: 'w-dr-a', shelfCount: 0, doorCount: 0, drawerCount: 8, hasGlassDoors: true },
   ],
   appliances: [],
   architecturalElements: [],
-  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, enabled: false },
-  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 60 },
-  backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, enabled: false },
+  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, material: 'رخام أسود نيرو ماركينا', thickness: 30, color: '#1a1a1a' },
+  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 100 },
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
   materials: {
     ...DEFAULT_MATERIAL_FINISHES,
-    frontFinish: 'خشب جوز أمريكي مدخن فاخر (Smoked Walnut)',
-    frontColor: '#594433',
-    bodyColor: '#27272a',
-    floorColor: '#8c6843',
-    wallColor: '#e5e0d8',
+    frontFinish: 'خشب جوز طبيعي مع زجاج أسود عاكس فوميه (Smoked Glass & Walnut)',
+    frontColor: '#3d2b1f',
+    bodyColor: '#1e293b',
+    handleStyle: 'بروفايل مقبض خفي أسود إيطالي',
   },
   manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
-  pricing: { ...DEFAULT_PRICING_SETTINGS, pricePerLinearMeterTall: 5200 },
+  pricing: DEFAULT_PRICING_SETTINGS,
+};
+
+// 2.2 SMOKED GLASS SLIDING WARDROBE (3.8m x 2.8m)
+export const PROJECT_DRESSING_GLASS_SLIDING: ProjectData = {
+  metadata: {
+    id: 'proj-dressing-glass-sliding-01',
+    name: 'دريسنج زجاج أسود عاكس فوميه وسلايدنج إيطالي مع ليد (Smoked Glass Sliding)',
+    projectType: 'dressing',
+    materialSystem: 'wood',
+    clientName: 'برج النيل',
+    designerName: 'استوديو كيتشن كاد برو',
+    date: '2026-08-28',
+    notes: 'دولاب ملابس سحاب إيطالي بأبواب زجاج فوميه عاكس ومقاطع ألومنيوم سوداء نحيفة.',
+    unit: 'cm',
+  },
+  room: {
+    shape: 'rectangular',
+    width: 3800,
+    length: 2800,
+    ceilingHeight: 2800,
+    wallThickness: 150,
+    walls: [
+      { id: 'w1', name: 'جدار الخزانة', startX: 0, startY: 0, endX: 3800, endY: 0, thickness: 150, height: 2800 },
+      { id: 'w2', name: 'جدار أيمـن', startX: 3800, startY: 0, endX: 3800, endY: 2800, thickness: 150, height: 2800 },
+      { id: 'w3', name: 'جدار أمامي', startX: 3800, startY: 2800, endX: 0, endY: 2800, thickness: 150, height: 2800 },
+      { id: 'w4', name: 'جدار أيسـر', startX: 0, startY: 2800, endX: 0, endY: 0, thickness: 150, height: 2800 },
+    ],
+    elements: [],
+  },
+  cabinets: [
+    { id: 'GS-01', name: 'دولاب تعليق ملابس زجاج فوميه', category: 'wardrobe', type: 'wardrobe-glass-vitrine', projectType: 'dressing', width: 1200, height: 2600, depth: 600, x: 0, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 2, doorCount: 2, drawerCount: 0, hasGlassDoors: true, hasHangingRail: true },
+    { id: 'GS-02', name: 'دولاب أرفف وأدراج داخلية مبطنة مخمل', category: 'wardrobe', type: 'wardrobe-shelves-drawers', projectType: 'dressing', width: 1000, height: 2600, depth: 600, x: 1200, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 4, doorCount: 2, drawerCount: 4, hasGlassDoors: true },
+    { id: 'GS-03', name: 'برج أحذية وحقائب بإضاءة ليد رأسية', category: 'wardrobe', type: 'wardrobe-glass-vitrine', projectType: 'dressing', width: 1000, height: 2600, depth: 600, x: 2200, y: 0, z: 100, rotation: 0, wallId: 'w1', shelfCount: 6, doorCount: 2, drawerCount: 0, hasGlassDoors: true },
+  ],
+  appliances: [],
+  architecturalElements: [],
+  countertop: DEFAULT_COUNTERTOP_CONFIG,
+  plinth: DEFAULT_PLINTH_CONFIG,
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
+  materials: {
+    ...DEFAULT_MATERIAL_FINISHES,
+    frontFinish: 'زجاج أسود فوميه عاكس مع إطارات ألومنيوم (Smoked Glass Profile)',
+    frontColor: '#1e293b',
+    bodyColor: '#0f172a',
+    handleStyle: 'مقبض بروفايل ألومنيوم أسود مدمج',
+  },
+  manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
+  pricing: DEFAULT_PRICING_SETTINGS,
 };
 
 // =========================================================================
-// 3. BEDROOMS COLLECTION (مجموعة غرف النوم الجاهزة)
+// 3. BEDROOMS COLLECTION (مجموعة غرف النوم الفاخرة)
 // =========================================================================
 
-// 3.1 MASTER KING LUXURY SUITE (5.0m x 4.2m)
+// 3.1 MASTER KING UPHOLSTERED SUITE (5.0m x 4.2m)
 export const PROJECT_BEDROOM_MASTER_KING: ProjectData = {
   metadata: {
     id: 'proj-bedroom-master-king-01',
-    name: 'غرفة نوم ماستر ملكية مع ظهر سرير مبطن وتسريحة بانورامية',
+    name: 'غرفة نوم ماستر ملكية مع ظهر سرير مبطن وتسريحة بانورامية (Master King Suite)',
     projectType: 'bedroom',
     materialSystem: 'wood',
-    clientName: 'د / إبراهيم خليل',
+    clientName: 'فيلا الرحاب',
     designerName: 'استوديو كيتشن كاد برو',
     date: '2026-08-28',
-    notes: 'غرفة نوم رئيسية فاخرة بسرير كينج 190 سم مع ظهر مبطن قماش بوكليه، كومودينو معلق، تسريحة دريسير عريضة ووحدة تلفزيون جدارية.',
+    notes: 'غرفة نوم ماستر بسرير كينج 180×200 سم مع ظهر سرير قماش بوكليه ممتد، كومودينو معلق، وتسريحة بمرايا مضيئة.',
     unit: 'cm',
   },
   room: {
@@ -386,58 +400,152 @@ export const PROJECT_BEDROOM_MASTER_KING: ProjectData = {
     ceilingHeight: 2800,
     wallThickness: 150,
     walls: [
-      { id: 'wall-a', name: 'الجدار أ (جدار السرير الرئيسي)', startX: 0, startY: 0, endX: 5000, endY: 0, thickness: 150, height: 2800 },
-      { id: 'wall-b', name: 'الجدار ب (الأيمن - التسريحة والنافذة)', startX: 5000, startY: 0, endX: 5000, endY: 4200, thickness: 150, height: 2800 },
-      { id: 'wall-c', name: 'الجدار ج (الأمامي - التلفزيون)', startX: 5000, startY: 4200, endX: 0, endY: 4200, thickness: 150, height: 2800 },
-      { id: 'wall-d', name: 'الجدار د (الأيسر - المدخل)', startX: 0, startY: 4200, endX: 0, endY: 0, thickness: 150, height: 2800 },
+      { id: 'w-bed-a', name: 'جدار السرير الرئيسي والبانوهات', startX: 0, startY: 0, endX: 5000, endY: 0, thickness: 150, height: 2800 },
+      { id: 'w-bed-b', name: 'جدار التسريحة والمكتب', startX: 5000, startY: 0, endX: 5000, endY: 4200, thickness: 150, height: 2800 },
+      { id: 'w-bed-c', name: 'جدار الشاشة والمدخل', startX: 5000, startY: 4200, endX: 0, endY: 4200, thickness: 150, height: 2800 },
+      { id: 'w-bed-d', name: 'جدار النوافذ والستائر', startX: 0, startY: 4200, endX: 0, endY: 0, thickness: 150, height: 2800 },
     ],
     elements: [
-      { id: 'win-bd-m', name: 'نافذة بانورامية كبيرة', type: 'window', x: 5000, y: 2200, z: 900, width: 1400, height: 1300, depth: 150, rotation: 90, wallId: 'wall-b' },
-      { id: 'door-bd-m', name: 'باب الغرفة الرئيسي', type: 'door', x: 400, y: 4200, z: 0, width: 900, height: 2200, depth: 150, rotation: 180, wallId: 'wall-c' },
+      { id: 'win-bed', name: 'نافذة بانورامية كبيرة', type: 'window', x: 1500, y: 4200, z: 800, width: 2000, height: 1600, depth: 150, rotation: 180, wallId: 'w-bed-c' },
     ],
   },
   cabinets: [
-    { id: 'BD01', name: 'سرير كينج ماستر مبطن (190×200 سم)', category: 'bed', type: 'bed-king', projectType: 'bedroom', width: 2000, height: 1200, depth: 2200, x: 1500, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 0, doorHinge: 'none', mattressWidth: 1900, mattressLength: 2000, headboardHeight: 1200, headboardThickness: 120 },
-    { id: 'BD02', name: 'كومودينو يسار السرير مع درجين مخفيين', category: 'nightstand', type: 'bedroom-nightstand', projectType: 'bedroom', width: 550, height: 500, depth: 450, x: 850, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
-    { id: 'BD03', name: 'كومودينو يمين السرير مع درجين مخفيين', category: 'nightstand', type: 'bedroom-nightstand', projectType: 'bedroom', width: 550, height: 500, depth: 450, x: 3600, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 2, doorHinge: 'none' },
-    { id: 'BD04', name: 'بانكيت فخم مبطن بوكليه نهاية السرير', category: 'bench', type: 'bedroom-bench-ottoman', projectType: 'bedroom', width: 1600, height: 460, depth: 450, x: 1700, y: 2300, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 0, doorCount: 0, drawerCount: 0, doorHinge: 'none' },
-    { id: 'BD05', name: 'تسريحة دريسير عريضة 6 أدراج مع مرآة بيضاوية ليد', category: 'dresser', type: 'bedroom-dresser-mirror', projectType: 'bedroom', width: 1600, height: 850, depth: 500, x: 5000, y: 800, z: 0, rotation: 90, wallId: 'wall-b', shelfCount: 0, doorCount: 0, drawerCount: 6, doorHinge: 'none', hasMirror: true, mirrorHeight: 950 },
-    { id: 'BD06', name: 'وحدة كونسول شاشة تلفزيون معلقة', category: 'tv-unit', type: 'bedroom-tv-credenza', projectType: 'bedroom', width: 2200, height: 420, depth: 360, x: 3400, y: 4200, z: 450, rotation: 180, wallId: 'wall-c', shelfCount: 1, doorCount: 2, drawerCount: 2, doorHinge: 'double' },
+    { id: 'BED-01', name: 'سرير كينج ماستر 180×200 سم بظهر مبطن', category: 'bed', type: 'bed-king-upholstered', projectType: 'bedroom', width: 2000, height: 1200, depth: 2150, x: 1500, y: 0, z: 0, rotation: 0, wallId: 'w-bed-a', shelfCount: 0, doorCount: 0, drawerCount: 0 },
+    { id: 'NS-L', name: 'كومودينو معلق أيسر بدرجين ولد', category: 'nightstand', type: 'nightstand-2drawers', projectType: 'bedroom', width: 550, height: 450, depth: 400, x: 850, y: 0, z: 150, rotation: 0, wallId: 'w-bed-a', shelfCount: 0, doorCount: 0, drawerCount: 2 },
+    { id: 'NS-R', name: 'كومودينو معلق أيمن بدرجين ولد', category: 'nightstand', type: 'nightstand-2drawers', projectType: 'bedroom', width: 550, height: 450, depth: 400, x: 3600, y: 0, z: 150, rotation: 0, wallId: 'w-bed-a', shelfCount: 0, doorCount: 0, drawerCount: 2 },
+    { id: 'DRS-01', name: 'تسريحة ماستر 6 أدراج بسطح كوارتز ومرايا LED', category: 'dresser', type: 'dresser-6drawers', projectType: 'bedroom', width: 1400, height: 850, depth: 500, x: 5000, y: 1200, z: 0, rotation: -90, wallId: 'w-bed-b', shelfCount: 0, doorCount: 0, drawerCount: 6 },
   ],
-  appliances: [
-    { id: 'TV01', name: 'شاشة تلفزيون 65 بوصة 4K OLED', type: 'tv-screen', width: 1450, height: 830, depth: 50, x: 3025, y: 4200, z: 950, rotation: 180, wallId: 'wall-c' },
-  ],
+  appliances: [],
   architecturalElements: [],
-  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, enabled: false },
-  plinth: { ...DEFAULT_PLINTH_CONFIG, enabled: false },
-  backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, enabled: false },
+  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, material: 'رخام كلكتا جولد ناعم', thickness: 20, color: '#fbfbfb' },
+  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 60 },
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
   materials: {
     ...DEFAULT_MATERIAL_FINISHES,
-    frontFinish: 'كشمير بيج دافئ (Warm Cashmere)',
-    frontColor: '#d6cec4',
-    bodyColor: '#bfa076',
-    wallColor: '#f8fafc',
-    floorColor: '#8c6843',
+    frontFinish: 'قماش بوكليه بيج عاجي مع خشب أرو طبيعي (Ivory Boucle & Natural Oak)',
+    frontColor: '#f1ebe1',
+    bodyColor: '#2d241e',
+    handleStyle: 'مقابض ذهبية نحاسية مطفية (Brushed Brass)',
+  },
+  manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
+  pricing: DEFAULT_PRICING_SETTINGS,
+};
+
+// 3.2 JAPANDI MINIMAL PLATFORM BEDROOM (4.4m x 3.6m)
+export const PROJECT_BEDROOM_JAPANDI_MINIMAL: ProjectData = {
+  metadata: {
+    id: 'proj-bedroom-japandi-01',
+    name: 'غرفة نوم جاباندي مينيمال بسرير منخفض وبانوهات خشب طبيعي (Japandi Minimal)',
+    projectType: 'bedroom',
+    materialSystem: 'wood',
+    clientName: 'شقة جاردن سيتي',
+    designerName: 'استوديو كيتشن كاد برو',
+    date: '2026-08-28',
+    notes: 'طراز جاباندي هادئ وبسيط يجمع بين الخشب الطبيعي الفاتح والخطوط المينيمال المريحة.',
+    unit: 'cm',
+  },
+  room: {
+    shape: 'rectangular',
+    width: 4400,
+    length: 3600,
+    ceilingHeight: 2700,
+    wallThickness: 150,
+    walls: [
+      { id: 'w1', name: 'جدار السرير', startX: 0, startY: 0, endX: 4400, endY: 0, thickness: 150, height: 2700 },
+      { id: 'w2', name: 'جدار جانبي', startX: 4400, startY: 0, endX: 4400, endY: 3600, thickness: 150, height: 2700 },
+      { id: 'w3', name: 'جدار مقابل', startX: 4400, startY: 3600, endX: 0, endY: 3600, thickness: 150, height: 2700 },
+      { id: 'w4', name: 'جدار المدخل', startX: 0, startY: 3600, endX: 0, endY: 0, thickness: 150, height: 2700 },
+    ],
+    elements: [],
+  },
+  cabinets: [
+    { id: 'JP-BED', name: 'سرير منصة جاباندي منخفض 180×200', category: 'bed', type: 'bed-king-upholstered', projectType: 'bedroom', width: 2100, height: 800, depth: 2200, x: 1150, y: 0, z: 0, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 0, drawerCount: 0 },
+    { id: 'JP-NS1', name: 'كومودينو جاباندي عائم أيسر', category: 'nightstand', type: 'nightstand-2drawers', projectType: 'bedroom', width: 500, height: 300, depth: 400, x: 550, y: 0, z: 150, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 0, drawerCount: 1 },
+    { id: 'JP-NS2', name: 'كومودينو جاباندي عائم أيمن', category: 'nightstand', type: 'nightstand-2drawers', projectType: 'bedroom', width: 500, height: 300, depth: 400, x: 3350, y: 0, z: 150, rotation: 0, wallId: 'w1', shelfCount: 0, doorCount: 0, drawerCount: 1 },
+  ],
+  appliances: [],
+  architecturalElements: [],
+  countertop: DEFAULT_COUNTERTOP_CONFIG,
+  plinth: DEFAULT_PLINTH_CONFIG,
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
+  materials: {
+    ...DEFAULT_MATERIAL_FINISHES,
+    frontFinish: 'خشب أرو طبيعي ياباني فاتح (Light Japanese Oak)',
+    frontColor: '#dfd2be',
+    bodyColor: '#3a342c',
+    handleStyle: 'بدون مقابض بنظام الدفع للفتح (Push-to-Open)',
   },
   manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
   pricing: DEFAULT_PRICING_SETTINGS,
 };
 
 // =========================================================================
-// 4. LIVING ROOM & OPEN SPACES (مجموعة غرف المعيشة والصالون)
+// 4. LIBRARIES & TV UNITS COLLECTION (مجموعة المكتبات ووحدات الشاشات)
 // =========================================================================
 
-// 4.1 LUXURY OPEN LIVING & DINING SUITE (6.0m x 4.5m)
+// 4.1 FLOOR-TO-CEILING 75" TV WALL LIBRARY (5.0m x 3.8m)
+export const PROJECT_LIBRARY_FULL_WALL: ProjectData = {
+  metadata: {
+    id: 'proj-library-full-wall-01',
+    name: 'مكتبة جدارية كاملة مع تجويف شاشة 75 بوصة ووحدات أرفف فخمة (Full Wall Library)',
+    projectType: 'library',
+    materialSystem: 'wood',
+    clientName: 'فيلا النرجس',
+    designerName: 'استوديو كيتشن كاد برو',
+    date: '2026-08-28',
+    notes: 'مكتبة جدارية سقفية مع شاشة تلفزيون 75 بوصة غاطسة، أرفف كتب مضيئة، وخزائن سفلية مغلقة.',
+    unit: 'cm',
+  },
+  room: {
+    shape: 'rectangular',
+    width: 5000,
+    length: 3800,
+    ceilingHeight: 2800,
+    wallThickness: 150,
+    walls: [
+      { id: 'w1', name: 'جدار المكتبة والشاشة الرئيسي', startX: 0, startY: 0, endX: 5000, endY: 0, thickness: 150, height: 2800 },
+      { id: 'w2', name: 'الجدار الأيمن', startX: 5000, startY: 0, endX: 5000, endY: 3800, thickness: 150, height: 2800 },
+      { id: 'w3', name: 'جدار الجلسة', startX: 5000, startY: 3800, endX: 0, endY: 3800, thickness: 150, height: 2800 },
+      { id: 'w4', name: 'الجدار الأيسر', startX: 0, startY: 3800, endX: 0, endY: 0, thickness: 150, height: 2800 },
+    ],
+    elements: [],
+  },
+  cabinets: [
+    { id: 'LIB-TV', name: 'وحدة شاشة تلفزيون 75 بوصة مع بانوهات خشب مضلعة', category: 'tv-media', type: 'living-tv-slat-wall', projectType: 'library', width: 2000, height: 2600, depth: 450, x: 1500, y: 0, z: 0, rotation: 0, wallId: 'w1', shelfCount: 2, doorCount: 2, drawerCount: 3 },
+    { id: 'LIB-L', name: 'برج مكتبة كتب وعرض تحف أيسر بإضاءة ليد', category: 'bookshelf', type: 'library-unit-standard', projectType: 'library', width: 1200, height: 2600, depth: 380, x: 300, y: 0, z: 0, rotation: 0, wallId: 'w1', shelfCount: 5, doorCount: 2, drawerCount: 0 },
+    { id: 'LIB-R', name: 'برج فيترينة زجاجية وتحف أيمن', category: 'display', type: 'library-unit-standard', projectType: 'library', width: 1200, height: 2600, depth: 380, x: 3500, y: 0, z: 0, rotation: 0, wallId: 'w1', shelfCount: 5, doorCount: 2, drawerCount: 0, hasGlassDoors: true },
+  ],
+  appliances: [],
+  architecturalElements: [],
+  countertop: DEFAULT_COUNTERTOP_CONFIG,
+  plinth: { ...DEFAULT_PLINTH_CONFIG, height: 80 },
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
+  materials: {
+    ...DEFAULT_MATERIAL_FINISHES,
+    frontFinish: 'خشب أرو أمريكي رمادي مع بانوهات مضلعة (American Grey Oak Slats)',
+    frontColor: '#5c544d',
+    bodyColor: '#1e293b',
+    handleStyle: 'نظام ضغط Push-to-open خفي',
+  },
+  manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
+  pricing: DEFAULT_PRICING_SETTINGS,
+};
+
+// =========================================================================
+// 5. LIVING & DINING COLLECTION (مجموعة الصالون وغرف المعيشة والسفرة)
+// =========================================================================
+
+// 5.1 OPEN LUXURY LIVING & DINING SUITE (6.0m x 4.5m)
 export const PROJECT_LIVING_LUXURY_OPEN: ProjectData = {
   metadata: {
     id: 'proj-living-luxury-01',
-    name: 'صالون ومعيشة مودرن مع جدار شاشة خشب مضلع وطاولة طعام 6 مقاعد',
+    name: 'صالون ومعيشة مودرن مع جدار شاشة مضلع وطاولة طعام 6 مقاعد (Open Living & Dining)',
     projectType: 'living',
     materialSystem: 'wood',
-    clientName: 'أ / تامر حسني',
+    clientName: 'بنتهاوس القطامية',
     designerName: 'استوديو كيتشن كاد برو',
     date: '2026-08-28',
-    notes: 'مساحة معيشة مفتوحة راقية تضم كنب ركنة وثلاثي، طاولة قهوة رخام، جدار تلفزيون كامل الارتفاع مع بانوهات خشب وسيعة، وطاولة طعام فخمة.',
+    notes: 'صالون مودرن فاخر مفتوح على السفرة مع كنب ركنة L، طاولة قهوة رخامية، وجدار شاشة TV خشب مضلع.',
     unit: 'cm',
   },
   room: {
@@ -447,49 +555,44 @@ export const PROJECT_LIVING_LUXURY_OPEN: ProjectData = {
     ceilingHeight: 2850,
     wallThickness: 150,
     walls: [
-      { id: 'wall-a', name: 'الجدار أ (جدار الشاشة الرئيسي)', startX: 0, startY: 0, endX: 6000, endY: 0, thickness: 150, height: 2850 },
-      { id: 'wall-b', name: 'الجدار ب (الأيمن - منطقة الطعام)', startX: 6000, startY: 0, endX: 6000, endY: 4500, thickness: 150, height: 2850 },
-      { id: 'wall-c', name: 'الجدار ج (الأمامي - النوافذ والتراس)', startX: 6000, startY: 4500, endX: 0, endY: 4500, thickness: 150, height: 2850 },
-      { id: 'wall-d', name: 'الجدار د (الأيسر - المدخل)', startX: 0, startY: 4500, endX: 0, endY: 0, thickness: 150, height: 2850 },
+      { id: 'w-lv-1', name: 'جدار الشاشة والبانوهات الرئيسي', startX: 0, startY: 0, endX: 6000, endY: 0, thickness: 150, height: 2850 },
+      { id: 'w-lv-2', name: 'جدار النوافذ البانورامية', startX: 6000, startY: 0, endX: 6000, endY: 4500, thickness: 150, height: 2850 },
+      { id: 'w-lv-3', name: 'الجدار الخلفي للسفرة', startX: 6000, startY: 4500, endX: 0, endY: 4500, thickness: 150, height: 2850 },
+      { id: 'w-lv-4', name: 'جدار المدخل والصالون', startX: 0, startY: 4500, endX: 0, endY: 0, thickness: 150, height: 2850 },
     ],
     elements: [
-      { id: 'win-liv', name: 'نافذة تراس زجاج سحاب بانورامية', type: 'window', x: 2500, y: 4500, z: 0, width: 2500, height: 2400, depth: 150, rotation: 180, wallId: 'wall-c' },
+      { id: 'win-lv', name: 'نافذة بانورامية كبيرة مطله على الحديقة', type: 'window', x: 1200, y: 4500, z: 500, width: 2800, height: 2100, depth: 150, rotation: 180, wallId: 'w-lv-3' },
     ],
   },
   cabinets: [
-    { id: 'LV01', name: 'جدار شاشة متكامل مع بانوهات خشب وسيعة ووحدة كونسول معلقة', category: 'tv-wall', type: 'living-tv-slat-wall', projectType: 'living', width: 2800, height: 2800, depth: 400, x: 600, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 2, drawerCount: 2, doorHinge: 'double', hasTvCavity: true, hasIntegratedLed: true },
-    { id: 'LV02', name: 'بوفيه / كونسول صالون مودرن 4 أبواب مع رخام علوي', category: 'credenza', type: 'living-credenza-buffet', projectType: 'living', width: 1800, height: 850, depth: 450, x: 3800, y: 0, z: 0, rotation: 0, wallId: 'wall-a', shelfCount: 2, doorCount: 4, drawerCount: 0, doorHinge: 'double' },
-    { id: 'LV03', name: 'كنبة مودرن 3 مقاعد فخمة', category: 'sofa', type: 'living-sofa-3seat', projectType: 'living', width: 2400, height: 800, depth: 950, x: 800, y: 2800, z: 0, rotation: 180, wallId: 'wall-c', shelfCount: 0, doorCount: 0, drawerCount: 0, doorHinge: 'none' },
-    { id: 'LV04', name: 'طاولة قهوة صالون رخام كوارتز كلكتا مزدوجة', category: 'coffee-table', type: 'living-coffee-table', projectType: 'living', width: 1200, height: 450, depth: 700, x: 1400, y: 1600, z: 0, rotation: 0, shelfCount: 1, doorCount: 0, drawerCount: 0, doorHinge: 'none' },
-    { id: 'LV05', name: 'طاولة سفرة وطعام 6 مقاعد خشب أرو ورخام', category: 'dining-table', type: 'dining-table-6seat', projectType: 'living', width: 2000, height: 760, depth: 950, x: 4200, y: 2200, z: 0, rotation: 0, shelfCount: 0, doorCount: 0, drawerCount: 0, doorHinge: 'none' },
-    { id: 'LV06', name: 'نبتة زينة داخلية استوائية في أصيص فخاري', category: 'accent', type: 'accent-indoor-plant', projectType: 'living', width: 500, height: 1500, depth: 500, x: 100, y: 100, z: 0, rotation: 0, shelfCount: 0, doorCount: 0, drawerCount: 0, doorHinge: 'none' },
+    { id: 'LV-TV', name: 'جدارية شاشة تلفزيون 75 بوصة ببانوهات خشب مضلعة', category: 'tv-wall', type: 'living-tv-slat-wall', projectType: 'living', width: 2400, height: 2600, depth: 400, x: 1800, y: 0, z: 0, rotation: 0, wallId: 'w-lv-1', shelfCount: 1, doorCount: 0, drawerCount: 3 },
+    { id: 'LV-SOFA', name: 'كنب ركنة مودرن فاخر حرف L قماش بوكليه', category: 'sofa', type: 'living-sofa-l-shape', projectType: 'living', width: 2800, height: 850, depth: 1800, x: 1600, y: 2500, z: 0, rotation: 180, wallId: 'w-lv-1', shelfCount: 0, doorCount: 0, drawerCount: 0 },
+    { id: 'LV-CTABLE', name: 'طاولة قهوة مستطيلة رخام كلكتا وقاعدة معدن', category: 'coffee-table', type: 'living-coffee-table', projectType: 'living', width: 1200, height: 420, depth: 700, x: 2400, y: 1600, z: 0, rotation: 0, wallId: 'w-lv-1', shelfCount: 0, doorCount: 0, drawerCount: 0 },
+    { id: 'LV-DINING', name: 'طاولة طعام سفرة مودرن 6 كراسي رخام وخشب', category: 'dining-table', type: 'dining-table-6seat', projectType: 'living', width: 1800, height: 760, depth: 900, x: 4400, y: 1800, z: 0, rotation: 90, wallId: 'w-lv-1', shelfCount: 0, doorCount: 0, drawerCount: 0 },
+    { id: 'LV-PLANT', name: 'نبتة مونستيرا استوائية داخلية بوعاء سيراميك', category: 'accent', type: 'accent-indoor-plant', projectType: 'living', width: 450, height: 1400, depth: 450, x: 600, y: 200, z: 0, rotation: 0, wallId: 'w-lv-1', shelfCount: 0, doorCount: 0, drawerCount: 0 },
   ],
-  appliances: [
-    { id: 'TV01', name: 'شاشة تلفزيون ذكية 75 بوصة 4K OLED', type: 'tv-screen', width: 1680, height: 960, depth: 60, x: 1160, y: 50, z: 850, rotation: 0, wallId: 'wall-a' },
-  ],
+  appliances: [],
   architecturalElements: [],
-  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, enabled: false },
-  plinth: { ...DEFAULT_PLINTH_CONFIG, enabled: false },
-  backsplash: { ...DEFAULT_BACKSPLASH_CONFIG, enabled: false },
+  countertop: { ...DEFAULT_COUNTERTOP_CONFIG, material: 'رخام كلكتا جولد ناعم', thickness: 30, color: '#fcfcfc' },
+  plinth: DEFAULT_PLINTH_CONFIG,
+  backsplash: DEFAULT_BACKSPLASH_CONFIG,
   materials: {
     ...DEFAULT_MATERIAL_FINISHES,
-    frontFinish: 'خشب جوز أمريكي مدخن فاخر (Smoked Walnut)',
-    frontColor: '#594433',
-    bodyColor: '#27272a',
-    wallColor: '#f8fafc',
-    floorColor: '#8c6843',
+    frontFinish: 'خشب جوز طبيعي وقماش بوكليه رمادي لؤلؤي (Walnut & Pearl Boucle)',
+    frontColor: '#3a2d24',
+    bodyColor: '#1e293b',
+    handleStyle: 'بروفايل أسود مدمج',
   },
   manufacturing: DEFAULT_MANUFACTURING_SETTINGS,
   pricing: DEFAULT_PRICING_SETTINGS,
 };
 
 // =========================================================================
-// 5. MASTER TEMPLATES REGISTRY (كتالوج القوالب المكتملة)
+// 6. MASTER REGISTRY OF ALL READY-MADE COMPLETE PROJECTS
 // =========================================================================
-
-export const ALL_SAMPLE_PROJECTS: {
+export interface ReadyProjectTemplate {
   id: string;
-  category: string;
+  category: ProjectType;
   name: string;
   style: string;
   dimensions: string;
@@ -497,120 +600,166 @@ export const ALL_SAMPLE_PROJECTS: {
   data: ProjectData;
   previewThumbnail: string;
   tags: string[];
-}[] = [
-  // Kitchens
-  {
-    id: 'proj-kitchen-01',
-    category: 'kitchen',
-    name: 'مطبخ مودرن حرف L مع برج أفران وثلاجة',
-    style: 'Modern Minimal',
-    dimensions: '4.2m × 3.6m',
-    cabinetCount: 8,
-    data: SAMPLE_PROJECT_KITCHEN,
-    previewThumbnail: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
-    tags: ['L-Shape', 'Modern', 'Built-in Tower', 'Calacatta Quartz'],
-  },
+}
+
+export const ALL_SAMPLE_PROJECTS: ReadyProjectTemplate[] = [
+  // --- KITCHENS ---
   {
     id: 'proj-kitchen-island-01',
     category: 'kitchen',
     name: 'مطبخ فيلا فاخر مع جزيرة رخام كلكتا وجلسة بار',
-    style: 'Luxury Modern',
+    style: 'Luxury Island Villa',
     dimensions: '5.4m × 4.2m',
-    cabinetCount: 10,
+    cabinetCount: 11,
     data: PROJECT_KITCHEN_LUXURY_ISLAND,
     previewThumbnail: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-    tags: ['Island', 'Luxury Villa', 'Smoked Walnut', 'LED Vitrine'],
+    tags: ['Island', 'Smoked Walnut', 'Calacatta Gold', 'Tall Towers', 'Luxury'],
   },
   {
-    id: 'proj-kitchen-galley-01',
+    id: 'proj-kitchen-classic-shaker-01',
     category: 'kitchen',
-    name: 'مطبخ متوازي مدمج للشقق العصرية',
-    style: 'Urban Galley',
-    dimensions: '3.2m × 2.4m',
-    cabinetCount: 7,
-    data: PROJECT_KITCHEN_COMPACT_GALLEY,
-    previewThumbnail: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80',
-    tags: ['Parallel / Galley', 'Compact', 'Matte White', 'High Efficiency'],
-  },
-  {
-    id: 'proj-kitchen-shaker-u-01',
-    category: 'kitchen',
-    name: 'مطبخ كلاسيك شيكر حرف U مع كورنيش وبانترى',
+    name: 'مطبخ كلاسيك شيكر أبيض مع بانترى وأفران مدمجة',
     style: 'Classic Shaker',
-    dimensions: '4.5m × 3.8m',
-    cabinetCount: 10,
-    data: PROJECT_KITCHEN_SHAKER_U,
-    previewThumbnail: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=800&q=80',
-    tags: ['U-Shape', 'Classic Shaker', 'Sage Green', 'Carrara Marble'],
+    dimensions: '4.8m × 3.6m',
+    cabinetCount: 8,
+    data: PROJECT_KITCHEN_CLASSIC_SHAKER,
+    previewThumbnail: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
+    tags: ['U-Shape', 'Classic Shaker', 'White Matte', 'Carrara Marble', 'Brass Pulls'],
+  },
+  {
+    id: 'proj-kitchen-l-cashmere-01',
+    category: 'kitchen',
+    name: 'مطبخ مودرن حرف L كاشمير مع ليد بانل وإضاءة خافتة',
+    style: 'Modern Cashmere',
+    dimensions: '4.2m × 3.2m',
+    cabinetCount: 7,
+    data: PROJECT_KITCHEN_MODERN_L_CASHMERE,
+    previewThumbnail: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80',
+    tags: ['L-Shape', 'Warm Cashmere', 'Bronze Gola', 'LED Strip', 'Minimal'],
+  },
+  {
+    id: 'proj-kitchen-parallel-01',
+    category: 'kitchen',
+    name: 'مطبخ متوازي ذكي للشقق العصرية مساحات محددة',
+    style: 'Urban Parallel Galley',
+    dimensions: '3.6m × 2.4m',
+    cabinetCount: 6,
+    data: PROJECT_KITCHEN_PARALLEL_GALLEY,
+    previewThumbnail: 'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?auto=format&fit=crop&w=800&q=80',
+    tags: ['Parallel Galley', 'Compact Kitchen', 'Anthracite Matte', 'Smart Storage'],
+  },
+  {
+    id: 'proj-kitchen-default-l',
+    category: 'kitchen',
+    name: 'مطبخ حرف L متكامل قياسي مع أجهزة كاملة',
+    style: 'Standard Modern L',
+    dimensions: '4.2m × 3.6m',
+    cabinetCount: 8,
+    data: SAMPLE_PROJECT_KITCHEN,
+    previewThumbnail: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80',
+    tags: ['L-Shape', 'Modern White & Oak', 'Integrated Appliances', 'Standard'],
   },
 
-  // Dressing Rooms
+  // --- DRESSING ROOMS ---
   {
-    id: 'proj-dressing-01',
-    category: 'dressing',
-    name: 'غرفة ملابس ودريسنج روم ماستر حرف L',
-    style: 'Modern Walk-in',
-    dimensions: '3.8m × 3.2m',
-    cabinetCount: 7,
-    data: SAMPLE_PROJECT_DRESSING,
-    previewThumbnail: 'https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=800&q=80',
-    tags: ['L-Shape Dressing', 'Jewelry Island', 'Shoe Tower', 'Walk-in'],
-  },
-  {
-    id: 'proj-dressing-master-u',
+    id: 'proj-dressing-master-u-01',
     category: 'dressing',
     name: 'غرفة ملابس ماستر ملكية حرف U مع جزيرة وساعات',
-    style: 'Luxury Master',
+    style: 'Royal Master Suite',
     dimensions: '4.4m × 3.8m',
     cabinetCount: 10,
     data: PROJECT_DRESSING_MASTER_U,
     previewThumbnail: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80',
-    tags: ['U-Shape Dressing', 'Luxury Glass Vitrine', 'Jewelry Island', 'Smoked Walnut'],
+    tags: ['U-Shape Dressing', 'Jewelry Island', 'Smoked Glass Vitrine', 'Sensor LED'],
+  },
+  {
+    id: 'proj-dressing-glass-sliding-01',
+    category: 'dressing',
+    name: 'دريسنج زجاج أسود عاكس فوميه وسلايدنج إيطالي مع ليد',
+    style: 'Smoked Glass Sliding',
+    dimensions: '3.8m × 2.8m',
+    cabinetCount: 6,
+    data: PROJECT_DRESSING_GLASS_SLIDING,
+    previewThumbnail: 'https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=800&q=80',
+    tags: ['Sliding Glass', 'Smoked Black', 'Shoe Towers', 'Italian Track'],
+  },
+  {
+    id: 'proj-dressing-default-l',
+    category: 'dressing',
+    name: 'غرفة ملابس ودريسنج روم ماستر حرف L مع جزيرة',
+    style: 'Modern Walk-in L',
+    dimensions: '3.8m × 3.2m',
+    cabinetCount: 7,
+    data: SAMPLE_PROJECT_DRESSING,
+    previewThumbnail: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80',
+    tags: ['L-Shape Dressing', 'Jewelry Island', 'Shoe Tower', 'Walk-in'],
   },
 
-  // Bedrooms
-  {
-    id: 'proj-bedroom-01',
-    category: 'bedroom',
-    name: 'غرفة نوم رئيسية ماستر مع تسريحة ووحدة تلفزيون',
-    style: 'Contemporary Master',
-    dimensions: '4.8m × 4.2m',
-    cabinetCount: 6,
-    data: SAMPLE_PROJECT_BEDROOM,
-    previewThumbnail: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80',
-    tags: ['Master King Bed', 'Upholstered Headboard', 'Dresser & Mirror', 'TV Credenza'],
-  },
+  // --- BEDROOMS ---
   {
     id: 'proj-bedroom-master-king-01',
     category: 'bedroom',
-    name: 'غرفة نوم ماستر ملكية مع ظهر سرير مبطن وتسريحة بانورامية',
-    style: 'Luxury Suite',
+    name: 'غرفة نوم ماستر ملكية مع سرير كينج مبطن وتسريحة بانورامية',
+    style: 'Luxury King Suite',
     dimensions: '5.0m × 4.2m',
     cabinetCount: 6,
     data: PROJECT_BEDROOM_MASTER_KING,
     previewThumbnail: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80',
     tags: ['King Suite', 'Boucle Upholstery', 'Warm Cashmere', 'Floating Nightstands'],
   },
-
-  // Libraries & TV Units
   {
-    id: 'proj-library-01',
+    id: 'proj-bedroom-japandi-01',
+    category: 'bedroom',
+    name: 'غرفة نوم جاباندي مينيمال بسرير منخفض وبانوهات خشب طبيعي',
+    style: 'Japandi Minimal',
+    dimensions: '4.4m × 3.6m',
+    cabinetCount: 5,
+    data: PROJECT_BEDROOM_JAPANDI_MINIMAL,
+    previewThumbnail: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80',
+    tags: ['Japandi Minimal', 'Platform Bed', 'Light Oak', 'Peaceful'],
+  },
+  {
+    id: 'proj-bedroom-default-master',
+    category: 'bedroom',
+    name: 'غرفة نوم رئيسية ماستر مع تسريحة ووحدة تلفزيون',
+    style: 'Contemporary Master',
+    dimensions: '4.8m × 4.2m',
+    cabinetCount: 6,
+    data: SAMPLE_PROJECT_BEDROOM,
+    previewThumbnail: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=800&q=80',
+    tags: ['Master King Bed', 'Upholstered Headboard', 'Dresser & Mirror', 'TV Credenza'],
+  },
+
+  // --- LIBRARIES & TV UNITS ---
+  {
+    id: 'proj-library-full-wall-01',
+    category: 'library',
+    name: 'مكتبة جدارية كاملة مع تجويف شاشة 75 بوصة ووحدات أرفف فخمة',
+    style: 'Full Wall Media Library',
+    dimensions: '5.0m × 3.8m',
+    cabinetCount: 5,
+    data: PROJECT_LIBRARY_FULL_WALL,
+    previewThumbnail: 'https://images.unsplash.com/photo-1544457070-4cd773b4d71e?auto=format&fit=crop&w=800&q=80',
+    tags: ['Full Wall Library', '75" TV Cavity', 'Glass Display', 'Oak Wood Slats'],
+  },
+  {
+    id: 'proj-library-default',
     category: 'library',
     name: 'مكتبة جدارية متكاملة ووحدة شاشة تلفزيون 65 بوصة',
     style: 'Modern Media Center',
     dimensions: '5.0m × 3.8m',
-    cabinetCount: 3,
+    cabinetCount: 4,
     data: SAMPLE_PROJECT_LIBRARY,
-    previewThumbnail: 'https://images.unsplash.com/photo-1544457070-4cd773b4d71e?auto=format&fit=crop&w=800&q=80',
+    previewThumbnail: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
     tags: ['Full Wall Library', '65" TV Cavity', 'Glass Display', 'Oak Wood'],
   },
 
-  // Living & Dining
+  // --- LIVING & DINING ---
   {
     id: 'proj-living-luxury-01',
     category: 'living',
-    name: 'صالون ومعيشة مودرن مع جدار شاشة خشب مضلع وطاولة طعام 6 مقاعد',
-    style: 'Open Concept Living',
+    name: 'صالون ومعيشة مودرن مع جدار شاشة مضلع وطاولة طعام 6 مقاعد',
+    style: 'Open Concept Living & Dining',
     dimensions: '6.0m × 4.5m',
     cabinetCount: 6,
     data: PROJECT_LIVING_LUXURY_OPEN,

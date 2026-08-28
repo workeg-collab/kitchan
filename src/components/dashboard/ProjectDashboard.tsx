@@ -88,9 +88,9 @@ export const ProjectDashboard: React.FC = () => {
     },
   ];
 
-  const handleSelectModule = (sampleData: typeof SAMPLE_PROJECT_KITCHEN) => {
+  const handleSelectModule = (typeId: ProjectType, sampleData: typeof SAMPLE_PROJECT_KITCHEN) => {
     loadSampleProject(sampleData);
-    setActiveTab('3d-view');
+    setActiveTab('templates-catalog');
   };
 
   return (
@@ -173,7 +173,7 @@ export const ProjectDashboard: React.FC = () => {
           {modules.map((m) => (
             <button
               key={m.id}
-              onClick={() => handleSelectModule(m.sample)}
+              onClick={() => handleSelectModule(m.id, m.sample)}
               className="group aspect-square w-full bg-white/95 hover:bg-white backdrop-blur-xl border border-white/80 rounded-3xl p-6 shadow-2xl hover:shadow-blue-600/30 flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 active:scale-95 cursor-pointer relative overflow-hidden"
             >
               {/* Subtle top light reflection accent */}

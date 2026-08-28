@@ -21,10 +21,10 @@ import {
 } from 'lucide-react';
 
 export const TemplatesBrowserView: React.FC = () => {
-  const { setProject } = useProjectStore();
+  const { project, setProject, resetProject } = useProjectStore();
   const { setActiveTab } = useUIStore();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>(project.metadata.projectType || 'all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStyle, setSelectedStyle] = useState<string>('all');
 
@@ -50,6 +50,16 @@ export const TemplatesBrowserView: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const handleCreateBlankProject = () => {
+    resetProject();
+    const cat = (selectedCategory === 'all' ? 'kitchen' : selectedCategory) as any;
+    useProjectStore.getState().updateMetadata({
+      name: `مشروع ${cat === 'kitchen' ? 'مطبخ' : cat === 'dressing' ? 'دريسينج' : cat === 'bedroom' ? 'غرفة نوم' : cat === 'library' ? 'مكتبة' : 'صالون'} جديد`,
+      projectType: cat,
+    });
+    setActiveTab('3d-view');
+  };
+
   const handleDuplicateAndCustomize = (templateData: ProjectData) => {
     setAdaptingProject(templateData);
     setIsAdaptModalOpen(true);
@@ -74,16 +84,26 @@ export const TemplatesBrowserView: React.FC = () => {
           </p>
         </div>
 
-        {/* Search Input */}
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-          <input
-            type="text"
-            placeholder="بحث بالاسم، الطراز، أو الأبعاد..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 font-sans shadow-xs"
-          />
+        {/* Search Input & Start Blank Button */}
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <input
+              type="text"
+              placeholder="بحث بالاسم، الطراز، أو الأبعاد..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 font-sans shadow-xs"
+            />
+          </div>
+
+          <button
+            onClick={handleCreateBlankProject}
+            className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl text-xs font-black shadow-md transition transform active:scale-95 cursor-pointer"
+            title="بدء مشروع جديد فارغ في هذا القسم"
+          >
+            <span>+ مشروع فارغ</span>
+          </button>
         </div>
       </div>
 

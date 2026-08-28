@@ -56,6 +56,7 @@ export type CabinetType =
   | 'base-trash-pullout'
   | 'base-gola-l'
   | 'base-island-cabinet'
+  | 'base-cooktop-housing'
   | 'base-magic-corner'
   | 'base-carousel-corner'
   | 'wall-single-door'
@@ -66,6 +67,7 @@ export type CabinetType =
   | 'wall-corner'
   | 'wall-aventos-bi-fold'
   | 'wall-aventos-hf'
+  | 'wall-lift-up-blum'
   | 'wall-glass-vitrine'
   | 'wall-loft-lift-up'
   | 'wall-loft-deep'
@@ -90,25 +92,32 @@ export type CabinetType =
   | 'wardrobe-corner-glass'
   | 'wardrobe-hanging-long'
   | 'wardrobe-hanging-double'
+  | 'wardrobe-double-hanging'
   | 'wardrobe-shelves-drawers'
   | 'wardrobe-shoe-rack'
   | 'wardrobe-jewelry-vanity'
   | 'wardrobe-trouser-rack'
   | 'wardrobe-laundry-hamper'
   | 'wardrobe-bags-vitrine'
+  | 'wardrobe-glass-vitrine'
   | 'wardrobe-glass-doors'
+  | 'dressing-jewelry-island'
   // Bedroom types
   | 'bed-single'
   | 'bed-double'
   | 'bed-queen'
   | 'bed-king'
+  | 'bed-king-upholstered'
   | 'bed-storage-hydraulic'
   | 'bedroom-nightstand'
+  | 'nightstand-2drawers'
   | 'bedroom-dresser-mirror'
+  | 'dresser-6drawers'
   | 'bedroom-tv-credenza'
   | 'bedroom-bench-ottoman'
   // Library types
   | 'library-full-wall'
+  | 'library-unit-standard'
   | 'library-bookshelf-open'
   | 'library-bookshelf-doors'
   | 'library-tv-center'
@@ -139,32 +148,59 @@ export type CabinetType =
 export type ApplianceType =
   | 'fridge-freestanding'
   | 'fridge-builtin'
+  | 'fridge-integrated'
+  | 'refrigerator'
+  | 'oven-builtin'
+  | 'oven-single'
+  | 'oven-double'
+  | 'microwave-builtin'
+  | 'cooktop'
+  | 'cooktop-gas'
   | 'cooktop-induction'
   | 'cooker-range'
-  | 'oven-builtin'
-  | 'microwave-builtin'
+  | 'range-freestanding'
   | 'dishwasher'
-  | 'washing-machine'
+  | 'dishwasher-integrated'
+  | 'dishwasher-freestanding'
   | 'hood-wall'
   | 'hood-integrated'
+  | 'range-hood-wall'
+  | 'range-hood-island'
+  | 'range-hood-integrated'
+  | 'washing-machine'
+  | 'dryer'
+  | 'wine-cooler'
+  | 'espresso-machine'
+  | 'coffee-machine'
+  | 'sink'
   | 'sink-single'
   | 'sink-double'
+  | 'sink-single-bowl'
+  | 'sink-double-bowl'
+  | 'sink-with-drainer'
   | 'tv-screen'
   | 'soundbar'
-  | 'led-strip'
-  | 'coffee-machine'
-  | 'wine-cooler';
+  | 'led-strip';
 
 export type ArchitecturalElementType =
   | 'door'
   | 'window'
   | 'column'
+  | 'pillar'
   | 'beam'
   | 'recess'
-  | 'pipe';
+  | 'pipe'
+  | 'radiator'
+  | 'pipe-gas'
+  | 'pipe-water'
+  | 'pipe-drain'
+  | 'vent'
+  | 'electrical-outlet'
+  | 'water-inlet'
+  | 'water-outlet';
 
 export type DoorHinge = 'left' | 'right' | 'double' | 'top' | 'sliding' | 'folding' | 'none';
-export type HandleType = 'bar-black' | 'bar-brass' | 'bar-chrome' | 'edge-pull' | 'knob' | 'handleless' | 'none';
+export type HandleType = 'bar-black' | 'bar-brass' | 'bar-chrome' | 'edge-pull' | 'knob' | 'handleless' | 'none' | string;
 
 export interface CabinetItem {
   id: string; // e.g. B01, W01, T01, WD01, BD01, LIB01
@@ -184,11 +220,12 @@ export interface CabinetItem {
   shelfCount: number;
   doorCount: number;
   drawerCount: number;
-  doorHinge: DoorHinge;
+  doorHinge?: DoorHinge;
   doorType?: WardrobeDoorType;
 
   // Kitchen Specific
   hasSinkCutout?: boolean;
+  hasCooktopCutout?: boolean;
   hasApplianceCavity?: boolean;
   applianceCavityHeight?: number;
   applianceCavityZ?: number;
@@ -220,12 +257,12 @@ export interface CabinetItem {
   tvHeight?: number;
   tvDepth?: number;
   verticalDividersCount?: number;
-  hasGlassDoors?: boolean;
   hasIntegratedLed?: boolean;
 
-  // Materials & Finish
-  materialFront?: string;
+  // Visual Overrides
   materialBody?: string;
+  materialFront?: string;
+  hasGlassDoors?: boolean;
   handleType?: HandleType;
   customNotes?: string;
   isCustom?: boolean;
@@ -236,6 +273,9 @@ export interface ApplianceItem {
   id: string;
   name: string;
   type: ApplianceType;
+  category?: 'cooking' | 'cooling' | 'cleaning' | 'sanitary' | 'other' | string;
+  brand?: string;
+  model?: string;
   width: number;
   height: number;
   depth: number;
@@ -247,7 +287,7 @@ export interface ApplianceItem {
   clearanceSides?: number;
   clearanceBack?: number;
   clearanceTop?: number;
-  finish?: 'stainless' | 'black' | 'white' | 'integrated';
+  finish?: 'stainless' | 'black' | 'white' | 'integrated' | 'black-glass' | string;
   customNotes?: string;
 }
 
@@ -296,6 +336,7 @@ export interface CountertopConfig {
   overhangSides: number;
   material: string;
   edgeProfile: 'square' | 'beveled' | 'bullnose';
+  color?: string;
 }
 
 export interface PlinthConfig {
@@ -310,12 +351,15 @@ export interface BacksplashConfig {
   height: number;
   thickness: number;
   material: string;
+  color?: string;
 }
 
 export interface MaterialFinishes {
   frontFinish: string;
   frontColor: string;
   bodyColor: string;
+  carcaseFinish?: string;
+  plinthFinish?: string;
   countertopMaterial: string;
   countertopColor: string;
   backsplashMaterial: string;

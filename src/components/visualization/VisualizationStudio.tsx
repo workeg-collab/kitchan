@@ -317,18 +317,29 @@ export const VisualizationStudio: React.FC = () => {
           </div>
         </div>
 
-        {/* Camera Angles Presets */}
+        {/* Camera Angles Presets (Contextual to Project Type) */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-            <Eye size={14} className="text-blue-400" />
-            <span>زوايا الكاميرا المعمارية</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+              <Eye size={14} className="text-blue-400" />
+              <span>زوايا الكاميرا المعمارية</span>
+            </label>
+            <span className="text-[10px] font-mono text-blue-400 bg-blue-950/80 px-1.5 py-0.5 rounded border border-blue-800/60 uppercase">
+              {project.metadata.projectType}
+            </span>
+          </div>
           <div className="grid grid-cols-2 gap-1.5">
             {[
-              { id: 'perspective', label: 'منظور 45°' },
+              { 
+                id: 'perspective', 
+                label: project.metadata.projectType === 'kitchen' ? 'منظور المطبخ 45°' : project.metadata.projectType === 'dressing' ? 'منظور الدريسينج 45°' : project.metadata.projectType === 'bedroom' ? 'منظور السرير 45°' : 'منظور 45° شامل' 
+              },
               { id: 'wide', label: 'عدسة واسعة 16mm' },
               { id: 'eye-level', label: 'عين الإنسان 1.65m' },
-              { id: 'macro-detail', label: 'كلوز تفاصيل المقابض' },
+              { 
+                id: 'macro-detail', 
+                label: project.metadata.projectType === 'kitchen' ? 'كلوز الرخام والمقابض' : project.metadata.projectType === 'dressing' ? 'كلوز جزيرة الساعات' : project.metadata.projectType === 'bedroom' ? 'كلوز ظهر السرير' : 'كلوز تفاصيل الخامات' 
+              },
               { id: 'axonometric', label: 'أيزومتريك 3D' },
               { id: 'top-down', label: 'مخطط رأسي مسقط' },
             ].map((ca) => (
