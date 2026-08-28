@@ -31,7 +31,9 @@ import {
   Sliders,
   Grid,
   Maximize,
-  Tv
+  Tv,
+  Settings,
+  Mic
 } from 'lucide-react';
 
 interface TutorialChapter {
@@ -40,7 +42,7 @@ interface TutorialChapter {
   duration: string;
   icon: React.ReactNode;
   color: string;
-  spokenNarration: string; // نص الشرح بالعامية المصرية السلسة
+  spokenSentences: string[]; // جمل قصيرة منسابة لمنع أي تقطيع نهائياً
   description: string;
   keyPoints: string[];
   proTips: string[];
@@ -54,8 +56,13 @@ export const AppVideoTutorialModal: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(true); // افتراضياً شاشة سينمائية عريضة جداً وكبيرة
-  const [userInteracted, setUserInteracted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(true);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoiceURI, setSelectedVoiceURI] = useState<string>('');
+  const [voicePitch, setVoicePitch] = useState<number>(1.35); // نبرة نسائية ناعمة وعالية
+
+  const activeUtterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
+  const isSpeakingRef = useRef<boolean>(false);
 
   const chapters: TutorialChapter[] = [
     {
@@ -64,7 +71,13 @@ export const AppVideoTutorialModal: React.FC = () => {
       duration: '01:15',
       icon: <Compass size={20} className="text-blue-500" />,
       color: 'blue',
-      spokenNarration: 'أهلاً بيك في فرنتشر كاد برو! أول خطوة بنعملها هي رسم أبعاد الغرفة ومقاسات الحوائط. البرنامج فيه ميزة ذكية جداً وهي المغناطيس التلقائي؛ أول ما تقرب أي كابينة من الحيطة بتثبت مكانها فوراً من غير أي تداخل. وكمان تقدر تتحكم في الزووم وتشوف مقاسات المسافات والفرغات بين الوحدات بكل سهولة.',
+      spokenSentences: [
+        'أهلاً بيك في فرنتشر كاد برو.',
+        'أول خطوة بنعملها، هي رسم أبعاد الغرفة ومقاسات الحوائط بدقة.',
+        'البرنامج فيه ميزة ذكية جداً، وهي المغناطيس التلقائي.',
+        'أول ما تقرب أي كابينة من الحيطة، بتثبت مكانها فوراً من غير أي تداخل.',
+        'وتقدر تتحكم في الزووم، وتشوف مقاسات المسافات والفرغات بين الوحدات بكل سهولة.'
+      ],
       description: 'طريقة رسم وتعديل أبعاد الغرفة، استخدام المغناطيس الذكي Snap to Grid & Wall، وإظهار خطوط الأبعاد والمسافات.',
       keyPoints: [
         'انقر على أداة "الغرفة" أو زر القلم لتعديل أبعاد الجدران وسماكتها بدقة.',
@@ -82,7 +95,12 @@ export const AppVideoTutorialModal: React.FC = () => {
       duration: '01:40',
       icon: <Box size={20} className="text-purple-500" />,
       color: 'purple',
-      spokenNarration: 'دلوقتي هنفتح الكتالوج من على الشمال ونختار الوحدات اللي محتاجينها، سواء وحدات سفلية، علوية، أو دواليب طولية. بمجرد ما تضغط على أي كابينة، بتظهرلك لوحة الخصائص عشان تعدل العرض، الارتفاع، والعمق بالمللي. وتقدر تلف الكابينة تسعين درجة بحرف الآر، أو تكررها فوراً بكنترول مع دي.',
+      spokenSentences: [
+        'دلوقتي هنفتح الكتالوج من على الشمال ونختار الوحدات اللي محتاجينها.',
+        'سواء وحدات سفلية، علوية، أو دواليب طولية.',
+        'بمجرد ما تضغط على أي كابينة، بتظهرلك لوحة الخصائص عشان تعدل العرض والارتفاع والعمق.',
+        'وتقدر تلف الكابينة تسعين درجة بحرف الآر، أو تكررها فوراً بكنترول مع دي.'
+      ],
       description: 'سحب وإفلات الوحدات والدواليب، تعديل العرض والارتفاع والعمق، التدوير 90°، والتكرار السريع.',
       keyPoints: [
         'افتح درج الكتالوج الجانبي واختر نوع الوحدة (سفلية / علوية / دواليب طولية / سرائر / تسريحات).',
@@ -100,7 +118,11 @@ export const AppVideoTutorialModal: React.FC = () => {
       duration: '01:20',
       icon: <Eye size={20} className="text-amber-500" />,
       color: 'amber',
-      spokenNarration: 'عشان تشوف تصميمك كأنه حقيقة، اضغط على منظور ثري دي 3D. هتشوف الخامات والإضاءة وانعكاسات الرخام بجودة عالية. والأحلى من كده، زرار الباب اللي فوق بيفتحلك كل الضلف والأدراج والقلابات مع بعض عشان تعاين التوزيع الداخلي والأرفف.',
+      spokenSentences: [
+        'عشان تشوف تصميمك كأنه حقيقة، اضغط على منظور ثري دي.',
+        'هتشوف الخامات والإضاءة وانعكاسات الرخام بجودة عالية جداً.',
+        'والأحلى من كده، زرار الباب اللي فوق بيفتحلك كل الضلف والأدراج والقلابات مع بعض، عشان تعاين التوزيع الداخلي والأرفف.'
+      ],
       description: 'التجوال ثلاثي الأبعاد الواقعي، المساقط الهندسية (علوي / أمامي / أيزومترك)، ومعاينة فتح وإغلاق الأبواب.',
       keyPoints: [
         'التبديل بين 2D و 3D متاح دائماً من الشريط العائم في أعلى منتصف الشاشة.',
@@ -118,7 +140,10 @@ export const AppVideoTutorialModal: React.FC = () => {
       duration: '00:55',
       icon: <Sparkles size={20} className="text-indigo-500" />,
       color: 'indigo',
-      spokenNarration: 'لو عايز شاشة كاملة مية في المية للرسم، اضغط على زرار التثبيت عشان تقفل درج الكتالوج وتستمتع بأكبر مساحة شغل مريحة لعينك. وشريط الأدوات اللي عايم في نص الشاشة بيوفرلك كل أدوات الكاميرا والزووم في مكان واحد.',
+      spokenSentences: [
+        'لو عايز شاشة كاملة مية في المية للرسم، اضغط على زرار التثبيت عشان تقفل درج الكتالوج وتستمتع بأكبر مساحة شغل.',
+        'وشريط الأدوات اللي عايم في نص الشاشة بيوفرلك كل أدوات الكاميرا والزووم في مكان واحد.'
+      ],
       description: 'كيف تخفي اللوحات الجانبية بضغطة زر وتستمتع بـ 100% من الشاشة للتصميم، وأهم الاختصارات.',
       keyPoints: [
         'زر الإخفاء ✕ أو زر التثبيت 📌 في درج الكتالوج يتيح إغلاق اللوحة الجانبية تماماً للحصول على أقصى مساحة رسم ممكنة.',
@@ -136,7 +161,12 @@ export const AppVideoTutorialModal: React.FC = () => {
       duration: '01:30',
       icon: <Calculator size={20} className="text-emerald-500" />,
       color: 'emerald',
-      spokenNarration: 'نيجي بقى لحساب التكلفة وعرض السعر. البرنامج بيديلك حرية الاختيار بين الحساب بالمتر المربع لوش الوحدات، يعني بنضرب العرض في الارتفاع لوش الكابينة وملناش دعوة بالعمق، أو الحساب بالمتر الطولي. وكمان بتحدد خامتك المعتمدة سواء خشب إيجر، أكريليك، أو كلادينج ألوميتال مقاوم للمياه، والبرنامج بيطلعلك عرض سعر رسمي جاهز للطباعة فوراً.',
+      spokenSentences: [
+        'نيجي بقى لحساب التكلفة وعرض السعر.',
+        'البرنامج بيحسبلك بالمتر المربع لوش الوحدات، يعني بنضرب العرض في الارتفاع لوش الكابينة وملناش دعوة بالعمق، أو الحساب بالمتر الطولي.',
+        'وكمان بتحدد خامتك المعتمدة سواء خشب إيجر، أكريليك، أو كلادينج ألوميتال مقاوم للمياه.',
+        'والبرنامج بيطلعلك عرض سعر رسمي معتمد جاهز للطباعة فوراً.'
+      ],
       description: 'حساب التكلفة بالمتر المربع لوش الوحدات (W × H بدون العمق) أو بالمتر الطولي مع اختيار نوع الخامة وتوليد عرض السعر.',
       keyPoints: [
         'التبديل بين المحاسبة بالمتر المربع لوش الوحدات (العرض × الارتفاع مع استبعاد العمق) أو بالمتر الطولي.',
@@ -154,7 +184,11 @@ export const AppVideoTutorialModal: React.FC = () => {
       duration: '01:10',
       icon: <Scissors size={20} className="text-rose-500" />,
       color: 'rose',
-      spokenNarration: 'وأخيراً للتصنيع، محرك التقطيع بيحسبلك مقاسات كل جنب وقاع ورف وضلفة بعد خصم شريط الحرف والقشاط، وبيرسملك خريطة توزيع الألواح عشان تقلل الهالك والفاقد في الورشة، وتقدر تصدر ملفات الإكسل وملفات الدي إكس إف للسي إن سي بضغطة زرار.',
+      spokenSentences: [
+        'وأخيراً للتصنيع، محرك التقطيع بيحسبلك مقاسات كل جنب وقاع ورف وضلفة بعد خصم شريط الحرف والقشاط.',
+        'وبيرسملك خريطة توزيع الألواح عشان تقلل الهالك والفاقد في الورشة.',
+        'وتقدر تصدر ملفات الإكسل وملفات الدي إكس إف للسي إن سي بضغطة زرار.'
+      ],
       description: 'استخراج تفصيل قص الألواح، أطوال القشاط، عدد الألواح المطلوبة، وتصدير ملفات PDF و Excel و DXF.',
       keyPoints: [
         'محرك التقطيع يحسب أبعاد كل جنب، قاع، سقف، رف، وضلفة بعد خصم الخلوصات وسماكة شريط الحرف.',
@@ -170,101 +204,126 @@ export const AppVideoTutorialModal: React.FC = () => {
 
   const currentChapter = chapters[activeChapterIndex];
 
-  // Arabic Egyptian Female Voice Speech Engine
-  const speakNarration = useCallback((text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
-    try {
-      window.speechSynthesis.cancel();
-      if (isMuted) return;
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      // ضبط اللهجة المصرية والنبرة الأنثوية الانسيابية
-      utterance.lang = 'ar-EG';
-      utterance.rate = 0.90;  // إيقاع هادئ وانسيابي ومريح للأذن
-      utterance.pitch = 1.25; // نبرة صوت نسائية ناعمة وواضحة جداً
-
-      const voices = window.speechSynthesis.getVoices();
-      
-      // البحث عن الأصوات العربية ذات النبرة النسائية أو اللهجة المصرية
-      const femaleArabicVoice = voices.find(v => 
-        (v.lang.includes('ar-EG') || v.lang.includes('ar')) && (
-          v.name.toLowerCase().includes('laila') ||
-          v.name.toLowerCase().includes('zeina') ||
-          v.name.toLowerCase().includes('hoda') ||
-          v.name.toLowerCase().includes('salma') ||
-          v.name.toLowerCase().includes('nour') ||
-          v.name.toLowerCase().includes('mariam') ||
-          v.name.toLowerCase().includes('female') ||
-          v.name.toLowerCase().includes('مريم') ||
-          v.name.toLowerCase().includes('هدى') ||
-          v.name.toLowerCase().includes('سلمى') ||
-          v.name.toLowerCase().includes('ليلى')
-        )
-      ) || voices.find(v => v.lang.includes('ar-EG')) 
-        || voices.find(v => v.lang.startsWith('ar'));
-
-      if (femaleArabicVoice) {
-        utterance.voice = femaleArabicVoice;
-      }
-
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn('Speech synthesis error:', e);
-      setIsSpeaking(false);
-    }
-  }, [isMuted]);
-
-  // Start speech when chapter changes or on play
+  // Load available system voices
   useEffect(() => {
-    if (isVideoTutorialOpen && isPlaying && !isMuted && userInteracted) {
-      speakNarration(currentChapter.spokenNarration);
-    } else if (!isPlaying || isMuted) {
+    const updateVoices = () => {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-      }
-    }
+        const vList = window.speechSynthesis.getVoices();
+        setAvailableVoices(vList);
+        
+        // Find best Arabic female voice
+        const bestFemale = vList.find(v => 
+          (v.lang.startsWith('ar')) && (
+            v.name.toLowerCase().includes('laila') ||
+            v.name.toLowerCase().includes('zeina') ||
+            v.name.toLowerCase().includes('hoda') ||
+            v.name.toLowerCase().includes('salma') ||
+            v.name.toLowerCase().includes('nour') ||
+            v.name.toLowerCase().includes('mariam') ||
+            v.name.toLowerCase().includes('female') ||
+            v.name.toLowerCase().includes('natural')
+          )
+        ) || vList.find(v => v.lang.includes('ar-EG')) || vList.find(v => v.lang.startsWith('ar'));
 
-    return () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+        if (bestFemale) {
+          setSelectedVoiceURI(bestFemale.voiceURI);
+        }
       }
     };
-  }, [activeChapterIndex, isVideoTutorialOpen, isPlaying, isMuted, userInteracted, speakNarration, currentChapter.spokenNarration]);
 
-  // Progress Bar
+    updateVoices();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+    }
+  }, []);
+
+  // Safe Non-Stuttering Sentence Queue Player
+  const stopSpeech = useCallback(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      activeUtterancesRef.current = [];
+      isSpeakingRef.current = false;
+      setIsSpeaking(false);
+    }
+  }, []);
+
+  const speakChapterSentences = useCallback((sentences: string[]) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window) || isMuted) return;
+
+    stopSpeech();
+
+    const selectedVoice = availableVoices.find(v => v.voiceURI === selectedVoiceURI) 
+      || availableVoices.find(v => v.lang.startsWith('ar'));
+
+    setIsSpeaking(true);
+    isSpeakingRef.current = true;
+
+    // Join with natural pauses
+    const fullText = sentences.join(' .. ');
+
+    const utterance = new SpeechSynthesisUtterance(fullText);
+    utterance.lang = 'ar-EG';
+    utterance.rate = 0.88;       // Smooth, clear, conversational Egyptian cadence
+    utterance.pitch = voicePitch; // Elevated pitch for natural female tone
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+
+    // Preserve in ref to prevent Chrome Garbage Collection mid-sentence bug
+    (window as any).__speechUtteranceRef = utterance;
+    activeUtterancesRef.current = [utterance];
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      isSpeakingRef.current = true;
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      isSpeakingRef.current = false;
+    };
+
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      isSpeakingRef.current = false;
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }, [availableVoices, isMuted, selectedVoiceURI, stopSpeech, voicePitch]);
+
+  // Handle Chapter change speech
+  const handleChapterSelect = (index: number) => {
+    setActiveChapterIndex(index);
+    setProgress(0);
+    setIsPlaying(true);
+    speakChapterSentences(chapters[index].spokenSentences);
+  };
+
+  // Progress Bar update (independent from speech)
   useEffect(() => {
     let interval: any;
     if (isPlaying && isVideoTutorialOpen) {
       interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
-            setActiveChapterIndex((curr) => (curr + 1) % chapters.length);
+            const nextIdx = (activeChapterIndex + 1) % chapters.length;
+            setActiveChapterIndex(nextIdx);
+            speakChapterSentences(chapters[nextIdx].spokenSentences);
             return 0;
           }
           return prev + 1;
         });
-      }, 450);
+      }, 500);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, isVideoTutorialOpen, activeChapterIndex, chapters.length]);
+  }, [isPlaying, isVideoTutorialOpen, activeChapterIndex, chapters, speakChapterSentences]);
 
   if (!isVideoTutorialOpen) return null;
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-lg p-2 sm:p-4 font-sans select-none animate-in fade-in duration-200"
-      onClick={() => {
-        if (!userInteracted) {
-          setUserInteracted(true);
-          speakNarration(currentChapter.spokenNarration);
-        }
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-xl p-2 sm:p-4 font-sans select-none animate-in fade-in duration-200"
     >
       <div className={`bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${isFullscreen ? 'w-[98vw] h-[96vh] rounded-2xl' : 'w-[94vw] max-w-6xl h-[88vh] rounded-3xl'}`}>
         
@@ -286,34 +345,42 @@ export const AppVideoTutorialModal: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                شاشة عرض سينمائية كبيرة توضح كل خطوة عملياً من داخل التطبيق
+                شاشة عرض سينمائية كبيرة توضح كل خطوة عملياً من داخل التطبيق بدون أي تقطيع
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Direct Female Voice Play CTA */}
+            {/* Direct Female Voice Trigger CTA */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setUserInteracted(true);
+              onClick={() => {
                 setIsMuted(false);
                 setIsPlaying(true);
-                speakNarration(currentChapter.spokenNarration);
+                speakChapterSentences(currentChapter.spokenSentences);
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-600/30 border border-rose-400/40"
-              title="تشغيل التعليق الصوتي النسائي المصري فوراً"
+              title="تشغيل صوت المهندسة باللهجة المصرية فوراً"
             >
               <Volume2 size={15} />
-              <span>استمع للشرح بصوت المهندسة (مصري)</span>
+              <span>استمع لصوت المهندسة (مصري 🎙️)</span>
+            </button>
+
+            {/* Pitch / Tone Selector (نعومة الصوت) */}
+            <button
+              onClick={() => {
+                const nextPitch = voicePitch === 1.35 ? 1.5 : voicePitch === 1.5 ? 1.2 : 1.35;
+                setVoicePitch(nextPitch);
+                speakChapterSentences(currentChapter.spokenSentences);
+              }}
+              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-bold border border-slate-700 transition"
+              title="تغيير درجة نعومة الصوت النسائي"
+            >
+              <span>نبرة: {voicePitch >= 1.4 ? 'أنثوي ناعم جداً' : voicePitch >= 1.3 ? 'أنثوي هادئ' : 'طبيعي'}</span>
             </button>
 
             {/* Toggle Fullscreen Size */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsFullscreen(!isFullscreen);
-              }}
+              onClick={() => setIsFullscreen(!isFullscreen)}
               className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
               title={isFullscreen ? 'تصغير الشاشة' : 'تكبير الشاشة ملء الشاشة بالكامل'}
             >
@@ -322,11 +389,8 @@ export const AppVideoTutorialModal: React.FC = () => {
 
             {/* Close */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                  window.speechSynthesis.cancel();
-                }
+              onClick={() => {
+                stopSpeech();
                 setIsVideoTutorialOpen(false);
               }}
               className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition"
@@ -554,7 +618,7 @@ export const AppVideoTutorialModal: React.FC = () => {
                       <p className="text-xs text-slate-300 mt-0.5">إخفاء القوائم الجانبية بضغطة زر والاستمتاع بأكبر مساحة تصميم</p>
                     </div>
                     <span className="bg-indigo-600 text-white text-xs font-black px-3 py-1.5 rounded-xl shadow-lg">
-                      Шريط الأدوات العائم مفعّل
+                      شريط الأدوات العائم مفعّل
                     </span>
                   </div>
 
@@ -705,14 +769,13 @@ export const AppVideoTutorialModal: React.FC = () => {
                 <div className="flex items-center justify-between text-white text-xs">
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUserInteracted(true);
-                        setIsPlaying(!isPlaying);
-                        if (isPlaying && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                          window.speechSynthesis.cancel();
-                        } else if (!isPlaying) {
-                          speakNarration(currentChapter.spokenNarration);
+                      onClick={() => {
+                        const nextPlay = !isPlaying;
+                        setIsPlaying(nextPlay);
+                        if (!nextPlay) {
+                          stopSpeech();
+                        } else {
+                          speakChapterSentences(currentChapter.spokenSentences);
                         }
                       }}
                       className="p-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl transition shadow-md shadow-rose-600/30 flex items-center gap-1 font-bold"
@@ -722,11 +785,9 @@ export const AppVideoTutorialModal: React.FC = () => {
                     </button>
 
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUserInteracted(true);
+                      onClick={() => {
                         setProgress(0);
-                        speakNarration(currentChapter.spokenNarration);
+                        speakChapterSentences(currentChapter.spokenSentences);
                       }}
                       className="p-2 hover:bg-white/20 rounded-xl transition flex items-center gap-1 text-slate-300"
                       title="إعادة الدرس من الأول"
@@ -737,15 +798,13 @@ export const AppVideoTutorialModal: React.FC = () => {
 
                     {/* Mute / Unmute Female Voice */}
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUserInteracted(true);
+                      onClick={() => {
                         const nextMuted = !isMuted;
                         setIsMuted(nextMuted);
-                        if (nextMuted && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                          window.speechSynthesis.cancel();
-                        } else if (!nextMuted) {
-                          speakNarration(currentChapter.spokenNarration);
+                        if (nextMuted) {
+                          stopSpeech();
+                        } else {
+                          speakChapterSentences(currentChapter.spokenSentences);
                         }
                       }}
                       className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 text-xs font-bold ${
@@ -760,11 +819,9 @@ export const AppVideoTutorialModal: React.FC = () => {
                   {/* Chapter Previous / Next & Fullscreen */}
                   <div className="flex items-center gap-2 font-mono text-xs font-bold">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUserInteracted(true);
-                        setActiveChapterIndex((prev) => (prev > 0 ? prev - 1 : chapters.length - 1));
-                        setProgress(0);
+                      onClick={() => {
+                        const prevIdx = activeChapterIndex > 0 ? activeChapterIndex - 1 : chapters.length - 1;
+                        handleChapterSelect(prevIdx);
                       }}
                       className="p-1.5 hover:bg-white/20 rounded-lg transition"
                       title="الدرس السابق"
@@ -775,11 +832,9 @@ export const AppVideoTutorialModal: React.FC = () => {
                       {activeChapterIndex + 1} / {chapters.length}
                     </span>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUserInteracted(true);
-                        setActiveChapterIndex((prev) => (prev + 1) % chapters.length);
-                        setProgress(0);
+                      onClick={() => {
+                        const nextIdx = (activeChapterIndex + 1) % chapters.length;
+                        handleChapterSelect(nextIdx);
                       }}
                       className="p-1.5 hover:bg-white/20 rounded-lg transition"
                       title="الدرس التالي"
@@ -788,10 +843,7 @@ export const AppVideoTutorialModal: React.FC = () => {
                     </button>
 
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsFullscreen(!isFullscreen);
-                      }}
+                      onClick={() => setIsFullscreen(!isFullscreen)}
                       className="p-2 hover:bg-white/20 rounded-xl transition ml-2 text-amber-300"
                       title={isFullscreen ? 'تصغير' : 'تكبير الشاشة'}
                     >
@@ -812,7 +864,7 @@ export const AppVideoTutorialModal: React.FC = () => {
                   نص التعليق الصوتي النسائي (باللهجة المصرية):
                 </strong>
                 <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-sans font-medium">
-                  "{currentChapter.spokenNarration}"
+                  "{currentChapter.spokenSentences.join(' ')}"
                 </p>
               </div>
             </div>
@@ -831,13 +883,7 @@ export const AppVideoTutorialModal: React.FC = () => {
                   return (
                     <button
                       key={ch.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUserInteracted(true);
-                        setActiveChapterIndex(idx);
-                        setProgress(0);
-                        setIsPlaying(true);
-                      }}
+                      onClick={() => handleChapterSelect(idx)}
                       className={`w-full p-3.5 rounded-2xl border text-right transition flex items-start justify-between group ${
                         isActive
                           ? 'bg-slate-800 border-rose-500 shadow-xl shadow-rose-500/20'
@@ -907,9 +953,7 @@ export const AppVideoTutorialModal: React.FC = () => {
 
           <button
             onClick={() => {
-              if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-              }
+              stopSpeech();
               setIsVideoTutorialOpen(false);
             }}
             className="px-6 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white rounded-xl text-xs font-black transition shadow-lg shadow-rose-600/30"
