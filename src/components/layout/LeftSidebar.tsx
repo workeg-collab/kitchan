@@ -9,6 +9,7 @@ import { LIBRARY_LIBRARY, LibraryTemplate } from '../../constants/libraryUnitLib
 import { LIVING_AND_OTHER_LIBRARY, LivingTemplate } from '../../constants/livingAndOtherLibrary';
 import { APPLIANCE_LIBRARY } from '../../constants/applianceLibrary';
 import { ARCHITECTURAL_LIBRARY, ArchitecturalTemplate } from '../../constants/archLibrary';
+import { useMaterialsStore } from '../../store/useMaterialsStore';
 import { formatDimension } from '../../utils/unitConversion';
 import { TRANSLATIONS } from '../../utils/i18n';
 import { 
@@ -109,6 +110,10 @@ export const LeftSidebar: React.FC = () => {
     });
   };
 
+  const { materials } = useMaterialsStore();
+  const frontMaterials = materials.filter(m => m.category === 'wood-sheet' || m.category === 'fabric' || m.category === 'glass');
+  const countertopMaterials = materials.filter(m => m.category === 'countertop');
+
   return (
     <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full select-none z-20 shadow-xs font-sans">
       {/* Dynamic Module-Aware Catalog Navigation Tabs */}
@@ -154,7 +159,7 @@ export const LeftSidebar: React.FC = () => {
           }`}
         >
           <Palette size={16} className="mb-0.5" />
-          <span>الخامات والألوان</span>
+          <span>الخامات والألوان ({materials.length})</span>
         </button>
       </div>
 
@@ -201,7 +206,7 @@ export const LeftSidebar: React.FC = () => {
                   onClick={() => setSelectedCategoryFilter('tall')}
                   className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'tall' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                 >
-                  أبراج طولية
+                  طولي
                 </button>
                 <button
                   onClick={() => setSelectedCategoryFilter('corner')}
@@ -216,27 +221,50 @@ export const LeftSidebar: React.FC = () => {
               <>
                 <button
                   onClick={() => setSelectedCategoryFilter('all')}
-                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'all' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                 >
                   الكل ({WARDROBE_LIBRARY.length})
                 </button>
                 <button
                   onClick={() => setSelectedCategoryFilter('wardrobe')}
-                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'wardrobe' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'wardrobe' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                 >
-                  ركنات وزوايا L
-                </button>
-                <button
-                  onClick={() => setSelectedCategoryFilter('closet-internals')}
-                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'closet-internals' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                >
-                  تعليق ومطابق
+                  دواليب
                 </button>
                 <button
                   onClick={() => setSelectedCategoryFilter('accessories')}
-                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'accessories' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'accessories' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                 >
-                  إكسسوارات وجزر
+                  إكسسوارات
+                </button>
+              </>
+            )}
+
+            {projectType === 'bedroom' && (
+              <>
+                <button
+                  onClick={() => setSelectedCategoryFilter('all')}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                >
+                  الكل ({BEDROOM_LIBRARY.length})
+                </button>
+                <button
+                  onClick={() => setSelectedCategoryFilter('bed')}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'bed' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                >
+                  سرائر
+                </button>
+                <button
+                  onClick={() => setSelectedCategoryFilter('nightstand')}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'nightstand' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                >
+                  كومودينو
+                </button>
+                <button
+                  onClick={() => setSelectedCategoryFilter('dresser')}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'dresser' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                >
+                  تسريحات
                 </button>
               </>
             )}
@@ -275,60 +303,39 @@ export const LeftSidebar: React.FC = () => {
             )}
           </div>
 
-          {/* Units List */}
-          <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2.5">
-            {filteredItems.map((template: any, idx: number) => (
+          {/* Catalog Items List */}
+          <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2.5">
+            {filteredItems.map((item: any) => (
               <div
-                key={idx}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('application/json', JSON.stringify({ type: 'cabinet', template }));
-                  e.dataTransfer.effectAllowed = 'copy';
-                }}
-                className="bg-white border border-slate-200 rounded-2xl p-3 hover:border-blue-400 hover:shadow-md transition cursor-grab active:cursor-grabbing group"
+                key={item.id}
+                className="bg-white border border-slate-200 rounded-2xl p-3 hover:border-blue-400 hover:shadow-md transition group"
               >
                 <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-slate-400 group-hover:text-blue-500 transition text-xs">⋮⋮</span>
-                      <h4 className="text-xs font-bold text-slate-900">{template.name}</h4>
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">{template.description}</p>
+                  <div className="min-w-0 flex-1 pr-2">
+                    <h4 className="text-xs font-bold text-slate-900 truncate">{item.name}</h4>
+                    <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{item.description}</p>
                   </div>
-                  {template.tag && (
-                    <span className="text-[10px] font-sans px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded-lg font-bold shrink-0">
-                      {template.tag}
-                    </span>
-                  )}
+                  <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded font-bold shrink-0">
+                    {item.category}
+                  </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-[10px] font-mono text-slate-600 mt-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-                  <span>W:{formatDimension(template.defaultWidth, unit)}</span>
-                  <span>H:{formatDimension(template.defaultHeight, unit)}</span>
-                  <span>D:{formatDimension(template.defaultDepth, unit)}</span>
-                </div>
-
-                <div className="mt-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-1 flex-wrap">
-                    {template.standardWidths?.map((sw: number) => (
-                      <button
-                        key={sw}
-                        onClick={() => handleAddItem(template, sw)}
-                        className="px-2 py-0.5 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 rounded-md text-[10px] font-mono transition"
-                        title={`إضافة بعرض ${formatDimension(sw, unit)}`}
-                      >
-                        {formatDimension(sw, unit, false)}
-                      </button>
-                    ))}
+                <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
+                    <span>{formatDimension(item.defaultWidth, unit)}</span>
+                    <span>×</span>
+                    <span>{formatDimension(item.defaultHeight, unit)}</span>
+                    <span>×</span>
+                    <span>{formatDimension(item.defaultDepth, unit)}</span>
                   </div>
 
                   <button
-                    onClick={() => handleAddItem(template)}
-                    className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition ml-2 shadow-xs flex items-center gap-1"
-                    title="إضافة فورية للرسم (أو اسحب القطعة وأفلتها)"
+                    onClick={() => handleAddItem(item)}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition shadow-xs"
+                    title="إضافة للمخطط"
                   >
-                    <Plus size={14} />
-                    <span className="text-[10px] font-bold px-0.5">إضافة</span>
+                    <Plus size={13} />
+                    <span>إضافة</span>
                   </button>
                 </div>
               </div>
@@ -337,77 +344,48 @@ export const LeftSidebar: React.FC = () => {
         </div>
       )}
 
-      {/* --- APPLIANCES TAB --- */}
-      {activeCatalogTab === 'appliances' && (
+      {/* --- APPLIANCES TAB (Kitchen Only) --- */}
+      {activeCatalogTab === 'appliances' && projectType === 'kitchen' && (
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2.5">
-          {/* Custom Appliance Builder Banner */}
-          <button
-            onClick={() => {
-              addAppliance({
-                name: 'جهاز / شاشة بمقاسات مخصصة',
-                type: 'tv-screen',
-                width: 600,
-                height: 850,
-                depth: 600,
-                x: 1200,
-                y: 0,
-                z: 0,
-                rotation: 0,
-                wallId: 'wall-a',
-                finish: 'stainless',
-                customNotes: 'جهاز تم تخصيص مقاساته يدوياً',
-              });
-            }}
-            className="w-full flex items-center justify-between p-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-2xl hover:border-amber-400 transition group shadow-xs text-right"
-          >
-            <div className="flex items-center gap-2">
-              <Plus size={16} className="text-amber-600 group-hover:rotate-90 transition" />
-              <div>
-                <div className="text-xs font-bold text-slate-900">إضافة جهاز أو شاشة بمقاس حر</div>
-                <div className="text-[10px] text-slate-500">تعديل العرض والارتفاع والعمق يدوياً</div>
-              </div>
-            </div>
-            <Tv size={16} className="text-amber-600" />
-          </button>
-
-          {APPLIANCE_LIBRARY.map((template, idx) => (
+          {APPLIANCE_LIBRARY.map((app, idx) => (
             <div
               key={idx}
               className="bg-white border border-slate-200 rounded-2xl p-3 hover:border-amber-400 hover:shadow-md transition"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-slate-900">{template.name}</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{template.description}</p>
+                  <h4 className="text-xs font-bold text-slate-900">{app.name}</h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">{app.description}</p>
                 </div>
                 <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-bold">
-                  {template.category}
+                  {app.category}
                 </span>
               </div>
 
               <div className="mt-2.5 flex items-center justify-between">
                 <span className="text-[10px] font-mono text-slate-500">
-                  {formatDimension(template.defaultWidth, unit)} x {formatDimension(template.defaultHeight, unit)}
+                  {formatDimension(app.defaultWidth, unit)} x {formatDimension(app.defaultHeight, unit)} x {formatDimension(app.defaultDepth, unit)}
                 </span>
 
                 <button
                   onClick={() => {
                     addAppliance({
-                      name: template.name,
-                      type: template.type,
-                      width: template.defaultWidth,
-                      height: template.defaultHeight,
-                      depth: template.defaultDepth,
-                      x: 1200,
+                      name: app.name,
+                      type: app.type as any,
+                      category: app.category as any,
+                      width: app.defaultWidth,
+                      height: app.defaultHeight,
+                      depth: app.defaultDepth,
+                      x: 1000,
                       y: 0,
-                      z: template.defaultZ,
+                      z: app.defaultZ,
                       rotation: 0,
                       wallId: 'wall-a',
                       finish: 'stainless',
                     });
                   }}
                   className="p-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition shadow-xs"
-                  title="وضع الجهاز أو الشاشة"
+                  title="إضافة الجهاز"
                 >
                   <Plus size={14} />
                 </button>
@@ -466,51 +444,59 @@ export const LeftSidebar: React.FC = () => {
         </div>
       )}
 
-      {/* --- FINISHES TAB --- */}
+      {/* --- FINISHES TAB WITH DYNAMIC USER MATERIALS --- */}
       {activeCatalogTab === 'finishes' && (
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-5 text-xs">
           <div>
-            <h4 className="font-bold text-slate-800 mb-2">لون وتشطيب الضلف الأمامية (Doors Finish)</h4>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { name: 'أبيض مطفي ناصع (Matte White)', color: '#f8fafc' },
-                { name: 'كشمير بيج دافئ (Warm Cashmere)', color: '#d6cec4' },
-                { name: 'رمادي غامق أنثراسيت (Anthracite)', color: '#334155' },
-                { name: 'خشب جوز أمريكي (Walnut Wood)', color: '#5c4033' },
-                { name: 'خشب أرو طبيعي (Natural Oak)', color: '#c49a6c' },
-                { name: 'أخضر زمردي مودرن (Forest Green)', color: '#1b4332' },
-              ].map((f) => (
+            <h4 className="font-bold text-slate-800 mb-2 flex items-center justify-between">
+              <span>لون وتشطيب الواجهات والضلف</span>
+              <span className="text-[10px] font-mono text-slate-400 font-normal">من الكتالوج المخصص</span>
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
+              {frontMaterials.map((f) => (
                 <button
-                  key={f.name}
-                  onClick={() => updateMaterials({ frontFinish: f.name })}
-                  className="p-2.5 rounded-xl border border-slate-200 hover:border-blue-500 transition flex items-center gap-2 text-right bg-slate-50 hover:bg-white"
+                  key={f.id}
+                  onClick={() => updateMaterials({ frontFinish: f.name, frontColor: f.colorCode })}
+                  className="p-2.5 rounded-xl border border-slate-200 hover:border-purple-500 transition flex items-center justify-between text-right bg-slate-50 hover:bg-white group"
                 >
-                  <span className="w-5 h-5 rounded-lg border border-slate-300 shrink-0 shadow-xs" style={{ backgroundColor: f.color }} />
-                  <span className="text-[11px] font-bold text-slate-800 leading-tight">{f.name}</span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-5 h-5 rounded-lg border border-slate-300 shrink-0 shadow-xs" style={{ backgroundColor: f.colorCode }} />
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-bold text-slate-800 leading-tight block truncate">{f.name}</span>
+                      <span className="text-[9px] text-slate-400 font-mono block">
+                        {f.sheetLength}×{f.sheetWidth} مم • {f.price} {project.pricing.currency}/{f.pricingUnit}
+                      </span>
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
           </div>
 
-          <div>
-            <h4 className="font-bold text-slate-800 mb-2">لون الشاسيه الداخلي (Carcase Body)</h4>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { name: 'أبيض كونتر', color: '#ffffff' },
-                { name: 'رمادي فاتح', color: '#e2e8f0' },
-                { name: 'خشب سابيلي', color: '#8b4513' },
-              ].map((b) => (
-                <button
-                  key={b.name}
-                  onClick={() => updateMaterials({ bodyColor: b.color })}
-                  className="p-2 rounded-xl border border-slate-200 hover:border-blue-500 transition flex flex-col items-center gap-1.5 text-center bg-slate-50"
-                >
-                  <span className="w-5 h-5 rounded-lg border border-slate-300 shadow-xs" style={{ backgroundColor: b.color }} />
-                  <span className="text-[10px] font-bold text-slate-700">{b.name}</span>
-                </button>
-              ))}
+          {projectType === 'kitchen' && countertopMaterials.length > 0 && (
+            <div>
+              <h4 className="font-bold text-slate-800 mb-2">خامات الرخام والكوارتز للأسطح</h4>
+              <div className="grid grid-cols-1 gap-2">
+                {countertopMaterials.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => updateMaterials({ countertopMaterial: c.name, countertopColor: c.colorCode })}
+                    className="p-2.5 rounded-xl border border-slate-200 hover:border-emerald-500 transition flex items-center justify-between text-right bg-slate-50 hover:bg-white"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-5 h-5 rounded-lg border border-slate-300 shrink-0 shadow-xs" style={{ backgroundColor: c.colorCode }} />
+                      <div className="min-w-0">
+                        <span className="text-[11px] font-bold text-slate-800 leading-tight block truncate">{c.name}</span>
+                        <span className="text-[9px] text-slate-400 font-mono block">
+                          {c.thickness} مم • {c.price} {project.pricing.currency}/{c.pricingUnit}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </aside>
