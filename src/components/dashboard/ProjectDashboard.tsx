@@ -152,9 +152,7 @@ export const ProjectDashboard: React.FC = () => {
 
           <button
             onClick={() => {
-              if (window.confirm('هل تريد تسجيل الخروج؟')) {
-                logout();
-              }
+              logout();
             }}
             className="flex items-center gap-1 px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white backdrop-blur-md border border-red-400/40 rounded-xl text-xs font-bold transition shadow-md"
             title="تسجيل الخروج"

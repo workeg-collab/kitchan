@@ -22,6 +22,7 @@ import {
   PencilRuler,
   X
 } from 'lucide-react';
+import { soundEffects } from '../../services/soundEffectsService';
 
 export const Canvas2D: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -159,6 +160,7 @@ export const Canvas2D: React.FC = () => {
       depth: d,
       rotation: rot,
     });
+    soundEffects.playPick();
   };
 
   // Start Resizing Room from Corner Handle
@@ -233,6 +235,9 @@ export const Canvas2D: React.FC = () => {
   };
 
   const handleMouseUp = () => {
+    if (draggingItem) {
+      soundEffects.playDrop();
+    }
     setIsPanning(false);
     setDraggingItem(null);
     setIsResizingRoom(false);

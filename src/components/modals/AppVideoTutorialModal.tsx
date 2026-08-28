@@ -198,6 +198,20 @@ export const AppVideoTutorialModal: React.FC = () => {
 
   const currentChapter = chapters[activeChapterIndex];
 
+  const [hasUserStartedAudio, setHasUserStartedAudio] = useState(false);
+
+  // Load and listen to browser voices (especially on Desktop Chrome)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const updateVoices = () => {
+        const v = window.speechSynthesis.getVoices();
+        setAvailableVoices(v);
+      };
+      updateVoices();
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+    }
+  }, []);
+
   // Stop Speech Helper
   const stopSpeech = useCallback(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -206,12 +220,13 @@ export const AppVideoTutorialModal: React.FC = () => {
     }
   }, []);
 
-  // Safe Speech Engine
+  // Safe Speech Engine with Desktop & Mobile Universal Support
   const speakChapterSentences = useCallback((sentences: string[]) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window) || isMuted) return;
 
     try {
       window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
 
       const voices = window.speechSynthesis.getVoices();
       const bestFemaleVoice = voices.find(v => 
@@ -224,11 +239,11 @@ export const AppVideoTutorialModal: React.FC = () => {
           v.name.toLowerCase().includes('mariam') ||
           v.name.toLowerCase().includes('female')
         )
-      ) || voices.find(v => v.lang.includes('ar')) || voices[0];
+      ) || voices.find(v => v.lang.includes('ar')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
 
       const fullText = sentences.join(' . ');
       const utterance = new SpeechSynthesisUtterance(fullText);
-      utterance.lang = 'ar-SA';
+      utterance.lang = bestFemaleVoice?.lang || 'ar-SA';
       utterance.rate = 0.90;
       utterance.pitch = 1.30;
 
@@ -240,6 +255,7 @@ export const AppVideoTutorialModal: React.FC = () => {
       activeUtterancesRef.current = [utterance];
 
       window.speechSynthesis.speak(utterance);
+      setHasUserStartedAudio(true);
     } catch (e) {
       console.warn('Speech playback error:', e);
     }

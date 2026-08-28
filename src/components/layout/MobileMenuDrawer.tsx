@@ -315,9 +315,8 @@ export const MobileMenuDrawer: React.FC = () => {
 
             <button
               onClick={() => {
-                if (window.confirm('هل تريد تسجيل الخروج؟')) {
-                  logout();
-                }
+                setIsMobileMenuOpen(false);
+                logout();
               }}
               className="w-full p-2.5 bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white rounded-xl font-bold flex items-center gap-2.5 transition border border-red-500/30"
             >

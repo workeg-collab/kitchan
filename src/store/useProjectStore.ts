@@ -25,6 +25,7 @@ import {
 import { SAMPLE_PROJECT_MODERN_L } from '../constants/sampleProjects';
 import { dbService } from '../services/dbService';
 import { getItemBoundingBox } from '../utils/cadGeometry';
+import { soundEffects } from '../services/soundEffectsService';
 
 interface ProjectState {
   project: ProjectData;
@@ -149,6 +150,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       canRedo: true,
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(previous));
+    soundEffects.playClick();
   },
 
   redo: () => {
@@ -167,6 +169,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       canRedo: newFuture.length > 0,
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    soundEffects.playClick();
   },
 
   setProject: (project) => {
@@ -297,6 +300,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated, selectedId: id, selectedType: 'cabinet' };
     });
+    soundEffects.playDrop();
 
     return newCabinet;
   },
@@ -334,6 +338,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         selectedType: state.selectedId === id ? null : state.selectedType,
       };
     });
+    soundEffects.playDelete();
   },
 
   duplicateCabinet: (id) => {
@@ -364,6 +369,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated, selectedId: newId, selectedType: 'cabinet' };
     });
+    soundEffects.playPick();
 
     return duplicated;
   },
@@ -388,6 +394,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return { project: updated };
     });
+    soundEffects.playRotate();
   },
 
   // --- Appliances CRUD ---

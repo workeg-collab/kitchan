@@ -35,6 +35,7 @@ import {
   Menu
 } from 'lucide-react';
 import { dbService } from '../../services/dbService';
+import { soundEffects } from '../../services/soundEffectsService';
 
 export const TopNavbar: React.FC = () => {
   const { project, updateMetadata, undo, redo, canUndo, canRedo } = useProjectStore();
@@ -72,9 +73,11 @@ export const TopNavbar: React.FC = () => {
       const tenantId = currentUser?.username || 'admin';
       await dbService.saveProjectForTenant(tenantId, project);
       setSaveSuccess(true);
+      soundEffects.playSuccess();
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (e) {
       console.error(e);
+      soundEffects.playError();
     }
   };
 
