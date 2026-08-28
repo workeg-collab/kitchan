@@ -84,6 +84,8 @@ export const TopNavbar: React.FC = () => {
         return { label: 'غرف نوم', icon: <BedDouble size={13} />, color: 'bg-purple-50 text-purple-700 border-purple-200' };
       case 'library':
         return { label: 'مكتبات', icon: <BookOpen size={13} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+      case 'living':
+        return { label: 'معيشة وصالون', icon: <Sparkles size={13} />, color: 'bg-rose-50 text-rose-700 border-rose-200' };
       default:
         return { label: 'مطابخ', icon: <CookingPot size={13} />, color: 'bg-blue-50 text-blue-700 border-blue-200' };
     }
@@ -94,9 +96,13 @@ export const TopNavbar: React.FC = () => {
   const mainTabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: '2d-plan', label: t.plan2D, icon: <Compass size={14} /> },
     { id: '3d-view', label: t.view3D, icon: <Box size={14} /> },
+    { id: 'walkthrough-vr', label: 'جولة VR', icon: <Sparkles size={14} className="text-purple-600" /> },
+    { id: 'visualization-studio', label: 'استوديو الرندر', icon: <Layers size={14} className="text-amber-600" /> },
+    { id: 'presentation-mode', label: 'عرض العميل', icon: <Users size={14} className="text-emerald-600" /> },
+    { id: 'templates-catalog', label: 'قوالب جاهزة', icon: <Sparkles size={14} className="text-blue-600" /> },
     { id: 'elevations', label: t.elevations, icon: <Layers size={14} /> },
     { id: 'technical-drawings', label: t.blueprint, icon: <FileText size={14} /> },
-    { id: 'manufacturing-bom', label: 'التقطيع والتسعير', icon: <Scissors size={14} /> },
+    { id: 'manufacturing-bom', label: 'التقطيع', icon: <Scissors size={14} /> },
   ];
 
   return (
@@ -239,16 +245,27 @@ export const TopNavbar: React.FC = () => {
           <Settings size={14} className="text-slate-700" />
         </button>
 
-        {/* Super Admin Licenses */}
+        {/* Super Admin Licenses & Catalog */}
         {currentUser?.role === 'admin' && (
-          <button
-            onClick={() => setIsAdminModalOpen(true)}
-            className="hidden 2xl:flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
-            title="لوحة تحكم الاشتراكات والشركات"
-          >
-            <Building2 size={14} />
-            <span>الاشتراكات</span>
-          </button>
+          <>
+            <button
+              onClick={() => setActiveTab('admin-catalog')}
+              className="hidden xl:flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition border border-slate-200"
+              title="إدارة الكتالوج والخامات والقوالب"
+            >
+              <Layers size={14} className="text-purple-600" />
+              <span>إدارة الكتالوج</span>
+            </button>
+
+            <button
+              onClick={() => setIsAdminModalOpen(true)}
+              className="hidden 2xl:flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
+              title="لوحة تحكم الاشتراكات والشركات"
+            >
+              <Building2 size={14} />
+              <span>الاشتراكات</span>
+            </button>
+          </>
         )}
 
         {/* Unit Toggle mm / cm */}

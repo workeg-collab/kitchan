@@ -38,15 +38,16 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
   const Z = bbox.centerY / 1000;
 
   const isBed = cabinet.category === 'bed' || cabinet.type.startsWith('bed-');
-  const isNightstand = cabinet.category === 'nightstand';
-  const isDresser = cabinet.category === 'dresser';
-  const isWardrobe = cabinet.category === 'wardrobe' || cabinet.category === 'closet-internals';
-  const isLibrary = cabinet.category === 'library-full' || cabinet.category === 'bookshelf' || cabinet.category === 'tv-media';
-  const isKitchenBase = cabinet.category === 'base';
+  const isSofa = cabinet.category === 'sofa' || cabinet.type.startsWith('living-sofa');
+  const isCoffeeTable = cabinet.category === 'coffee-table' || cabinet.type === 'living-coffee-table';
+  const isDiningTable = cabinet.category === 'dining-table' || cabinet.type === 'dining-table-6seat';
+  const isTvSlatWall = cabinet.type === 'living-tv-slat-wall' || cabinet.category === 'tv-wall';
+  const isPlant = cabinet.category === 'accent' || cabinet.type === 'accent-indoor-plant';
+  const isKitchenBase = cabinet.category === 'base' || cabinet.category === 'island';
   const isFlapDoor = cabinet.flipUpDoor || cabinet.doorHinge === 'top' || cabinet.type.includes('loft') || cabinet.type.includes('lift-up') || cabinet.type.includes('aventos');
-  const isGlassVitrine = cabinet.hasGlassDoors || cabinet.type === 'wall-glass-vitrine';
+  const isGlassVitrine = cabinet.hasGlassDoors || cabinet.type === 'wall-glass-vitrine' || cabinet.type.includes('glass');
 
-  // Smooth Door Opening Animation (Hinged Doors & Flip-up Flap Doors)
+  // Smooth Door Opening Animation
   useFrame((_, delta) => {
     const targetAngle = isOpenDoors ? Math.PI / 2.2 : 0;
     const targetFlapAngle = isOpenDoors ? -Math.PI / 2.5 : 0;
@@ -108,8 +109,88 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             <meshStandardMaterial color="#f1f5f9" />
           </mesh>
         </group>
+      ) : isSofa ? (
+        /* 2. LIVING SOFA 3D MODEL */
+        <group>
+          {/* Base Seating Cushion */}
+          <mesh position={[0, -H / 2 + 0.25, 0]} castShadow receiveShadow>
+            <boxGeometry args={[W, 0.3, D]} />
+            <meshStandardMaterial color={selectionHighlight || '#334155'} roughness={0.8} />
+          </mesh>
+          {/* Backrest */}
+          <mesh position={[0, 0.1, -D / 2 + 0.15]} castShadow receiveShadow>
+            <boxGeometry args={[W, H * 0.7, 0.25]} />
+            <meshStandardMaterial color={selectionHighlight || '#334155'} roughness={0.8} />
+          </mesh>
+          {/* Left Armrest */}
+          <mesh position={[-W / 2 + 0.1, 0, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.2, H * 0.55, D]} />
+            <meshStandardMaterial color={selectionHighlight || '#334155'} roughness={0.8} />
+          </mesh>
+          {/* Right Armrest */}
+          <mesh position={[W / 2 - 0.1, 0, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.2, H * 0.55, D]} />
+            <meshStandardMaterial color={selectionHighlight || '#334155'} roughness={0.8} />
+          </mesh>
+        </group>
+      ) : isCoffeeTable || isDiningTable ? (
+        /* 3. COFFEE & DINING TABLES */
+        <group>
+          {/* Tabletop */}
+          <mesh position={[0, H / 2 - 0.02, 0]} castShadow receiveShadow>
+            <boxGeometry args={[W, 0.04, D]} />
+            <meshStandardMaterial color={topColor} roughness={0.25} metalness={0.1} />
+          </mesh>
+          {/* 4 Legs */}
+          {[-W / 2 + 0.08, W / 2 - 0.08].map((lx, i) =>
+            [-D / 2 + 0.08, D / 2 - 0.08].map((lz, j) => (
+              <mesh key={`${i}-${j}`} position={[lx, 0, lz]} castShadow receiveShadow>
+                <cylinderGeometry args={[0.025, 0.02, H - 0.04, 16]} />
+                <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
+              </mesh>
+            ))
+          )}
+        </group>
+      ) : isTvSlatWall ? (
+        /* 4. SLAT ACCENT TV WALL PANEL */
+        <group>
+          {/* Back Panel */}
+          <mesh position={[0, 0, -D / 2 + 0.02]} receiveShadow>
+            <boxGeometry args={[W, H, 0.02]} />
+            <meshStandardMaterial color={bodyColor} roughness={0.7} />
+          </mesh>
+          {/* Vertical Wood Slats */}
+          {Array.from({ length: Math.floor(W / 0.08) }).map((_, idx) => {
+            const sx = -W / 2 + 0.04 + idx * 0.08;
+            return (
+              <mesh key={idx} position={[sx, 0, -D / 2 + 0.04]} castShadow receiveShadow>
+                <boxGeometry args={[0.035, H, 0.025]} />
+                <meshStandardMaterial color={frontColor} roughness={0.6} />
+              </mesh>
+            );
+          })}
+          {/* Floating Lower Media Credenza */}
+          <mesh position={[0, -H / 2 + 0.25, 0]} castShadow receiveShadow>
+            <boxGeometry args={[W * 0.9, 0.35, D]} />
+            <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+          </mesh>
+        </group>
+      ) : isPlant ? (
+        /* 5. DECORATIVE INDOOR PLANT */
+        <group>
+          {/* Ceramic Pot */}
+          <mesh position={[0, -H / 2 + 0.25, 0]} castShadow receiveShadow>
+            <cylinderGeometry args={[0.18, 0.14, 0.5, 24]} />
+            <meshStandardMaterial color="#f8fafc" roughness={0.4} />
+          </mesh>
+          {/* Green Plant Foliage */}
+          <mesh position={[0, 0.2, 0]} castShadow>
+            <sphereGeometry args={[0.3, 16, 16]} />
+            <meshStandardMaterial color="#1b4332" roughness={0.8} />
+          </mesh>
+        </group>
       ) : (
-        /* 2. STANDARD CABINET / DRESSING / LOFT / DRAWER 3D MODEL */
+        /* 6. STANDARD CABINET / DRESSING / LOFT / DRAWER 3D MODEL */
         <group>
           {/* Left Carcase Side */}
           <mesh position={[-W / 2 + 0.009, 0, 0]} castShadow receiveShadow>
@@ -161,15 +242,15 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             </mesh>
           )}
 
-          {/* Kitchen Base Countertop */}
+          {/* Kitchen Base / Island Countertop */}
           {isKitchenBase && countertop.enabled && (
-            <mesh position={[0, H / 2 + (countertop.thickness / 2000), (countertop.overhangFront / 2000)]} castShadow receiveShadow>
-              <boxGeometry args={[W + (countertop.overhangSides * 2 / 1000), countertop.thickness / 1000, D + (countertop.overhangFront / 1000)]} />
-              <meshStandardMaterial color={topColor} roughness={0.3} metalness={0.1} />
+            <mesh position={[0, H / 2 + countertop.thickness / 2000, countertop.overhangFront / 2000]} castShadow receiveShadow>
+              <boxGeometry args={[W + (countertop.overhangSides * 2) / 1000, countertop.thickness / 1000, D + countertop.overhangFront / 1000]} />
+              <meshStandardMaterial color={topColor} roughness={0.25} metalness={0.1} />
             </mesh>
           )}
 
-          {/* --- A) FLIP-UP / LIFT-UP CEILING LOFT DOORS (أبواب قلابة للأعلى) --- */}
+          {/* --- A) FLIP-UP / LIFT-UP CEILING LOFT DOORS --- */}
           {isFlapDoor && (
             <group ref={flapDoorRef} position={[0, H / 2 - 0.009, D / 2 + 0.009]}>
               <mesh position={[0, -H / 2 + 0.009, 0]} castShadow receiveShadow>
@@ -184,7 +265,7 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             </group>
           )}
 
-          {/* --- B) MULTIPLE DRAWERS FRONT FACADES (واجهات الأدراج 3D) --- */}
+          {/* --- B) MULTIPLE DRAWERS FRONT FACADES --- */}
           {cabinet.drawerCount > 0 && !isFlapDoor && (
             <group position={[0, 0, D / 2 + 0.009]}>
               {Array.from({ length: cabinet.drawerCount }).map((_, i) => {

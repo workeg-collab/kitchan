@@ -4,13 +4,13 @@ import { getItemBoundingBox } from '../../utils/cadGeometry';
 
 interface Appliance3DProps {
   appliance: ApplianceItem;
-  isSelected: boolean;
-  onSelect: () => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
 export const Appliance3D: React.FC<Appliance3DProps> = ({
   appliance,
-  isSelected,
+  isSelected = false,
   onSelect,
 }) => {
   const { id, type, width, height, depth, x, y, z, rotation, finish } = appliance;
@@ -33,7 +33,7 @@ export const Appliance3D: React.FC<Appliance3DProps> = ({
       rotation={[0, rotRad, 0]}
       onClick={(e) => {
         e.stopPropagation();
-        onSelect();
+        onSelect?.();
       }}
     >
       {isSelected && (

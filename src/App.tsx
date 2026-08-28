@@ -16,6 +16,11 @@ import { TechnicalBlueprint } from './components/technical/TechnicalBlueprint';
 import { CabinetSchedule } from './components/schedule/CabinetSchedule';
 import { CuttingListView } from './components/manufacturing/CuttingListView';
 import { PricingCalculatorView } from './components/pricing/PricingCalculatorView';
+import { WalkthroughVRCanvas } from './components/walkthrough/WalkthroughVRCanvas';
+import { VisualizationStudio } from './components/visualization/VisualizationStudio';
+import { ClientPresentationView } from './components/presentation/ClientPresentationView';
+import { TemplatesBrowserView } from './components/templates/TemplatesBrowserView';
+import { AdminCatalogManager } from './components/admin/AdminCatalogManager';
 import { RoomConfigModal } from './components/modals/RoomConfigModal';
 import { RoomSketcherModal } from './components/modals/RoomSketcherModal';
 import { CustomCabinetModal } from './components/modals/CustomCabinetModal';
@@ -133,11 +138,16 @@ export const App: React.FC = () => {
         <main className="flex-1 h-full relative overflow-hidden bg-slate-100">
           {activeTab === '2d-plan' && <Canvas2D />}
           {activeTab === '3d-view' && <Canvas3D />}
+          {activeTab === 'walkthrough-vr' && <WalkthroughVRCanvas />}
+          {activeTab === 'visualization-studio' && <VisualizationStudio />}
+          {activeTab === 'presentation-mode' && <ClientPresentationView />}
+          {activeTab === 'templates-catalog' && <TemplatesBrowserView />}
           {activeTab === 'elevations' && <ElevationViewer />}
           {activeTab === 'technical-drawings' && <TechnicalBlueprint />}
           {activeTab === 'cabinet-schedule' && <CabinetSchedule />}
           {activeTab === 'manufacturing-bom' && <CuttingListView />}
           {activeTab === 'pricing-calculator' && <PricingCalculatorView />}
+          {activeTab === 'admin-catalog' && <AdminCatalogManager />}
         </main>
 
         {/* Right Sidebar (Only in 2D and 3D views) */}

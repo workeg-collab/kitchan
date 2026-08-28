@@ -13,13 +13,13 @@ export * from './manufacturingSystems';
 
 export type UnitType = 'mm' | 'cm';
 
-export type ProjectType = 'kitchen' | 'dressing' | 'bedroom' | 'library';
+export type ProjectType = 'kitchen' | 'dressing' | 'bedroom' | 'library' | 'living' | 'office' | 'bathroom';
 
-export type CabinetCategory = 'base' | 'wall' | 'tall' | 'corner' | 'custom';
+export type CabinetCategory = 'base' | 'wall' | 'tall' | 'corner' | 'island' | 'custom';
 
 // Dressing / Wardrobe Types
 export type WardrobeCategory = 'wardrobe' | 'closet-internals' | 'accessories' | 'custom';
-export type WardrobeDoorType = 'hinged' | 'sliding' | 'folding' | 'open';
+export type WardrobeDoorType = 'hinged' | 'sliding' | 'folding' | 'open' | 'glass-frame';
 
 // Bedroom Types
 export type BedroomCategory = 'bed' | 'nightstand' | 'dresser' | 'tv-unit' | 'bench' | 'custom';
@@ -28,7 +28,19 @@ export type BedType = 'single' | 'double' | 'queen' | 'king' | 'storage-hydrauli
 // Library Types
 export type LibraryCategory = 'library-full' | 'bookshelf' | 'tv-media' | 'display' | 'floating' | 'custom';
 
-export type FurnitureCategory = CabinetCategory | WardrobeCategory | BedroomCategory | LibraryCategory;
+// Living, Office, Bathroom, & Custom Categories
+export type LivingCategory = 'sofa' | 'coffee-table' | 'dining-table' | 'tv-wall' | 'credenza' | 'wall-panel' | 'accent' | 'custom';
+export type OfficeCategory = 'office-desk' | 'office-chair' | 'filing-cabinet' | 'custom';
+export type BathroomCategory = 'vanity-basin' | 'mirror-cabinet' | 'custom';
+
+export type FurnitureCategory = 
+  | CabinetCategory 
+  | WardrobeCategory 
+  | BedroomCategory 
+  | LibraryCategory 
+  | LivingCategory 
+  | OfficeCategory 
+  | BathroomCategory;
 
 export type CabinetType = 
   | 'base-single-door'
@@ -101,7 +113,28 @@ export type CabinetType =
   | 'library-bookshelf-doors'
   | 'library-tv-center'
   | 'library-display-glass'
-  | 'library-floating-shelves';
+  | 'library-floating-shelves'
+  // Living & Dining types
+  | 'living-sofa-3seat'
+  | 'living-sofa-l-shape'
+  | 'living-armchair'
+  | 'living-coffee-table'
+  | 'living-tv-slat-wall'
+  | 'living-credenza-buffet'
+  | 'dining-table-6seat'
+  | 'dining-chair'
+  // Office types
+  | 'office-executive-desk'
+  | 'office-chair'
+  | 'office-storage-credenza'
+  // Bathroom types
+  | 'bathroom-vanity-single'
+  | 'bathroom-vanity-double'
+  | 'bathroom-mirror-led'
+  // Decorative & Accents
+  | 'accent-indoor-plant'
+  | 'accent-pendant-light'
+  | 'accent-slat-wall-panel';
 
 export type ApplianceType =
   | 'fridge-freestanding'
@@ -118,7 +151,9 @@ export type ApplianceType =
   | 'sink-double'
   | 'tv-screen'
   | 'soundbar'
-  | 'led-strip';
+  | 'led-strip'
+  | 'coffee-machine'
+  | 'wine-cooler';
 
 export type ArchitecturalElementType =
   | 'door'
@@ -360,6 +395,51 @@ export interface ProjectMetadata {
   unit: UnitType;
 }
 
+export interface DesignOption {
+  id: string;
+  name: string;
+  description?: string;
+  materials: MaterialFinishes;
+  countertop?: CountertopConfig;
+  plinth?: PlinthConfig;
+  backsplash?: BacksplashConfig;
+  previewImage?: string;
+  isDefault?: boolean;
+}
+
+export type LightingPreset = 'daylight' | 'sunset' | 'night' | 'studio';
+export type CameraAnglePreset = 'perspective' | 'wide' | 'eye-level' | 'macro-detail' | 'axonometric' | 'top-down';
+export type RenderResolution = '1080p' | '2k' | '4k';
+
+export interface RenderSnapshot {
+  id: string;
+  timestamp: string;
+  imageUrl: string;
+  angleName: string;
+  lightingPreset: LightingPreset;
+  resolution: RenderResolution;
+  designOptionName?: string;
+  isAiEnhanced?: boolean;
+}
+
+export interface DimensionAdaptationRule {
+  targetWidth: number;
+  targetLength: number;
+  targetHeight: number;
+  preserveIsland?: boolean;
+  scaleMethod: 'modular-fit' | 'proportional' | 'fill-spacers';
+}
+
+export interface DimensionConflict {
+  id: string;
+  type: 'wall-overflow' | 'aisle-clearance' | 'door-collision' | 'appliance-mismatch' | 'corner-fit';
+  severity: 'warning' | 'error';
+  message: string;
+  involvedCabinetId?: string;
+  involvedCabinetName?: string;
+  suggestedFix?: string;
+}
+
 export interface ProjectData {
   metadata: ProjectMetadata;
   room: RoomConfig;
@@ -372,14 +452,22 @@ export interface ProjectData {
   materials: MaterialFinishes;
   manufacturing: ManufacturingSettings;
   pricing: PricingSettings;
+  designOptions?: DesignOption[];
+  activeDesignOptionId?: string;
+  savedSnapshots?: RenderSnapshot[];
 }
 
 export type ActiveTab = 
   | '2d-plan' 
   | '3d-view' 
+  | 'walkthrough-vr'
+  | 'visualization-studio'
+  | 'presentation-mode'
+  | 'templates-catalog'
   | 'elevations' 
   | 'technical-drawings' 
   | 'cabinet-schedule' 
   | 'manufacturing-bom' 
   | 'pricing-calculator'
+  | 'admin-catalog'
   | 'dashboard';

@@ -4,13 +4,13 @@ import { getItemBoundingBox } from '../../utils/cadGeometry';
 
 interface ArchElements3DProps {
   elements: ArchitecturalElement[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
+  selectedId?: string | null;
+  onSelect?: (id: string) => void;
 }
 
 export const ArchElements3D: React.FC<ArchElements3DProps> = ({
   elements,
-  selectedId,
+  selectedId = null,
   onSelect,
 }) => {
   return (
@@ -65,7 +65,7 @@ export const ArchElements3D: React.FC<ArchElements3DProps> = ({
             rotation={[0, rotRad, 0]}
             onClick={(e) => {
               e.stopPropagation();
-              onSelect(id);
+              onSelect?.(id);
             }}
           >
             {/* WINDOW (Embedded inside Wall Thickness) */}

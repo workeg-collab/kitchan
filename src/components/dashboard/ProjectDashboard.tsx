@@ -10,6 +10,7 @@ import {
   SAMPLE_PROJECT_BEDROOM, 
   SAMPLE_PROJECT_LIBRARY 
 } from '../../constants/sampleProjects';
+import { PROJECT_LIVING_LUXURY_OPEN } from '../../constants/expandedProjects';
 import { 
   CookingPot, 
   Shirt, 
@@ -17,7 +18,12 @@ import {
   BookOpen, 
   LogOut,
   Users,
-  Building2
+  Building2,
+  Armchair,
+  Sparkles,
+  Footprints,
+  Camera,
+  Layers
 } from 'lucide-react';
 
 export const ProjectDashboard: React.FC = () => {
@@ -39,7 +45,7 @@ export const ProjectDashboard: React.FC = () => {
       id: 'kitchen',
       title: 'مطابخ',
       titleEn: 'Kitchens',
-      icon: <CookingPot size={42} strokeWidth={1.75} />,
+      icon: <CookingPot size={38} strokeWidth={1.75} />,
       iconColor: 'text-blue-600',
       iconBg: 'bg-blue-50 group-hover:bg-blue-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_KITCHEN,
@@ -48,7 +54,7 @@ export const ProjectDashboard: React.FC = () => {
       id: 'dressing',
       title: 'دريسينج',
       titleEn: 'Dressing Rooms',
-      icon: <Shirt size={42} strokeWidth={1.75} />,
+      icon: <Shirt size={38} strokeWidth={1.75} />,
       iconColor: 'text-amber-600',
       iconBg: 'bg-amber-50 group-hover:bg-amber-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_DRESSING,
@@ -57,25 +63,34 @@ export const ProjectDashboard: React.FC = () => {
       id: 'bedroom',
       title: 'غرف نوم',
       titleEn: 'Bedrooms',
-      icon: <BedDouble size={42} strokeWidth={1.75} />,
+      icon: <BedDouble size={38} strokeWidth={1.75} />,
       iconColor: 'text-purple-600',
       iconBg: 'bg-purple-50 group-hover:bg-purple-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_BEDROOM,
     },
     {
       id: 'library',
-      title: 'مكتبات',
-      titleEn: 'Libraries & TV Units',
-      icon: <BookOpen size={42} strokeWidth={1.75} />,
+      title: 'مكتبات وشاشات',
+      titleEn: 'Libraries & Media',
+      icon: <BookOpen size={38} strokeWidth={1.75} />,
       iconColor: 'text-emerald-600',
       iconBg: 'bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_LIBRARY,
+    },
+    {
+      id: 'living',
+      title: 'معيشة وصالون',
+      titleEn: 'Living & Dining',
+      icon: <Armchair size={38} strokeWidth={1.75} />,
+      iconColor: 'text-rose-600',
+      iconBg: 'bg-rose-50 group-hover:bg-rose-600 group-hover:text-white',
+      sample: PROJECT_LIVING_LUXURY_OPEN as any,
     },
   ];
 
   const handleSelectModule = (sampleData: typeof SAMPLE_PROJECT_KITCHEN) => {
     loadSampleProject(sampleData);
-    setActiveTab('2d-plan');
+    setActiveTab('3d-view');
   };
 
   return (
@@ -153,33 +168,60 @@ export const ProjectDashboard: React.FC = () => {
           </p>
         </div>
 
-        {/* 3. The 4 Clean, Light-Colored Square Cards (بدون أي بيانات داخل المربع) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full px-2">
+        {/* 3. The 5 Clean, Light-Colored Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 w-full px-2">
           {modules.map((m) => (
             <button
               key={m.id}
               onClick={() => handleSelectModule(m.sample)}
-              className="group aspect-square w-full bg-white/95 hover:bg-white backdrop-blur-xl border border-white/80 rounded-3xl p-8 shadow-2xl hover:shadow-blue-600/30 flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 active:scale-95 cursor-pointer relative overflow-hidden"
+              className="group aspect-square w-full bg-white/95 hover:bg-white backdrop-blur-xl border border-white/80 rounded-3xl p-6 shadow-2xl hover:shadow-blue-600/30 flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 active:scale-95 cursor-pointer relative overflow-hidden"
             >
               {/* Subtle top light reflection accent */}
               <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-slate-200 to-transparent group-hover:via-blue-500 transition-colors" />
 
               {/* Large Icon Container */}
-              <div className={`w-24 h-24 rounded-3xl ${m.iconBg} ${m.iconColor} flex items-center justify-center transition-all duration-300 shadow-sm group-hover:scale-110 mb-5`}>
+              <div className={`w-18 h-18 rounded-2xl ${m.iconBg} ${m.iconColor} flex items-center justify-center transition-all duration-300 shadow-sm group-hover:scale-110 mb-4`}>
                 {m.icon}
               </div>
 
-              {/* Only Clean Title */}
-              <h2 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight">
+              {/* Clean Title */}
+              <h2 className="text-lg md:text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight text-center">
                 {m.title}
               </h2>
               
               {/* English Sub-label */}
-              <span className="text-xs font-mono font-bold text-slate-400 mt-1 uppercase tracking-wider group-hover:text-slate-600 transition-colors">
+              <span className="text-[10px] font-mono font-bold text-slate-400 mt-0.5 uppercase tracking-wider group-hover:text-slate-600 transition-colors text-center">
                 {m.titleEn}
               </span>
             </button>
           ))}
+        </div>
+
+        {/* Quick Hub Shortcuts */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <button
+            onClick={() => setActiveTab('templates-catalog')}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl text-xs font-black shadow-xl shadow-blue-500/30 transition transform hover:scale-105 cursor-pointer border border-blue-400/40"
+          >
+            <Sparkles size={16} />
+            <span>كتالوج المشاريع الجاهزة والمواءمة الذكية</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('visualization-studio')}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-2xl text-xs font-black shadow-xl transition transform hover:scale-105 cursor-pointer border border-white/30"
+          >
+            <Camera size={16} />
+            <span>استوديو الرندر والتصوير الواقعي</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('walkthrough-vr')}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-2xl text-xs font-black shadow-xl transition transform hover:scale-105 cursor-pointer border border-white/30"
+          >
+            <Footprints size={16} />
+            <span>جولة التجول الافتراضي VR</span>
+          </button>
         </div>
       </div>
 

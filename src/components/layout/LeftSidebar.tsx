@@ -6,6 +6,7 @@ import { CABINET_LIBRARY, CabinetTemplate } from '../../constants/cabinetLibrary
 import { WARDROBE_LIBRARY, WardrobeTemplate } from '../../constants/wardrobeLibrary';
 import { BEDROOM_LIBRARY, BedroomTemplate } from '../../constants/bedroomLibrary';
 import { LIBRARY_LIBRARY, LibraryTemplate } from '../../constants/libraryUnitLibrary';
+import { LIVING_AND_OTHER_LIBRARY, LivingTemplate } from '../../constants/livingAndOtherLibrary';
 import { APPLIANCE_LIBRARY } from '../../constants/applianceLibrary';
 import { ARCHITECTURAL_LIBRARY, ArchitecturalTemplate } from '../../constants/archLibrary';
 import { formatDimension } from '../../utils/unitConversion';
@@ -52,6 +53,10 @@ export const LeftSidebar: React.FC = () => {
         return BEDROOM_LIBRARY;
       case 'library':
         return LIBRARY_LIBRARY;
+      case 'living':
+      case 'office':
+      case 'bathroom':
+        return LIVING_AND_OTHER_LIBRARY;
       default:
         return CABINET_LIBRARY;
     }
