@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSubscriptionStore } from '../../store/useSubscriptionStore';
 import { dbService } from '../../services/dbService';
-import { Lock, User, Eye, EyeOff, ShieldCheck, CheckCircle2, AlertCircle, Building2, Mail } from 'lucide-react';
+import { soundEffects } from '../../services/soundEffectsService';
+import { Lock, User, Eye, EyeOff, ShieldCheck, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
 export const LoginScreen: React.FC = () => {
   const { login, loginAsTenant } = useAuthStore();
@@ -14,7 +15,7 @@ export const LoginScreen: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Auto-fill and auto-login from URL parameters if present (e.g. from WhatsApp link: ?u=...&p=...)
+  // Auto-fill and auto-login from URL parameters if present
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const u = params.get('u') || params.get('user') || params.get('username');
@@ -36,6 +37,7 @@ export const LoginScreen: React.FC = () => {
 
       if (!cleanUser || !cleanPass) {
         setErrorMessage('يرجى إدخال اسم المستخدم وكلمة المرور');
+        soundEffects.playError();
         setIsLoading(false);
         return;
       }
@@ -45,6 +47,7 @@ export const LoginScreen: React.FC = () => {
         const result = login('admin', 'Germen@600');
         if (result.success) {
           setActiveTenant(null);
+          soundEffects.playSuccess();
           setIsLoading(false);
           return;
         }
@@ -83,6 +86,7 @@ export const LoginScreen: React.FC = () => {
           const validity = checkSubscriptionValid(tenant);
           if (!validity.isValid) {
             setErrorMessage(validity.reason || 'عفواً، انتهت فترة الاشتراك المحددة لشركتكم. يرجى التواصل مع الإدارة للتجديد.');
+            soundEffects.playError();
             setIsLoading(false);
             return;
           }
@@ -95,10 +99,12 @@ export const LoginScreen: React.FC = () => {
             companyName: tenant.companyName,
             createdAt: tenant.createdAt,
           });
+          soundEffects.playSuccess();
           setIsLoading(false);
           return;
         } else {
           setErrorMessage('كلمة المرور غير صحيحة لحساب المشترك');
+          soundEffects.playError();
           setIsLoading(false);
           return;
         }
@@ -108,17 +114,21 @@ export const LoginScreen: React.FC = () => {
       const result = login(cleanUser, cleanPass);
       if (!result.success) {
         setErrorMessage(result.error || 'اسم المستخدم أو كلمة المرور غير صحيحة');
+        soundEffects.playError();
       } else {
-        setActiveTenant(null); // Admin / Local user
+        setActiveTenant(null);
+        soundEffects.playSuccess();
       }
     } catch (err) {
       console.warn('Login fallback:', err);
-      // Failsafe: Try standard user login before showing any error
       const cleanUser = inputUser.trim().toLowerCase();
       const cleanPass = inputPass.trim();
       const result = login(cleanUser, cleanPass);
       if (!result.success) {
         setErrorMessage('اسم المستخدم أو كلمة المرور غير صحيحة');
+        soundEffects.playError();
+      } else {
+        soundEffects.playSuccess();
       }
     } finally {
       setIsLoading(false);
@@ -131,179 +141,194 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="w-screen h-screen bg-slate-100 flex items-center justify-center p-4 md:p-8 relative overflow-hidden select-none font-sans">
+    <div className="min-h-screen w-full bg-slate-950 flex flex-col items-center justify-center p-3 sm:p-6 md:p-8 relative overflow-y-auto font-sans select-none">
+      
       {/* Background Architectural Grid Pattern */}
-      <div className="absolute inset-0 bg-cad-grid opacity-70 pointer-events-none" />
+      <div 
+        className="fixed inset-0 bg-cover bg-center opacity-30 scale-105 pointer-events-none"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=80')`
+        }}
+      />
+      <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-[4px] pointer-events-none" />
 
-      {/* Decorative Blur Glows */}
-      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Decorative Glows */}
+      <div className="fixed top-1/4 -left-20 w-80 sm:w-96 h-80 sm:h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-1/4 -right-20 w-80 sm:w-96 h-80 sm:h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Split-Screen Main Card */}
-      <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden relative z-10 grid grid-cols-1 md:grid-cols-2 animate-in fade-in zoom-in-95 duration-200">
-        {/* RIGHT SIDE: Modern Interior Showcase */}
-        <div className="relative bg-slate-900 text-white p-8 flex flex-col justify-between overflow-hidden min-h-[380px] md:min-h-[540px]">
-          {/* High-Resolution Luxury Kitchen & Dressing Image */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center opacity-65 scale-105 transition duration-700 hover:scale-100"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80')`
-            }}
-          />
-          {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-900/40" />
-
-          {/* Top Brand Tag */}
-          <div className="relative z-10 flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <span className="font-mono font-black text-white text-base tracking-tighter">FC</span>
-            </div>
-            <div>
-              <div className="text-base font-bold tracking-tight text-white">
-                فرنتشر كاد <span className="text-blue-400 font-extrabold">برو</span>
+      {/* Main Container Card */}
+      <div className="relative z-10 w-full max-w-4xl bg-slate-900/90 border border-slate-800/90 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl my-auto animate-in fade-in zoom-in-95 duration-300">
+        <div className="grid grid-cols-1 md:grid-cols-12">
+          
+          {/* DESKTOP LEFT / TOP SHOWCASE BANNER (Hidden on small mobile to give priority to login form) */}
+          <div className="hidden md:flex md:col-span-6 relative bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 p-8 flex-col justify-between overflow-hidden border-l border-slate-800 text-white">
+            {/* Top Brand Tag */}
+            <div className="relative z-10 flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 border border-white/20">
+                <span className="font-mono font-black text-white text-lg">FC</span>
               </div>
-              <div className="text-[11px] text-slate-300 font-medium">نظام التصميم والتصنيع السحابي B2B</div>
+              <div>
+                <div className="text-base font-black text-white">
+                  فرنتشر كاد <span className="text-blue-400">برو</span>
+                </div>
+                <div className="text-xs text-slate-400 font-medium">نظام التصميم والتصنيع السحابي</div>
+              </div>
+            </div>
+
+            {/* Center Visuals */}
+            <div className="relative z-10 my-auto py-6 space-y-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold rounded-full">
+                <Sparkles size={13} className="text-amber-300" />
+                <span>منظومة تصميم الأثاث والمطابخ</span>
+              </span>
+              <h2 className="text-2xl font-black text-white leading-snug">
+                صمم بالدقة الهندسية 2D/3D واستخرج جداول التقطيع والتسعير فوراً
+              </h2>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                دعم كامل للمطابخ، الدريسينج، غرف النوم، والمكتبات مع حفظ سحابي دائم للمشاريع.
+              </p>
+
+              {/* Feature Chips */}
+              <div className="grid grid-cols-2 gap-2 pt-2 text-xs font-bold text-slate-200">
+                <div className="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/10">
+                  <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
+                  <span>توليد كشوفات BOM</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/10">
+                  <CheckCircle2 size={15} className="text-blue-400 shrink-0" />
+                  <span>تسعير وش الوحدات م²</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/10">
+                  <CheckCircle2 size={15} className="text-purple-400 shrink-0" />
+                  <span>مسح بالكاميرا AI</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/10">
+                  <CheckCircle2 size={15} className="text-amber-400 shrink-0" />
+                  <span>تصدير PDF و DXF</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Version */}
+            <div className="relative z-10 text-[11px] text-slate-500 font-mono flex justify-between items-center border-t border-slate-800 pt-3">
+              <span>FurnitureCAD Cloud v2.5</span>
+              <span>تشفير آمن للبيانات 🔒</span>
             </div>
           </div>
 
-          {/* Center Graphic Highlights */}
-          <div className="relative z-10 my-auto py-6">
-            <span className="inline-block px-3 py-1 bg-blue-500/20 border border-blue-400/40 text-blue-300 text-[11px] font-bold rounded-full mb-3 backdrop-blur-md">
-              منظومة الاشتراكات السحابية لمصانع وشركات الأثاث
-            </span>
-            <h2 className="text-2xl lg:text-3xl font-extrabold text-white leading-snug">
-              صمم بالدقة الهندسية، شاهد مجسمك 3D، واستخرج جداول التقطيع والتسعير
-            </h2>
-            <p className="text-xs text-slate-300 mt-2.5 leading-relaxed">
-              دعم كامل للمطابخ، الدريسينج، غرف النوم، والمكتبات مع حماية وتخزين المشاريع في قاعدة بيانات دائمة.
-            </p>
-
-            {/* Quick Feature Bullets */}
-            <div className="grid grid-cols-2 gap-2.5 mt-6 text-xs font-semibold text-slate-200">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
-                <CheckCircle2 size={15} className="text-blue-400 shrink-0" />
-                <span>اشتراكات شهرية وسنوية</span>
+          {/* RIGHT / MAIN LOGIN FORM (Optimized for Mobile & Desktop) */}
+          <div className="md:col-span-6 p-6 sm:p-8 md:p-10 flex flex-col justify-center bg-white rounded-3xl md:rounded-r-none">
+            
+            {/* Mobile Header Brand (Visible on Mobile) */}
+            <div className="md:hidden flex items-center justify-center gap-2.5 pb-4 mb-4 border-b border-slate-100">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 text-white font-mono font-black text-sm">
+                FC
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
-                <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
-                <span>حفظ سحابي دائم للمشاريع</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
-                <CheckCircle2 size={15} className="text-amber-400 shrink-0" />
-                <span>جداول تقطيع الألواح والأعواد</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
-                <CheckCircle2 size={15} className="text-purple-400 shrink-0" />
-                <span>تصدير أوتوكاد و PDF</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Version */}
-          <div className="relative z-10 text-[11px] text-slate-400 font-mono flex justify-between items-center border-t border-white/10 pt-3">
-            <span>FurnitureCAD Cloud v2.5</span>
-            <span>بيانات مشفرة ومؤمنة</span>
-          </div>
-        </div>
-
-        {/* LEFT SIDE: Secure Login Form */}
-        <div className="p-8 md:p-10 flex flex-col justify-center bg-white">
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">تسجيل الدخول</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              أدخل اسم المستخدم وكلمة المرور الخاصة بشركتكم أو حسابك
-            </p>
-          </div>
-
-          {/* Error Alert */}
-          {errorMessage && (
-            <div className="mb-5 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-start gap-2.5 animate-shake">
-              <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
-              <div className="leading-relaxed">{errorMessage}</div>
-            </div>
-          )}
-
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-4">
-            {/* Username Input */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                اسم المستخدم (Username)
-              </label>
-              <div className="relative">
-                <User size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  required
-                  autoFocus
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="اسم المستخدم أو كود الشركة"
-                  className="w-full pr-10 pl-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 transition"
-                />
+              <div className="text-right">
+                <h1 className="text-base font-black text-slate-900">
+                  فرنتشر كاد <span className="text-blue-600">برو</span>
+                </h1>
+                <p className="text-[11px] text-slate-500 font-medium">تسجيل الدخول للنظام</p>
               </div>
             </div>
 
-            {/* Password Input */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                كلمة المرور (Password)
-              </label>
-              <div className="relative">
-                <Lock size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="أدخل كلمة المرور"
-                  className="w-full pr-10 pl-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
+            {/* Desktop Header */}
+            <div className="mb-5 text-right">
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">تسجيل الدخول</h3>
+              <p className="text-xs text-slate-500 mt-1 font-medium">
+                أدخل اسم المستخدم وكلمة المرور الخاصة بحسابك أو شركتك
+              </p>
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 transition transform active:scale-98 mt-3"
-            >
-              {isLoading ? (
-                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  <ShieldCheck size={16} />
-                  <span>دخول إلى ساحة العمل</span>
-                </>
-              )}
-            </button>
-          </form>
+            {/* Error Message Alert */}
+            {errorMessage && (
+              <div className="mb-4 p-3 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-start gap-2 animate-in fade-in duration-200">
+                <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">{errorMessage}</div>
+              </div>
+            )}
 
-          {/* Agency Signature & Contact (Borderless & Minimalist) */}
-          <div className="mt-6 flex flex-col items-center justify-center text-center space-y-1 text-[10.5px] text-slate-400">
-            <div className="flex items-center justify-center gap-1.5 flex-wrap">
-              <span>تطوير وبرمجة:</span>
-              <strong className="text-slate-700 font-mono font-bold">POM Agency</strong>
-              <span className="text-slate-300">•</span>
-              <span>للتواصل والاستفسارات:</span>
-              <a
-                href="mailto:sales@pom-agency.online"
-                className="font-mono text-blue-600 hover:text-blue-700 underline underline-offset-2 transition font-semibold"
-                title="sales@pom-agency.online"
+            {/* Form */}
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Username Input */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 text-right">
+                  اسم المستخدم (Username)
+                </label>
+                <div className="relative">
+                  <User size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="اسم المستخدم أو كود الشركة"
+                    className="w-full pr-11 pl-3 py-3 sm:py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 text-right">
+                  كلمة المرور (Password)
+                </label>
+                <div className="relative">
+                  <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="أدخل كلمة المرور"
+                    className="w-full pr-11 pl-11 py-3 sm:py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 transition"
+                    title={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer mt-2"
               >
-                sales@pom-agency.online
-              </a>
+                {isLoading ? (
+                  <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <ShieldCheck size={18} />
+                    <span>دخول إلى ساحة العمل 🚀</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Footer Credits */}
+            <div className="mt-6 pt-4 border-t border-slate-100 text-center space-y-1 text-[11px] text-slate-400 font-medium">
+              <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                <span>تطوير وبرمجة:</span>
+                <strong className="text-slate-700 font-mono font-bold">POM Agency</strong>
+                <span className="text-slate-300">•</span>
+                <a
+                  href="mailto:sales@pom-agency.online"
+                  className="font-mono text-blue-600 hover:underline font-bold"
+                >
+                  sales@pom-agency.online
+                </a>
+              </div>
+              <p className="text-[10px] text-slate-400">
+                منظومة فرنتشر كاد برو &copy; 2026 جميع الحقوق محفوظة
+              </p>
             </div>
-            <p className="text-[10px] text-slate-400/70">
-              منظومة فرنتشر كاد برو &copy; 2026 جميع الحقوق محفوظة
-            </p>
           </div>
         </div>
       </div>
