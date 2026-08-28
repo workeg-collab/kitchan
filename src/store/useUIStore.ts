@@ -88,6 +88,8 @@ interface UIState {
   setIsVideoTutorialOpen: (open: boolean) => void;
   isCameraScannerOpen: boolean;
   setIsCameraScannerOpen: (open: boolean) => void;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
 }
 
 const savedLang = (localStorage.getItem('kitchan_lang') as Language) || 'ar';
@@ -200,4 +202,6 @@ export const useUIStore = create<UIState>((set) => ({
   setIsVideoTutorialOpen: (isVideoTutorialOpen) => set({ isVideoTutorialOpen }),
   isCameraScannerOpen: false,
   setIsCameraScannerOpen: (isCameraScannerOpen) => set({ isCameraScannerOpen }),
+  isMobileMenuOpen: false,
+  setIsMobileMenuOpen: (isMobileMenuOpen) => set({ isMobileMenuOpen }),
 }));

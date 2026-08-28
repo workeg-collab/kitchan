@@ -58,7 +58,20 @@ export const RightSidebar: React.FC = () => {
   }
 
   return (
-    <aside className="w-80 bg-white border-l border-slate-200/90 flex flex-col h-full select-none z-20 overflow-y-auto shadow-sm font-sans animate-in slide-in-from-right-2 duration-200 text-xs">
+    <>
+      {/* Backdrop on mobile when an item is selected */}
+      {hasSelection && (
+        <div 
+          onClick={clearSelection}
+          className="lg:hidden fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-30 transition-opacity"
+        />
+      )}
+
+      <aside className="fixed inset-x-0 bottom-12 max-h-[75vh] w-full bg-white border-t-2 border-slate-300 z-40 shadow-2xl rounded-t-3xl overflow-y-auto select-none font-sans animate-in slide-in-from-bottom duration-200 text-xs lg:relative lg:bottom-0 lg:max-h-full lg:w-80 lg:rounded-none lg:border-t-0 lg:border-l lg:border-slate-200/90 lg:z-20 lg:slide-in-from-right-2">
+        {/* Mobile Drag Indicator Pill */}
+        <div className="lg:hidden flex items-center justify-center pt-2 pb-1">
+          <div className="w-12 h-1.5 bg-slate-300 rounded-full" />
+        </div>
       {/* ========================================================================= */}
       {/* 1. CABINET / FURNITURE ITEM INSPECTOR                                      */}
       {/* ========================================================================= */}
@@ -435,5 +448,6 @@ export const RightSidebar: React.FC = () => {
         </div>
       )}
     </aside>
+    </>
   );
 };

@@ -31,7 +31,8 @@ import {
   ChevronDown,
   Camera,
   FolderOpen,
-  Play
+  Play,
+  Menu
 } from 'lucide-react';
 import { dbService } from '../../services/dbService';
 
@@ -50,6 +51,7 @@ export const TopNavbar: React.FC = () => {
     setIsSettingsModalOpen,
     setIsVideoTutorialOpen,
     setIsCameraScannerOpen,
+    setIsMobileMenuOpen,
   } = useUIStore();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -340,7 +342,11 @@ export const TopNavbar: React.FC = () => {
       {/* ========================================================================= */}
       {/* 3. RIGHT SECTION: UNIT, LANGUAGE, EXPORT & SETTINGS                       */}
       {/* ========================================================================= */}
-      <div className="flex items-center gap-2">
+      {/* ========================================================================= */}
+      {/* 3. RIGHT SECTION: RESPONSIVE CONTROLS & MOBILE HAMBURGER MENU             */}
+      {/* ========================================================================= */}
+      {/* Desktop Controls (lg:flex) */}
+      <div className="hidden lg:flex items-center gap-2">
         {/* Unit Toggle cm / mm */}
         <button
           onClick={toggleUnit}
@@ -350,14 +356,14 @@ export const TopNavbar: React.FC = () => {
           {unit === 'cm' ? 'سم (cm)' : 'مم (mm)'}
         </button>
 
-        {/* Mobile Camera AI Room Scanner Trigger */}
+        {/* Camera AI Room Scanner Trigger */}
         <button
           onClick={() => setIsCameraScannerOpen(true)}
           className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition shadow-2xs"
           title="مسح وتصوير المطبخ بالكاميرا واستخراج رسمة بالذكاء الاصطناعي"
         >
           <Camera size={14} className="text-emerald-600" />
-          <span className="hidden sm:inline">مسح بالكاميرا</span>
+          <span>مسح بالكاميرا</span>
         </button>
 
         {/* Export / PDF Modal */}
@@ -367,7 +373,7 @@ export const TopNavbar: React.FC = () => {
           title="تصدير المخطط، تقرير الأسعار، أو ملفات PDF"
         >
           <Download size={14} className="text-blue-600" />
-          <span className="hidden sm:inline">تصدير</span>
+          <span>تصدير</span>
         </button>
 
         {/* Video Tutorial Guide Trigger */}
@@ -377,7 +383,7 @@ export const TopNavbar: React.FC = () => {
           title="فيديو ودليل الشرح الشامل لطرق الرسم والتعامل مع البلوكات والأدوات المخفية"
         >
           <Play size={13} fill="currentColor" />
-          <span className="hidden md:inline">شرح البرنامج</span>
+          <span>شرح البرنامج</span>
         </button>
 
         {/* Project & Materials Settings Modal Trigger */}
@@ -387,14 +393,14 @@ export const TopNavbar: React.FC = () => {
           title="إعدادات المشروع، الخامات الجديدة، وتعديل أسعار الألواح"
         >
           <Settings size={14} className="text-purple-600" />
-          <span className="hidden sm:inline">الخامات والإعدادات</span>
+          <span>الخامات والإعدادات</span>
         </button>
 
         {/* User Account / Admin Badge */}
         {currentUser?.role === 'admin' && (
           <button
             onClick={() => setIsAdminModalOpen(true)}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
             title="لوحة الإدارة والاشتراكات"
           >
             <Building2 size={13} />
@@ -408,6 +414,27 @@ export const TopNavbar: React.FC = () => {
           title={currentUser?.name || currentUser?.username || 'المستخدم'}
         >
           <Users size={15} />
+        </button>
+      </div>
+
+      {/* Mobile Controls (lg:hidden) */}
+      <div className="flex lg:hidden items-center gap-1.5">
+        {/* Camera Shortcut */}
+        <button
+          onClick={() => setIsCameraScannerOpen(true)}
+          className="p-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition shadow-2xs"
+          title="مسح بالكاميرا"
+        >
+          <Camera size={16} />
+        </button>
+
+        {/* Hamburger Menu Toggle Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="p-2 bg-slate-900 text-white hover:bg-slate-800 rounded-xl transition shadow-sm flex items-center justify-center"
+          title="فتح القائمة الشاملة"
+        >
+          <Menu size={18} />
         </button>
       </div>
     </header>

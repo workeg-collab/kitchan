@@ -113,11 +113,19 @@ export const LeftSidebar: React.FC = () => {
   const countertopMaterials = materials.filter(m => m.category === 'countertop');
 
   return (
-    <div className="flex h-full z-20 select-none font-sans relative">
+    <div className="flex h-full select-none font-sans relative">
+      {/* Backdrop on mobile when drawer is open */}
+      {activeLeftCategory && (
+        <div 
+          onClick={() => setActiveLeftCategory(null)}
+          className="lg:hidden fixed inset-0 bg-slate-950/50 backdrop-blur-xs z-30 transition-opacity"
+        />
+      )}
+
       {/* ========================================================================= */}
       {/* 1. SLIM ICON TOOL RAIL (54px width) - Professional CAD Look               */}
       {/* ========================================================================= */}
-      <aside className="w-14 bg-white border-r border-slate-200/90 flex flex-col items-center py-3 gap-2 z-20 shadow-xs">
+      <aside className="hidden lg:flex w-14 bg-white border-r border-slate-200/90 flex-col items-center py-3 gap-2 z-20 shadow-xs">
         {/* Main Furniture / Cabinets Category */}
         <button
           onClick={() => toggleLeftCategory('cabinets')}
@@ -205,7 +213,7 @@ export const LeftSidebar: React.FC = () => {
       {/* 2. FLYOUT DRAWER PANEL (310px width) - Slides out seamlessly             */}
       {/* ========================================================================= */}
       {activeLeftCategory && (
-        <div className="w-80 bg-white border-r border-slate-200/90 flex flex-col h-full shadow-lg animate-in slide-in-from-left-2 duration-200">
+        <div className="fixed inset-y-0 right-0 max-w-[85vw] w-80 bg-white border-l border-slate-200 z-40 shadow-2xl flex flex-col h-full lg:relative lg:border-r lg:border-l-0 lg:z-10 animate-in slide-in-from-right lg:slide-in-from-left duration-200">
           {/* Drawer Header */}
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
             <div className="flex items-center gap-2">

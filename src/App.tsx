@@ -8,6 +8,8 @@ import { TopNavbar } from './components/layout/TopNavbar';
 import { StatusBar } from './components/layout/StatusBar';
 import { LeftSidebar } from './components/layout/LeftSidebar';
 import { RightSidebar } from './components/layout/RightSidebar';
+import { MobileBottomBar } from './components/layout/MobileBottomBar';
+import { MobileMenuDrawer } from './components/layout/MobileMenuDrawer';
 import { ProjectDashboard } from './components/dashboard/ProjectDashboard';
 import { Canvas2D } from './components/planner2d/Canvas2D';
 import { Canvas3D } from './components/viewer3d/Canvas3D';
@@ -156,8 +158,16 @@ export const App: React.FC = () => {
         {(activeTab === '2d-plan' || activeTab === '3d-view') && <RightSidebar />}
       </div>
 
-      {/* Bottom Status Bar */}
-      <StatusBar />
+      {/* Bottom Status Bar on Desktop */}
+      <div className="hidden lg:block">
+        <StatusBar />
+      </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileBottomBar />
+
+      {/* Mobile Slide-Over Drawer */}
+      <MobileMenuDrawer />
 
       {/* Modals */}
       <RoomConfigModal />
