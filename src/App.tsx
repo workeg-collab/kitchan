@@ -32,6 +32,7 @@ import { ManufacturingSystemModal } from './components/modals/ManufacturingSyste
 import { AdminSubscriptionDashboard } from './components/admin/AdminSubscriptionDashboard';
 import { SettingsModal } from './components/modals/SettingsModal';
 import { AppVideoTutorialModal } from './components/modals/AppVideoTutorialModal';
+import { AICameraRoomScannerModal } from './components/modals/AICameraRoomScannerModal';
 import { liveTelemetry } from './services/liveTelemetryService';
 import { useProjectStore } from './store/useProjectStore';
 
@@ -184,6 +185,7 @@ export const App: React.FC = () => {
         onClose={() => setIsSettingsModalOpen(false)}
       />
       <AppVideoTutorialModal />
+      <AICameraRoomScannerModal />
       <Analytics />
     </div>
   );

@@ -49,6 +49,7 @@ export const TopNavbar: React.FC = () => {
     setIsExportModalOpen,
     setIsSettingsModalOpen,
     setIsVideoTutorialOpen,
+    setIsCameraScannerOpen,
   } = useUIStore();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -190,6 +191,26 @@ export const TopNavbar: React.FC = () => {
       {/* ========================================================================= */}
       {/* 2. CENTER SECTION: WORKSPACE MODE SEGMENTED CONTROL                       */}
       {/* ========================================================================= */}
+      {/* Mobile Compact View Switcher */}
+      <div className="flex lg:hidden items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+        <button
+          onClick={() => setActiveTab('2d-plan')}
+          className={`px-2 py-1 rounded-lg text-xs font-bold transition ${
+            activeTab === '2d-plan' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600'
+          }`}
+        >
+          2D
+        </button>
+        <button
+          onClick={() => setActiveTab('3d-view')}
+          className={`px-2 py-1 rounded-lg text-xs font-bold transition ${
+            activeTab === '3d-view' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600'
+          }`}
+        >
+          3D
+        </button>
+      </div>
+
       <nav className="hidden lg:flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200/80 shadow-inner">
         {/* 2D Plan */}
         <button
@@ -327,6 +348,16 @@ export const TopNavbar: React.FC = () => {
           title={`تغيير وحدة القياس (الحالية: ${unit})`}
         >
           {unit === 'cm' ? 'سم (cm)' : 'مم (mm)'}
+        </button>
+
+        {/* Mobile Camera AI Room Scanner Trigger */}
+        <button
+          onClick={() => setIsCameraScannerOpen(true)}
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition shadow-2xs"
+          title="مسح وتصوير المطبخ بالكاميرا واستخراج رسمة بالذكاء الاصطناعي"
+        >
+          <Camera size={14} className="text-emerald-600" />
+          <span className="hidden sm:inline">مسح بالكاميرا</span>
         </button>
 
         {/* Export / PDF Modal */}

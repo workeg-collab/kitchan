@@ -21,13 +21,15 @@ import {
   Sparkles,
   Layers,
   Play,
-  Video
+  Video,
+  Camera
 } from 'lucide-react';
 import { AppVideoTutorialModal } from '../modals/AppVideoTutorialModal';
+import { AICameraRoomScannerModal } from '../modals/AICameraRoomScannerModal';
 
 export const ProjectDashboard: React.FC = () => {
   const { loadSampleProject } = useProjectStore();
-  const { setActiveTab, setIsVideoTutorialOpen } = useUIStore();
+  const { setActiveTab, setIsVideoTutorialOpen, setIsCameraScannerOpen } = useUIStore();
   const { currentUser, logout, setIsUserModalOpen } = useAuthStore();
   const { setIsAdminModalOpen } = useSubscriptionStore();
 
@@ -107,11 +109,21 @@ export const ProjectDashboard: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Mobile Camera AI Room Scanner Trigger */}
+          <button
+            onClick={() => setIsCameraScannerOpen(true)}
+            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-500/30 border border-white/30 backdrop-blur-md cursor-pointer transform hover:scale-105 active:scale-95"
+            title="تصوير ومسح المطبخ أو الغرفة بالكاميرا واستخراج رسمة جاهزة بالذكاء الاصطناعي"
+          >
+            <Camera size={14} />
+            <span>مسح المطبخ بالكاميرا 📷</span>
+          </button>
+
           {/* Video Tutorial Glowing Trigger Button */}
           <button
             onClick={() => setIsVideoTutorialOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-red-500/30 border border-white/30 backdrop-blur-md cursor-pointer transform hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-red-500/30 border border-white/30 backdrop-blur-md cursor-pointer transform hover:scale-105 active:scale-95"
             title="فيديو ودليل الشرح الشامل لطرق الرسم والتعامل مع البلوكات والأدوات المخفية"
           >
             <Play size={13} fill="currentColor" />
@@ -225,6 +237,9 @@ export const ProjectDashboard: React.FC = () => {
 
       {/* Video Tutorial Modal */}
       <AppVideoTutorialModal />
+
+      {/* AI Camera Room Scanner Modal */}
+      <AICameraRoomScannerModal />
     </div>
   );
 };
