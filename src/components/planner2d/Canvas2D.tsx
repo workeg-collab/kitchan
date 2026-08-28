@@ -8,6 +8,7 @@ import { DimensionLine } from './DimensionLine';
 import { calculateSnap, calculateAisleClearance } from '../../utils/cadGeometry';
 import { formatDimension, convertMmToUnit, convertUnitToMm } from '../../utils/unitConversion';
 import { TRANSLATIONS } from '../../utils/i18n';
+import { FloatingCanvasToolbar } from '../layout/FloatingCanvasToolbar';
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -363,74 +364,8 @@ export const Canvas2D: React.FC = () => {
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop2D}
     >
-      {/* 2D Floating Toolbar (Light Mode) */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 p-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-lg">
-        <button
-          onClick={() => setZoom2D((z) => Math.min(z * 1.2, 1.5))}
-          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
-          title={t.zoomIn}
-        >
-          <ZoomIn size={17} />
-        </button>
-        <button
-          onClick={() => setZoom2D((z) => Math.max(z * 0.8, 0.05))}
-          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
-          title={t.zoomOut}
-        >
-          <ZoomOut size={17} />
-        </button>
-        <button
-          onClick={resetView2D}
-          className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
-          title={t.fitView}
-        >
-          <Maximize2 size={17} />
-        </button>
-
-        <div className="w-[1px] h-5 bg-slate-200 mx-1" />
-
-        <button
-          onClick={() => setSnapToGridEnabled(!snapToGridEnabled)}
-          className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold ${
-            snapToGridEnabled ? 'bg-blue-50 text-blue-600 border border-blue-200 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
-          }`}
-          title={t.gridSnap}
-        >
-          <Grid size={16} />
-          <span>{gridSize}mm</span>
-        </button>
-
-        <button
-          onClick={() => setShowDimensions2D(!showDimensions2D)}
-          className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold ${
-            showDimensions2D ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
-          }`}
-          title={t.dimensions}
-        >
-          <Ruler size={16} />
-          <span>{t.dimensions}</span>
-        </button>
-
-        <button
-          onClick={() => setShowAisleClearance(!showAisleClearance)}
-          className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold ${
-            showAisleClearance ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm' : 'text-slate-500 hover:bg-slate-100'
-          }`}
-          title={t.aisles}
-        >
-          <Eye size={16} />
-          <span>{t.aisles}</span>
-        </button>
-
-        <button
-          onClick={() => setIsRoomSketcherOpen(true)}
-          className="p-2 rounded-xl transition flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 border border-transparent hover:border-indigo-200"
-          title={t.sketchRoom}
-        >
-          <PencilRuler size={16} />
-          <span>{language === 'ar' ? 'رسم الغرفة' : 'Sketch'}</span>
-        </button>
-      </div>
+      {/* Sleek Floating Canvas Toolbar */}
+      <FloatingCanvasToolbar mode="2d" />
 
       {/* Floating Selection Quick Toolbar */}
       {selectedItemPos && selectedId && (

@@ -10,6 +10,7 @@ import { Room3D } from './Room3D';
 import { TRANSLATIONS } from '../../utils/i18n';
 import { formatDimension } from '../../utils/unitConversion';
 import { calculateSnap } from '../../utils/cadGeometry';
+import { FloatingCanvasToolbar } from '../layout/FloatingCanvasToolbar';
 import { 
   DoorOpen, 
   RotateCw, 
@@ -159,60 +160,8 @@ export const Canvas3D: React.FC = () => {
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop3D}
     >
-      {/* 3D Floating Camera & Control Toolbar */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 p-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-lg">
-        {/* Preset Angles */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 gap-1 text-xs">
-          <button
-            onClick={() => setViewAngle3D('perspective')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition ${
-              viewAngle3D === 'perspective' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            {t.perspective}
-          </button>
-          <button
-            onClick={() => setViewAngle3D('isometric')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition ${
-              viewAngle3D === 'isometric' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            {t.isometric}
-          </button>
-          <button
-            onClick={() => setViewAngle3D('top')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition ${
-              viewAngle3D === 'top' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            {t.top3D}
-          </button>
-          <button
-            onClick={() => setViewAngle3D('front')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition ${
-              viewAngle3D === 'front' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            {t.front}
-          </button>
-        </div>
-
-        <div className="w-[1px] h-6 bg-slate-200 mx-1" />
-
-        {/* Door Animation Toggle */}
-        <button
-          onClick={toggleOpenDoors3D}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-            openDoors3D
-              ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
-          }`}
-          title="Open / Close all cabinet doors and drawers"
-        >
-          <DoorOpen size={16} />
-          <span>{openDoors3D ? t.closeDoors : t.openDoors}</span>
-        </button>
-      </div>
+      {/* Sleek Floating Canvas Toolbar */}
+      <FloatingCanvasToolbar mode="3d" />
 
       {/* 3D FLOATING INTERACTIVE GIZMO / CONTROL HUD (WHEN OBJECT IS SELECTED) */}
       {(selectedCabinet || selectedAppliance) && (

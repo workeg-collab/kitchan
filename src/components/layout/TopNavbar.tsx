@@ -5,7 +5,6 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useSubscriptionStore } from '../../store/useSubscriptionStore';
 import { ActiveTab, ProjectType } from '../../types';
 import { TRANSLATIONS } from '../../utils/i18n';
-import { FileMenu } from './FileMenu';
 import { 
   Compass, 
   Box, 
@@ -16,8 +15,6 @@ import {
   RotateCcw, 
   RotateCw, 
   Download, 
-  PencilRuler, 
-  Languages, 
   Check, 
   Users, 
   LogOut, 
@@ -26,11 +23,14 @@ import {
   BedDouble, 
   BookOpen, 
   LayoutDashboard, 
-  Settings2, 
   Building2, 
   Sparkles,
   Settings,
-  Save
+  Save,
+  Pencil,
+  ChevronDown,
+  Camera,
+  FolderOpen
 } from 'lucide-react';
 import { dbService } from '../../services/dbService';
 
@@ -46,14 +46,13 @@ export const TopNavbar: React.FC = () => {
     unit,
     toggleUnit,
     setIsExportModalOpen,
-    setIsRoomSketcherOpen,
-    setIsCustomKitchenModalOpen,
     setIsSettingsModalOpen,
   } = useUIStore();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [projectTitle, setProjectTitle] = useState(project.metadata.name);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isViewsDropdownOpen, setIsViewsDropdownOpen] = useState(false);
 
   const t = TRANSLATIONS[language];
   const projectType = project.metadata.projectType || 'kitchen';
@@ -84,8 +83,6 @@ export const TopNavbar: React.FC = () => {
         return { label: 'غرف نوم', icon: <BedDouble size={13} />, color: 'bg-purple-50 text-purple-700 border-purple-200' };
       case 'library':
         return { label: 'مكتبات', icon: <BookOpen size={13} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
-      case 'living':
-        return { label: 'معيشة وصالون', icon: <Sparkles size={13} />, color: 'bg-rose-50 text-rose-700 border-rose-200' };
       default:
         return { label: 'مطابخ', icon: <CookingPot size={13} />, color: 'bg-blue-50 text-blue-700 border-blue-200' };
     }
@@ -93,211 +90,281 @@ export const TopNavbar: React.FC = () => {
 
   const moduleInfo = getModuleBadge(projectType);
 
-  const mainTabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
-    { id: '2d-plan', label: t.plan2D, icon: <Compass size={14} /> },
-    { id: '3d-view', label: t.view3D, icon: <Box size={14} /> },
-    { id: 'walkthrough-vr', label: 'جولة VR', icon: <Sparkles size={14} className="text-purple-600" /> },
-    { id: 'visualization-studio', label: 'استوديو الرندر', icon: <Layers size={14} className="text-amber-600" /> },
-    { id: 'presentation-mode', label: 'عرض العميل', icon: <Users size={14} className="text-emerald-600" /> },
-    { id: 'templates-catalog', label: 'قوالب جاهزة', icon: <Sparkles size={14} className="text-blue-600" /> },
-    { id: 'elevations', label: t.elevations, icon: <Layers size={14} /> },
-    { id: 'technical-drawings', label: t.blueprint, icon: <FileText size={14} /> },
-    { id: 'manufacturing-bom', label: 'التقطيع', icon: <Scissors size={14} /> },
-  ];
-
   return (
-    <header className="h-14 bg-white border-b border-slate-200 px-3 md:px-4 flex items-center justify-between z-30 shadow-xs select-none font-sans">
-      {/* LEFT SECTION: Brand, File Menu & Project Name */}
-      <div className="flex items-center gap-2">
+    <header className="h-14 bg-white border-b border-slate-200/90 px-3 md:px-4 flex items-center justify-between z-30 shadow-xs select-none font-sans">
+      {/* ========================================================================= */}
+      {/* 1. LEFT SECTION: BRAND, PROJECT TITLE, UNDO/REDO & QUICK SAVE             */}
+      {/* ========================================================================= */}
+      <div className="flex items-center gap-2.5">
         {/* Back to Projects Dashboard */}
         <button
           onClick={() => setActiveTab('dashboard')}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-xs"
           title="العودة لصفحة الأقسام والمشاريع"
         >
-          <LayoutDashboard size={14} className="text-blue-600" />
-          <span className="hidden md:inline">المشاريع</span>
+          <LayoutDashboard size={14} className="text-blue-400" />
+          <span className="hidden sm:inline">المشاريع</span>
         </button>
 
-        {/* 1. THE FILE MENU (ملف) */}
-        <FileMenu />
-
-        <div className="h-4 w-[1px] bg-slate-200 hidden sm:block" />
-
-        {/* Current Module Badge */}
-        <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border shadow-xs ${moduleInfo.color}`}>
+        {/* Category Pill Badge */}
+        <div className={`hidden md:flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border ${moduleInfo.color}`}>
           {moduleInfo.icon}
           <span>{moduleInfo.label}</span>
         </div>
 
-        {/* Editable Title */}
-        <div className="flex items-center gap-1.5">
+        {/* Project Name (Click to edit) */}
+        <div className="flex items-center">
           {isEditingTitle ? (
             <div className="flex items-center gap-1">
               <input
                 type="text"
+                autoFocus
                 value={projectTitle}
                 onChange={(e) => setProjectTitle(e.target.value)}
                 onBlur={handleTitleSave}
                 onKeyDown={(e) => e.key === 'Enter' && handleTitleSave()}
-                autoFocus
-                className="px-2 py-0.5 border border-blue-500 rounded text-xs font-bold text-slate-900 bg-white shadow-xs focus:outline-none"
+                className="px-2 py-1 text-xs font-bold text-slate-900 bg-slate-100 border border-blue-500 rounded-lg outline-none w-44"
               />
-              <button onClick={handleTitleSave} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
+              <button onClick={handleTitleSave} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
                 <Check size={14} />
               </button>
             </div>
           ) : (
-            <div
-              onClick={() => setIsEditingTitle(true)}
-              className="text-xs font-black text-slate-800 hover:text-blue-600 cursor-pointer truncate max-w-[130px] lg:max-w-[180px]"
+            <button
+              onClick={() => {
+                setProjectTitle(project.metadata.name);
+                setIsEditingTitle(true);
+              }}
+              className="flex items-center gap-1 px-2 py-1 hover:bg-slate-100 rounded-lg transition text-right group max-w-[180px] sm:max-w-[240px]"
               title="انقر لتعديل اسم المشروع"
             >
-              {project.metadata.name}
-            </div>
+              <span className="text-xs font-bold text-slate-800 truncate block">
+                {project.metadata.name || 'مشروع جديد'}
+              </span>
+              <Pencil size={11} className="text-slate-400 opacity-0 group-hover:opacity-100 transition shrink-0" />
+            </button>
           )}
         </div>
 
-        {/* Undo / Redo */}
-        <div className="hidden lg:flex items-center gap-0.5 text-slate-500">
+        {/* Undo / Redo Controls */}
+        <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
           <button
             onClick={undo}
             disabled={!canUndo}
-            className={`p-1 rounded transition ${canUndo ? 'hover:text-slate-900 hover:bg-slate-100' : 'opacity-30 cursor-not-allowed'}`}
-            title="تراجع"
+            className={`p-1.5 rounded-lg transition ${
+              canUndo ? 'text-slate-700 hover:bg-white hover:text-blue-600 shadow-xs' : 'text-slate-300 cursor-not-allowed'
+            }`}
+            title="تراجع (Ctrl+Z)"
           >
-            <RotateCcw size={13} />
+            <RotateCcw size={14} />
           </button>
           <button
             onClick={redo}
             disabled={!canRedo}
-            className={`p-1 rounded transition ${canRedo ? 'hover:text-slate-900 hover:bg-slate-100' : 'opacity-30 cursor-not-allowed'}`}
-            title="إعادة"
+            className={`p-1.5 rounded-lg transition ${
+              canRedo ? 'text-slate-700 hover:bg-white hover:text-blue-600 shadow-xs' : 'text-slate-300 cursor-not-allowed'
+            }`}
+            title="إعادة (Ctrl+Y)"
           >
-            <RotateCw size={13} />
+            <RotateCw size={14} />
           </button>
         </div>
-      </div>
 
-      {/* CENTER SECTION: Ultra-Clean Segmented Views Bar */}
-      <nav className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200/80 gap-1">
-        {mainTabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                isActive
-                  ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              {tab.icon}
-              <span className="hidden sm:inline">{tab.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* RIGHT SECTION: Quick Actions */}
-      <div className="flex items-center gap-1.5">
-        {/* Custom Kitchen / Unit Builder */}
-        <button
-          onClick={() => setIsCustomKitchenModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-extrabold shadow-sm transition transform active:scale-95"
-          title="مصمم الوحدات والمطابخ المخصص"
-        >
-          <Sparkles size={14} />
-          <span className="hidden xl:inline">مطابخ كاستوم</span>
-        </button>
-
-        {/* Quick Save */}
+        {/* Quick Cloud Save */}
         <button
           onClick={handleQuickSave}
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+          className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition ${
             saveSuccess
-              ? 'bg-emerald-600 text-white border-emerald-600'
-              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
+              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
           }`}
-          title="حفظ المشروع"
+          title="حفظ التعديلات في السحابة"
         >
-          {saveSuccess ? <Check size={14} /> : <Save size={14} />}
-          <span className="hidden lg:inline">{saveSuccess ? 'تم الحفظ' : 'حفظ'}</span>
+          {saveSuccess ? <Check size={14} /> : <Save size={14} className="text-blue-600" />}
+          <span className="hidden sm:inline">{saveSuccess ? 'تم الحفظ!' : 'حفظ'}</span>
+        </button>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. CENTER SECTION: WORKSPACE MODE SEGMENTED CONTROL                       */}
+      {/* ========================================================================= */}
+      <nav className="hidden lg:flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200/80 shadow-inner">
+        {/* 2D Plan */}
+        <button
+          onClick={() => setActiveTab('2d-plan')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeTab === '2d-plan'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+          }`}
+        >
+          <Compass size={14} />
+          <span>مخطط 2D</span>
         </button>
 
-        {/* Export Technical Package */}
+        {/* 3D Realistic */}
+        <button
+          onClick={() => setActiveTab('3d-view')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeTab === '3d-view'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+          }`}
+        >
+          <Box size={14} />
+          <span>منظور 3D</span>
+        </button>
+
+        {/* VR Walkthrough */}
+        <button
+          onClick={() => setActiveTab('walkthrough-vr')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'walkthrough-vr'
+              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+          }`}
+        >
+          <Sparkles size={14} className="text-amber-300" />
+          <span>جولة VR</span>
+        </button>
+
+        {/* Render Studio */}
+        <button
+          onClick={() => setActiveTab('visualization-studio')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'visualization-studio'
+              ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+          }`}
+        >
+          <Camera size={14} />
+          <span>استوديو الرندر</span>
+        </button>
+
+        {/* Engineering & Manufacturing Menu */}
+        <div className="relative">
+          <button
+            onClick={() => setIsViewsDropdownOpen(!isViewsDropdownOpen)}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+              ['elevations', 'technical-drawings', 'manufacturing-bom', 'pricing-calculator', 'cabinet-schedule'].includes(activeTab)
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+            }`}
+          >
+            <Scissors size={14} />
+            <span>الهندسة والتقطيع ({projectType === 'kitchen' ? 'مطابخ' : projectType === 'dressing' ? 'دريسينج' : projectType === 'bedroom' ? 'غرف نوم' : 'مكتبات'})</span>
+            <ChevronDown size={12} />
+          </button>
+
+          {isViewsDropdownOpen && (
+            <div className="absolute top-full mt-1.5 right-0 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 font-sans">
+              <button
+                onClick={() => {
+                  setActiveTab('elevations');
+                  setIsViewsDropdownOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-right transition ${
+                  activeTab === 'elevations' ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Layers size={14} className="text-blue-500" />
+                <span>الواجهات الرأسية (Elevations)</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('technical-drawings');
+                  setIsViewsDropdownOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-right transition ${
+                  activeTab === 'technical-drawings' ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <FileText size={14} className="text-indigo-500" />
+                <span>المخطط التنفيذي (Blueprint)</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('manufacturing-bom');
+                  setIsViewsDropdownOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-right transition ${
+                  activeTab === 'manufacturing-bom' ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Scissors size={14} className="text-emerald-500" />
+                <span>قوائم التقطيع وتوزيع الألواح (BOM)</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('pricing-calculator');
+                  setIsViewsDropdownOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-right transition ${
+                  activeTab === 'pricing-calculator' ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Calculator size={14} className="text-amber-500" />
+                <span>حاسبة التكاليف وعروض الأسعار</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* ========================================================================= */}
+      {/* 3. RIGHT SECTION: UNIT, LANGUAGE, EXPORT & SETTINGS                       */}
+      {/* ========================================================================= */}
+      <div className="flex items-center gap-2">
+        {/* Unit Toggle cm / mm */}
+        <button
+          onClick={toggleUnit}
+          className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-mono font-bold transition border border-slate-200"
+          title={`تغيير وحدة القياس (الحالية: ${unit})`}
+        >
+          {unit === 'cm' ? 'سم (cm)' : 'مم (mm)'}
+        </button>
+
+        {/* Export / PDF Modal */}
         <button
           onClick={() => setIsExportModalOpen(true)}
-          className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-sm transition"
-          title="تصدير المخططات الهندسية والـ PDF"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200 shadow-xs"
+          title="تصدير المخطط، تقرير الأسعار، أو ملفات PDF"
         >
-          <Download size={14} />
+          <Download size={14} className="text-blue-600" />
           <span className="hidden sm:inline">تصدير</span>
         </button>
 
-        {/* Comprehensive Settings Modal */}
+        {/* Project & Materials Settings Modal Trigger */}
         <button
           onClick={() => setIsSettingsModalOpen(true)}
-          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition border border-slate-200"
-          title="إعدادات المشروع والتصنيع"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-xs font-bold transition shadow-xs"
+          title="إعدادات المشروع، الخامات الجديدة، وتعديل أسعار الألواح"
         >
-          <Settings size={14} className="text-slate-700" />
+          <Settings size={14} className="text-purple-600" />
+          <span className="hidden sm:inline">الخامات والإعدادات</span>
         </button>
 
-        {/* Super Admin Licenses & Catalog */}
+        {/* User Account / Admin Badge */}
         {currentUser?.role === 'admin' && (
-          <>
-            <button
-              onClick={() => setActiveTab('admin-catalog')}
-              className="hidden xl:flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition border border-slate-200"
-              title="إدارة الكتالوج والخامات والقوالب"
-            >
-              <Layers size={14} className="text-purple-600" />
-              <span>إدارة الكتالوج</span>
-            </button>
-
-            <button
-              onClick={() => setIsAdminModalOpen(true)}
-              className="hidden 2xl:flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
-              title="لوحة تحكم الاشتراكات والشركات"
-            >
-              <Building2 size={14} />
-              <span>الاشتراكات</span>
-            </button>
-          </>
+          <button
+            onClick={() => setIsAdminModalOpen(true)}
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-xs"
+            title="لوحة الإدارة والاشتراكات"
+          >
+            <Building2 size={13} />
+            <span>الإدارة</span>
+          </button>
         )}
 
-        {/* Unit Toggle mm / cm */}
-        <button
-          onClick={toggleUnit}
-          className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5 text-xs font-mono font-bold text-slate-700 transition"
-          title="تبديل وحدة القياس"
-        >
-          <span className={`px-1.5 py-0.5 rounded-lg ${unit === 'mm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>مم</span>
-          <span className={`px-1.5 py-0.5 rounded-lg ${unit === 'cm' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>سم</span>
-        </button>
-
-        {/* User Account */}
         <button
           onClick={() => setIsUserModalOpen(true)}
-          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition border border-slate-200"
-          title="إدارة الحساب"
+          className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-700 transition"
+          title={currentUser?.name || currentUser?.username || 'المستخدم'}
         >
-          <Users size={14} className="text-slate-700" />
-        </button>
-
-        {/* Logout */}
-        <button
-          onClick={() => {
-            if (window.confirm('هل تريد تسجيل الخروج؟')) {
-              logout();
-            }
-          }}
-          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
-          title="تسجيل الخروج"
-        >
-          <LogOut size={14} />
+          <Users size={15} />
         </button>
       </div>
     </header>

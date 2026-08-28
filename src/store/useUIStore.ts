@@ -54,6 +54,19 @@ interface UIState {
   selectedElevationWallId: string;
   setSelectedElevationWallId: (wallId: string) => void;
 
+  // Responsive Workspace & Collapsible Panels
+  activeLeftCategory: 'cabinets' | 'appliances' | 'architecture' | 'finishes' | 'dimensions' | 'templates' | null;
+  setActiveLeftCategory: (cat: 'cabinets' | 'appliances' | 'architecture' | 'finishes' | 'dimensions' | 'templates' | null) => void;
+  toggleLeftCategory: (cat: 'cabinets' | 'appliances' | 'architecture' | 'finishes' | 'dimensions' | 'templates') => void;
+  isLeftPanelPinned: boolean;
+  setIsLeftPanelPinned: (pinned: boolean) => void;
+  toggleLeftPanelPinned: () => void;
+  isRightPanelCollapsed: boolean;
+  setIsRightPanelCollapsed: (collapsed: boolean) => void;
+  toggleRightPanel: () => void;
+  isFullscreenCanvas: boolean;
+  toggleFullscreenCanvas: () => void;
+
   // Modals
   isRoomModalOpen: boolean;
   setIsRoomModalOpen: (open: boolean) => void;
@@ -146,6 +159,22 @@ export const useUIStore = create<UIState>((set) => ({
 
   selectedElevationWallId: 'wall-a',
   setSelectedElevationWallId: (selectedElevationWallId) => set({ selectedElevationWallId }),
+
+  activeLeftCategory: 'cabinets',
+  setActiveLeftCategory: (activeLeftCategory) => set({ activeLeftCategory }),
+  toggleLeftCategory: (cat) => set((state) => ({ 
+    activeLeftCategory: state.activeLeftCategory === cat ? null : cat 
+  })),
+  isLeftPanelPinned: true,
+  setIsLeftPanelPinned: (isLeftPanelPinned) => set({ isLeftPanelPinned }),
+  toggleLeftPanelPinned: () => set((state) => ({ isLeftPanelPinned: !state.isLeftPanelPinned })),
+
+  isRightPanelCollapsed: false,
+  setIsRightPanelCollapsed: (isRightPanelCollapsed) => set({ isRightPanelCollapsed }),
+  toggleRightPanel: () => set((state) => ({ isRightPanelCollapsed: !state.isRightPanelCollapsed })),
+
+  isFullscreenCanvas: false,
+  toggleFullscreenCanvas: () => set((state) => ({ isFullscreenCanvas: !state.isFullscreenCanvas })),
 
   isRoomModalOpen: false,
   setIsRoomModalOpen: (isRoomModalOpen) => set({ isRoomModalOpen }),
