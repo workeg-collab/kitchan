@@ -16,8 +16,7 @@ import {
   Copy, 
   Layers,
   Ruler,
-  Maximize2,
-  Armchair
+  Maximize2
 } from 'lucide-react';
 
 export const TemplatesBrowserView: React.FC = () => {
@@ -38,7 +37,6 @@ export const TemplatesBrowserView: React.FC = () => {
     { id: 'dressing', label: 'دريسينج روم', icon: <Shirt size={15} /> },
     { id: 'bedroom', label: 'غرف نوم', icon: <BedDouble size={15} /> },
     { id: 'library', label: 'مكتبات وشاشات TV', icon: <BookOpen size={15} /> },
-    { id: 'living', label: 'صالون ومعيشة', icon: <Armchair size={15} /> },
   ];
 
   const filteredProjects = ALL_SAMPLE_PROJECTS.filter((proj) => {
@@ -136,7 +134,7 @@ export const TemplatesBrowserView: React.FC = () => {
               {/* Card Image Banner */}
               <div className="relative aspect-video w-full overflow-hidden bg-slate-900">
                 <img
-                  src={p.previewThumbnail}
+                  src={p.thumbnail || p.previewThumbnail || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
                   alt={p.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />

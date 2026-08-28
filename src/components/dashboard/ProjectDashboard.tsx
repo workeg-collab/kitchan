@@ -10,7 +10,6 @@ import {
   SAMPLE_PROJECT_BEDROOM, 
   SAMPLE_PROJECT_LIBRARY 
 } from '../../constants/sampleProjects';
-import { PROJECT_LIVING_LUXURY_OPEN } from '../../constants/expandedProjects';
 import { 
   CookingPot, 
   Shirt, 
@@ -19,7 +18,6 @@ import {
   LogOut,
   Users,
   Building2,
-  Armchair,
   Sparkles,
   Layers
 } from 'lucide-react';
@@ -43,7 +41,7 @@ export const ProjectDashboard: React.FC = () => {
       id: 'kitchen',
       title: 'مطابخ',
       titleEn: 'Kitchens',
-      icon: <CookingPot size={38} strokeWidth={1.75} />,
+      icon: <CookingPot size={42} strokeWidth={1.75} />,
       iconColor: 'text-blue-600',
       iconBg: 'bg-blue-50 group-hover:bg-blue-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_KITCHEN,
@@ -52,7 +50,7 @@ export const ProjectDashboard: React.FC = () => {
       id: 'dressing',
       title: 'دريسينج',
       titleEn: 'Dressing Rooms',
-      icon: <Shirt size={38} strokeWidth={1.75} />,
+      icon: <Shirt size={42} strokeWidth={1.75} />,
       iconColor: 'text-amber-600',
       iconBg: 'bg-amber-50 group-hover:bg-amber-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_DRESSING,
@@ -61,7 +59,7 @@ export const ProjectDashboard: React.FC = () => {
       id: 'bedroom',
       title: 'غرف نوم',
       titleEn: 'Bedrooms',
-      icon: <BedDouble size={38} strokeWidth={1.75} />,
+      icon: <BedDouble size={42} strokeWidth={1.75} />,
       iconColor: 'text-purple-600',
       iconBg: 'bg-purple-50 group-hover:bg-purple-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_BEDROOM,
@@ -70,19 +68,10 @@ export const ProjectDashboard: React.FC = () => {
       id: 'library',
       title: 'مكتبات وشاشات',
       titleEn: 'Libraries & Media',
-      icon: <BookOpen size={38} strokeWidth={1.75} />,
+      icon: <BookOpen size={42} strokeWidth={1.75} />,
       iconColor: 'text-emerald-600',
       iconBg: 'bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white',
       sample: SAMPLE_PROJECT_LIBRARY,
-    },
-    {
-      id: 'living',
-      title: 'معيشة وصالون',
-      titleEn: 'Living & Dining',
-      icon: <Armchair size={38} strokeWidth={1.75} />,
-      iconColor: 'text-rose-600',
-      iconBg: 'bg-rose-50 group-hover:bg-rose-600 group-hover:text-white',
-      sample: PROJECT_LIVING_LUXURY_OPEN as any,
     },
   ];
 
@@ -104,7 +93,7 @@ export const ProjectDashboard: React.FC = () => {
         <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[3px]" />
       </div>
 
-      {/* Top Floating Discreet User Header (No white bar) */}
+      {/* Top Floating Discreet User Header */}
       <div className="absolute top-6 inset-x-6 flex items-center justify-between z-20">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg">
@@ -129,7 +118,7 @@ export const ProjectDashboard: React.FC = () => {
 
           <button
             onClick={() => setIsUserModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/30 rounded-xl text-xs font-bold transition shadow-md"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/30 rounded-xl text-xs font-bold transition shadow-md"
             title={currentUser?.role === 'admin' ? 'إدارة المستخدمين' : 'بيانات حسابي واشتراكي'}
           >
             <Users size={14} />
@@ -142,7 +131,7 @@ export const ProjectDashboard: React.FC = () => {
                 logout();
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white backdrop-blur-md border border-red-400/40 rounded-xl text-xs font-bold transition shadow-md"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-red-600/80 hover:bg-red-600 text-white backdrop-blur-md border border-red-400/40 rounded-xl text-xs font-bold transition shadow-md"
             title="تسجيل الخروج"
           >
             <LogOut size={14} />
@@ -166,8 +155,8 @@ export const ProjectDashboard: React.FC = () => {
           </p>
         </div>
 
-        {/* 3. The 5 Clean, Light-Colored Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 w-full px-2">
+        {/* 3. The 4 Clean, Pure Category Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full px-2">
           {modules.map((m) => (
             <button
               key={m.id}
@@ -178,17 +167,17 @@ export const ProjectDashboard: React.FC = () => {
               <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-slate-200 to-transparent group-hover:via-blue-500 transition-colors" />
 
               {/* Large Icon Container */}
-              <div className={`w-18 h-18 rounded-2xl ${m.iconBg} ${m.iconColor} flex items-center justify-center transition-all duration-300 shadow-sm group-hover:scale-110 mb-4`}>
+              <div className={`w-20 h-20 rounded-2xl ${m.iconBg} ${m.iconColor} flex items-center justify-center transition-all duration-300 shadow-sm group-hover:scale-110 mb-4`}>
                 {m.icon}
               </div>
 
               {/* Clean Title */}
-              <h2 className="text-lg md:text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight text-center">
+              <h2 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors tracking-tight text-center">
                 {m.title}
               </h2>
               
               {/* English Sub-label */}
-              <span className="text-[10px] font-mono font-bold text-slate-400 mt-0.5 uppercase tracking-wider group-hover:text-slate-600 transition-colors text-center">
+              <span className="text-[11px] font-mono font-bold text-slate-400 mt-1 uppercase tracking-wider group-hover:text-slate-600 transition-colors text-center">
                 {m.titleEn}
               </span>
             </button>
@@ -199,15 +188,15 @@ export const ProjectDashboard: React.FC = () => {
         <div className="flex items-center justify-center pt-3">
           <button
             onClick={() => setActiveTab('templates-catalog')}
-            className="flex items-center gap-2.5 px-7 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-2xl text-sm font-black shadow-2xl shadow-blue-500/40 transition transform hover:-translate-y-0.5 hover:scale-105 active:scale-95 cursor-pointer border border-white/30 backdrop-blur-md"
+            className="flex items-center gap-2.5 px-8 py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-2xl text-sm font-black shadow-2xl shadow-blue-500/40 transition transform hover:-translate-y-0.5 hover:scale-105 active:scale-95 cursor-pointer border border-white/30 backdrop-blur-md"
           >
             <Sparkles size={18} className="text-amber-300 animate-pulse" />
-            <span>كتالوج المشاريع الجاهزة والمواءمة الذكية</span>
+            <span>كتالوج المشاريع والتصاميم الجاهزة والمواءمة الذكية</span>
           </button>
         </div>
       </div>
 
-      {/* Absolute Bottom Clean Minimalist Footer (بدون مربع وبخط صغير وناعم) */}
+      {/* Absolute Bottom Clean Minimalist Footer */}
       <div className="absolute bottom-3 inset-x-0 z-20 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-300/80 font-medium select-none pointer-events-auto text-center px-4">
         <span>تطوير وبرمجة: <strong className="text-white font-mono font-bold">POM Agency</strong></span>
         <span className="text-slate-400/50">•</span>

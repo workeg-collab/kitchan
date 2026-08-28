@@ -26,7 +26,7 @@ export type BedroomCategory = 'bed' | 'nightstand' | 'dresser' | 'tv-unit' | 'be
 export type BedType = 'single' | 'double' | 'queen' | 'king' | 'storage-hydraulic' | 'platform' | 'upholstered' | 'wooden';
 
 // Library Types
-export type LibraryCategory = 'library-full' | 'bookshelf' | 'tv-media' | 'display' | 'floating' | 'custom';
+export type LibraryCategory = 'library-full' | 'library-wall' | 'bookshelf' | 'tv-media' | 'display' | 'floating' | 'media-console' | 'tv-wall' | 'custom';
 
 // Living, Office, Bathroom, & Custom Categories
 export type LivingCategory = 'sofa' | 'coffee-table' | 'dining-table' | 'tv-wall' | 'credenza' | 'wall-panel' | 'accent' | 'custom';
@@ -93,6 +93,7 @@ export type CabinetType =
   | 'wardrobe-hanging-long'
   | 'wardrobe-hanging-double'
   | 'wardrobe-double-hanging'
+  | 'wardrobe-tall-hanging'
   | 'wardrobe-shelves-drawers'
   | 'wardrobe-shoe-rack'
   | 'wardrobe-jewelry-vanity'
@@ -101,6 +102,7 @@ export type CabinetType =
   | 'wardrobe-bags-vitrine'
   | 'wardrobe-glass-vitrine'
   | 'wardrobe-glass-doors'
+  | 'wardrobe-island-accessories'
   | 'dressing-jewelry-island'
   // Bedroom types
   | 'bed-single'
@@ -108,21 +110,30 @@ export type CabinetType =
   | 'bed-queen'
   | 'bed-king'
   | 'bed-king-upholstered'
+  | 'bed-king-floating'
   | 'bed-storage-hydraulic'
   | 'bedroom-nightstand'
   | 'nightstand-2drawers'
+  | 'nightstand-floating'
   | 'bedroom-dresser-mirror'
   | 'dresser-6drawers'
+  | 'dresser-6drawers-luxury'
+  | 'dresser-floating-modern'
   | 'bedroom-tv-credenza'
   | 'bedroom-bench-ottoman'
-  // Library types
+  // Library & Media types
   | 'library-full-wall'
   | 'library-unit-standard'
   | 'library-bookshelf-open'
+  | 'library-bookshelf-tall'
   | 'library-bookshelf-doors'
   | 'library-tv-center'
   | 'library-display-glass'
+  | 'library-vitrine-tall'
   | 'library-floating-shelves'
+  | 'library-shelf-floating'
+  | 'living-tv-slat-wall'
+  | 'living-credenza-floating'
   // Living & Dining types
   | 'living-sofa-3seat'
   | 'living-sofa-l-shape'

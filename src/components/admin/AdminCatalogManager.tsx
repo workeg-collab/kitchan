@@ -153,6 +153,7 @@ export const AdminCatalogManager: React.FC = () => {
                   cabinetCount: project.cabinets.length,
                   data: project,
                   previewThumbnail: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+                  thumbnail: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
                   tags: ['Custom', 'User Template'],
                 };
                 ALL_SAMPLE_PROJECTS.unshift(newTmpl);
