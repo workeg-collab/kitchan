@@ -31,6 +31,40 @@ export const PricingCalculatorView: React.FC = () => {
     window.print();
   };
 
+  const projectType = project.metadata.projectType || 'kitchen';
+
+  const getPricingHeader = () => {
+    switch (projectType) {
+      case 'bedroom':
+        return {
+          title: 'حاسبة مسطحات وتكاليف غرف النوم والأسرّة والتسريحات',
+          sub: 'حساب دقيق لمسطحات الألواح، مساحة ظهر السرير، شاسيهات المراتب، وتكلفة أدراج التسريحة والكومود',
+        };
+      case 'dressing':
+        return {
+          title: 'حاسبة مسطحات وتكاليف الدريسينج روم وخزائن الملابس',
+          sub: 'حساب مسطحات القواطع الرأسية (Gables)، أرفف التخزين، أدراج الساعات، ودواليب الملابس الطولية',
+        };
+      case 'library':
+        return {
+          title: 'حاسبة مسطحات وتكاليف المكتبات ووحدات الشاشات الجدارية',
+          sub: 'حساب مسطحات تجاويف الشاشات الكبيرة، البانوهات الخشبية المضلعة، والأرفف الديكورية المعلقة',
+        };
+      case 'living':
+        return {
+          title: 'حاسبة مسطحات وتكاليف أثاث الصالون وغرف المعيشة والسفرة',
+          sub: 'حساب مسطحات طاولات القهوة، السفرة، بوفيهات التقديم، ووحدات المعيشة المفتوحة',
+        };
+      default:
+        return {
+          title: 'حاسبة عدد أمتار المطبخ وعرض السعر التقديري',
+          sub: 'حساب دقيق لمسطحات الأبواب، الرخام، والأمتار الطولية مع حساب التكلفة الإجمالية بناءً على سعر المتر',
+        };
+    }
+  };
+
+  const headerInfo = getPricingHeader();
+
   return (
     <div className="w-full h-full flex flex-col bg-slate-100 overflow-auto p-6">
       {/* Top Header */}
@@ -38,10 +72,10 @@ export const PricingCalculatorView: React.FC = () => {
         <div>
           <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2.5">
             <Calculator className="text-blue-600" size={24} />
-            حاسبة عدد أمتار المطبخ وعرض السعر التقديري
+            {headerInfo.title}
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            حساب دقيق لمسطحات الأبواب، الرخام، والأمتار الطولية مع حساب التكلفة الإجمالية بناءً على سعر المتر
+            {headerInfo.sub}
           </p>
         </div>
 
@@ -75,36 +109,56 @@ export const PricingCalculatorView: React.FC = () => {
         {/* 1. METERAGE SUMMARY CARDS (بطاقات قياس الأمتار بالمتر المسطح والطولي) */}
         <div>
           <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider font-mono mb-3">
-            أولاً: حصر كميات وأمتار المطبخ (متر مربع وطولي)
+            {projectType === 'kitchen' ? 'أولاً: حصر كميات وأمتار المطبخ (متر مربع وطولي)' : `أولاً: حصر كميات ومسطحات ${projectType === 'bedroom' ? 'غرفة النوم' : projectType === 'dressing' ? 'الدريسينج' : projectType === 'library' ? 'المكتبة والشاشات' : 'الأثاث'}`}
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* مسطح الواجهات */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="text-[11px] text-slate-500 font-bold">مسطح الواجهات والأبواب</div>
+              <div className="text-[11px] text-slate-500 font-bold">
+                {projectType === 'bedroom' ? 'مسطح الألواح والواجهات' : projectType === 'dressing' ? 'مسطح قواطع وأرفف الدريسينج' : 'مسطح الواجهات والأبواب'}
+              </div>
               <div className="text-2xl font-bold text-blue-600 mt-1">{meterage.frontsAreaM2} م²</div>
-              <div className="text-[10px] text-slate-400 mt-1">إجمالي مساحة ضلف الخشب والأدراج</div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                {projectType === 'bedroom' ? 'إجمالي مساحة الواجهات والأدراج' : 'إجمالي مساحة ضلف الخشب والأدراج'}
+              </div>
             </div>
 
-            {/* مسطح الرخام */}
+            {/* مسطح الرخام / الأسطح */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="text-[11px] text-slate-500 font-bold">مسطح الرخام / الكوارتز</div>
-              <div className="text-2xl font-bold text-emerald-600 mt-1">{meterage.countertopAreaM2} م²</div>
-              <div className="text-[10px] text-slate-400 mt-1">شامل الرفرفة الأمامية 2 سم</div>
+              <div className="text-[11px] text-slate-500 font-bold">
+                {projectType === 'kitchen' ? 'مسطح الرخام / الكوارتز' : 'إجمالي مسطحات الخشب'}
+              </div>
+              <div className="text-2xl font-bold text-emerald-600 mt-1">
+                {projectType === 'kitchen' ? `${meterage.countertopAreaM2} م²` : `${meterage.totalWoodPanelsAreaM2} م²`}
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                {projectType === 'kitchen' ? 'شامل الرفرفة الأمامية 2 سم' : 'شاسيه + أرفف + أدراج'}
+              </div>
             </div>
 
             {/* الأمتار الطولية السفلية */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="text-[11px] text-slate-500 font-bold">المتر الطولي (الوحدات السفلية)</div>
+              <div className="text-[11px] text-slate-500 font-bold">
+                {projectType === 'bedroom' ? 'عرض السرير والكومودينو' : projectType === 'dressing' ? 'المتر الطولي للدواليب' : 'المتر الطولي (السفلي)'}
+              </div>
               <div className="text-2xl font-bold text-indigo-600 mt-1">{meterage.baseLinearM} م.ط</div>
-              <div className="text-[10px] text-slate-400 mt-1">طول كبائن الأرضي بالكامل</div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                {projectType === 'bedroom' ? 'مجموع أطوال قطع الأثاث' : 'طول كبائن الأرضي بالكامل'}
+              </div>
             </div>
 
             {/* الأمتار الطولية العلوية */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="text-[11px] text-slate-500 font-bold">المتر الطولي (الوحدات العلوية)</div>
-              <div className="text-2xl font-bold text-purple-600 mt-1">{meterage.wallLinearM} م.ط</div>
-              <div className="text-[10px] text-slate-400 mt-1">طول كبائن الحائط المعلقة</div>
+              <div className="text-[11px] text-slate-500 font-bold">
+                {projectType === 'dressing' ? 'الدواليب الطولية الماستر' : projectType === 'bedroom' ? 'مساحة أرضية الغرفة' : 'المتر الطولي (العلوي)'}
+              </div>
+              <div className="text-2xl font-bold text-purple-600 mt-1">
+                {projectType === 'bedroom' ? `${meterage.roomFloorAreaM2} م²` : projectType === 'dressing' ? `${meterage.tallLinearM} م.ط` : `${meterage.wallLinearM} م.ط`}
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                {projectType === 'bedroom' ? 'مساحة الغرفة الصافية' : projectType === 'dressing' ? 'خزائن الملابس المرتفعة' : 'طول كبائن الحائط المعلقة'}
+              </div>
             </div>
           </div>
 

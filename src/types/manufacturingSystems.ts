@@ -85,6 +85,7 @@ export interface ManufacturingSystemTemplate {
   nameEn: string;
   systemType: MaterialSystemType;
   description: string;
+  supportedCategories?: ProjectType[];
   
   // Board & Sheet Properties (for Wood/Cladding/Fibre)
   standardSheetWidth: number; // e.g. 2800 or 2440

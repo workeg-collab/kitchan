@@ -26,19 +26,26 @@ export const CuttingListView: React.FC = () => {
   const { unit, language } = useUIStore();
   const t = TRANSLATIONS[language];
 
-  // Active Material System Template
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(
-    PRESET_MANUFACTURING_TEMPLATES.find((t) => t.systemType === project.manufacturing.systemType)?.id || PRESET_MANUFACTURING_TEMPLATES[0].id
+  const projectType = project.metadata.projectType || 'kitchen';
+
+  // Filter templates strictly by current active category
+  const relevantTemplates = PRESET_MANUFACTURING_TEMPLATES.filter((tmpl) => 
+    !tmpl.supportedCategories || tmpl.supportedCategories.includes(projectType)
   );
 
-  const activeTemplate = PRESET_MANUFACTURING_TEMPLATES.find((t) => t.id === selectedTemplateId) || PRESET_MANUFACTURING_TEMPLATES[0];
+  // Active Material System Template
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(
+    relevantTemplates.find((t) => t.systemType === project.manufacturing.systemType)?.id || relevantTemplates[0]?.id || PRESET_MANUFACTURING_TEMPLATES[0].id
+  );
+
+  const activeTemplate = relevantTemplates.find((t) => t.id === selectedTemplateId) || relevantTemplates[0] || PRESET_MANUFACTURING_TEMPLATES[0];
 
   // Run the Unified Manufacturing Engine
   const mfgResult = calculateUnifiedManufacturingPackage(project.cabinets, activeTemplate);
 
   const handleSelectSystem = (tmplId: string) => {
     setSelectedTemplateId(tmplId);
-    const tmpl = PRESET_MANUFACTURING_TEMPLATES.find((t) => t.id === tmplId);
+    const tmpl = relevantTemplates.find((t) => t.id === tmplId);
     if (tmpl) {
       updateManufacturing({
         systemType: tmpl.systemType,
@@ -54,12 +61,12 @@ export const CuttingListView: React.FC = () => {
     let csvContent = 'data:text/csv;charset=utf-8,';
 
     if (mfgResult.systemType === 'wood') {
-      csvContent += 'Cabinet ID,Cabinet Name,Part Name,Qty,Length (mm),Width (mm),Thickness (mm),Material,Edge Top,Edge Bottom,Edge Left,Edge Right\n';
+      csvContent += 'Item ID,Item Name,Part Name,Qty,Length (mm),Width (mm),Thickness (mm),Material,Edge Top,Edge Bottom,Edge Left,Edge Right\n';
       mfgResult.woodPanels.forEach((p) => {
         csvContent += `"${p.cabinetId}","${p.cabinetName}","${p.partName}",${p.quantity},${p.length},${p.width},${p.thickness},"${p.material}",${p.edgeBanding.top ? 1 : 0},${p.edgeBanding.bottom ? 1 : 0},${p.edgeBanding.left ? 1 : 0},${p.edgeBanding.right ? 1 : 0}\n`;
       });
     } else {
-      csvContent += 'Cabinet ID,Cabinet Name,Profile Code,Profile Name,Qty,Cut Length (mm),Left Angle,Right Angle,Notes\n';
+      csvContent += 'Item ID,Item Name,Profile Code,Profile Name,Qty,Cut Length (mm),Left Angle,Right Angle,Notes\n';
       mfgResult.profileCuts.forEach((p) => {
         csvContent += `"${p.cabinetId}","${p.cabinetName}","${p.profileCode}","${p.profileName}",${p.quantity},${p.length},${p.cutAngleLeft}°,${p.cutAngleRight}°,"${p.notes || ''}"\n`;
       });
@@ -68,11 +75,48 @@ export const CuttingListView: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${project.metadata.name}_Cutting_List_${activeTemplate.systemType}.csv`);
+    link.setAttribute('download', `${project.metadata.name}_Cutting_List_${projectType}_${activeTemplate.systemType}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+
+  const getCategoryTitle = () => {
+    switch (projectType) {
+      case 'bedroom':
+        return {
+          title: 'محرك تفصيل وتقطيع غرف النوم والأسرّة والتسريحات',
+          sub: 'حساب مقاسات شاسيهات الأسرّة، قواطع الأدراج، الألواح، وشريط الـ ABS المانع للصدمات 2 مم',
+          iconColor: 'bg-purple-50 text-purple-600',
+        };
+      case 'dressing':
+        return {
+          title: 'محرك تفصيل وتقطيع الدريسينج روم وخزائن الملابس',
+          sub: 'حساب مقاسات القواطع الرأسية (Gables)، أرفف الأحذية، أدراج المجوهرات، وسكك السلايدنج',
+          iconColor: 'bg-amber-50 text-amber-600',
+        };
+      case 'library':
+        return {
+          title: 'محرك تفصيل وتقطيع المكتبات ووحدات الشاشات الجدارية',
+          sub: 'حساب مسطحات تجاويف الشاشات، أرفف الكتب، البانوهات الخشبية المضلعة، والتجميع المخفي',
+          iconColor: 'bg-emerald-50 text-emerald-600',
+        };
+      case 'living':
+        return {
+          title: 'محرك تفصيل أثاث الصالون وغرف المعيشة والسفرة',
+          sub: 'حساب مسطحات طاولات القهوة، السفرة، بوفيهات التقديم، ووحدات الحوائط',
+          iconColor: 'bg-rose-50 text-rose-600',
+        };
+      default:
+        return {
+          title: 'محرك تصنيع وتقطيع المطابخ (خشب / ألوميتال / كلادينج / خشمونيوم)',
+          sub: 'حساب دقيق للألواح والقطاعات وزوايا 45°/90° والشيتات وهالك القص لكافة أنظمة المطابخ',
+          iconColor: 'bg-blue-50 text-blue-600',
+        };
+    }
+  };
+
+  const catInfo = getCategoryTitle();
 
   return (
     <div className="w-full h-full flex flex-col bg-slate-100 overflow-hidden font-sans select-none">
@@ -80,22 +124,22 @@ export const CuttingListView: React.FC = () => {
       <div className="bg-white border-b border-slate-200 px-6 py-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+            <span className={`p-1.5 rounded-lg ${catInfo.iconColor}`}>
               <Scissors size={18} />
             </span>
             <h2 className="text-base font-extrabold text-slate-900">
-              محرك التصنيع وتقطيع الخامات (Manufacturing & Cutting Engine)
+              {catInfo.title}
             </h2>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            اختر نظام وخامة التصنيع لحساب القطاعات، الألواح، الزوايا، واستغلال الخامات تلقائياً
+          <p className="text-xs text-slate-500 mt-1 font-medium">
+            {catInfo.sub}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200"
+            className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200 shadow-xs"
           >
             <Download size={14} />
             <span>{t.exportCSV}</span>
@@ -103,9 +147,9 @@ export const CuttingListView: React.FC = () => {
         </div>
       </div>
 
-      {/* Material Systems 5 Tabs */}
+      {/* Material Systems Category-Specific Tabs */}
       <div className="bg-slate-50 border-b border-slate-200 px-6 py-2 flex items-center gap-2 overflow-x-auto">
-        {PRESET_MANUFACTURING_TEMPLATES.map((tmpl) => {
+        {relevantTemplates.map((tmpl) => {
           const isSelected = tmpl.id === selectedTemplateId;
           return (
             <button

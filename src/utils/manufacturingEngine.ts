@@ -173,78 +173,177 @@ export function calculateUnifiedManufacturingPackage(
       const internalWidth = isSidesOutside ? CW - 2 * BT : CW;
       const internalHeight = isSidesOutside ? CH : CH - 2 * BT;
 
-      // Side Left & Right Panels
-      woodPanels.push({
-        id: `${cab.id}-SIDE-L`,
-        cabinetId: cab.id,
-        cabinetName: cab.name,
-        partName: 'جنب شاسيه يسار',
-        quantity: 1,
-        length: isSidesOutside ? CH : internalHeight,
-        width: CD,
-        thickness: BT,
-        material: cab.materialBody || 'ميلامين 18 مم',
-        edgeBanding: { top: false, bottom: false, left: false, right: true },
-      });
-      woodPanels.push({
-        id: `${cab.id}-SIDE-R`,
-        cabinetId: cab.id,
-        cabinetName: cab.name,
-        partName: 'جنب شاسيه يمين',
-        quantity: 1,
-        length: isSidesOutside ? CH : internalHeight,
-        width: CD,
-        thickness: BT,
-        material: cab.materialBody || 'ميلامين 18 مم',
-        edgeBanding: { top: false, bottom: false, left: false, right: true },
-      });
+      const isBed = cab.category === 'bed' || cab.type.startsWith('bed-');
+      const isTable = cab.category === 'coffee-table' || cab.category === 'dining-table';
+      const isTvWall = cab.category === 'tv-wall' || cab.type === 'living-tv-slat-wall';
 
-      // Bottom Panel
-      woodPanels.push({
-        id: `${cab.id}-BOT`,
-        cabinetId: cab.id,
-        cabinetName: cab.name,
-        partName: 'قاع شاسيه سفلي',
-        quantity: 1,
-        length: internalWidth,
-        width: CD,
-        thickness: BT,
-        material: cab.materialBody || 'ميلامين 18 مم',
-        edgeBanding: { top: false, bottom: false, left: false, right: true },
-      });
-
-      // Top Panel / Stretchers
-      if (cab.category === 'base') {
+      if (isBed) {
+        // 1. BED HEADBOARD & FRAME COMPONENTS
         woodPanels.push({
-          id: `${cab.id}-TOP-RAIL-F`,
+          id: `${cab.id}-HEADBOARD`,
           cabinetId: cab.id,
           cabinetName: cab.name,
-          partName: 'عارضة تثبيت أمامية',
+          partName: 'ظهر سرير ماستر رئيسي (Headboard Panel)',
           quantity: 1,
-          length: internalWidth,
-          width: 100,
+          length: CW,
+          width: CH,
+          thickness: BT,
+          material: cab.materialFront || 'خشب مبطن بوكليه / قشرة 18 مم',
+          edgeBanding: { top: true, bottom: true, left: true, right: true },
+        });
+
+        woodPanels.push({
+          id: `${cab.id}-SIDE-L`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'جنب شاسيه سرير يسار (Left Bed Rail)',
+          quantity: 1,
+          length: CD,
+          width: 320,
+          thickness: BT,
+          material: cab.materialBody || 'ميلامين 18 مم',
+          edgeBanding: { top: true, bottom: false, left: false, right: false },
+        });
+
+        woodPanels.push({
+          id: `${cab.id}-SIDE-R`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'جنب شاسيه سرير يمين (Right Bed Rail)',
+          quantity: 1,
+          length: CD,
+          width: 320,
+          thickness: BT,
+          material: cab.materialBody || 'ميلامين 18 مم',
+          edgeBanding: { top: true, bottom: false, left: false, right: false },
+        });
+
+        woodPanels.push({
+          id: `${cab.id}-FOOTBOARD`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'عارضة قدم السرير الأمامية (Bed Footboard)',
+          quantity: 1,
+          length: CW,
+          width: 320,
+          thickness: BT,
+          material: cab.materialBody || 'ميلامين 18 مم',
+          edgeBanding: { top: true, bottom: false, left: false, right: false },
+        });
+
+        woodPanels.push({
+          id: `${cab.id}-SLAT-BASE`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'شاسيه حمل المرتبة (Mattress Support Platform)',
+          quantity: 1,
+          length: CD - 60,
+          width: CW - 60,
+          thickness: BT,
+          material: 'كونتر / MDF 18 مم',
+          edgeBanding: { top: false, bottom: false, left: false, right: false },
+        });
+
+        addHw('زوايا تجميع أسرّة حديد ثقيلة مع مسامير زنك', 'hardware', 4, 'طقم', 45, 'زوايا تثبيت أركان السرير');
+        if (cab.hasHydraulicStorage || cab.type.includes('hydraulic')) {
+          addHw('ميكانيزم هيدروليك رفع السرير 1200N', 'hardware', 1, 'طقم', 380, 'بساتم رفع سحارة التخزين');
+        }
+      } else if (isTable) {
+        // 2. TABLETOP & FRAME RAILS
+        woodPanels.push({
+          id: `${cab.id}-TABLETOP`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'قرصة سطح الطاولة العلوية (Tabletop Panel)',
+          quantity: 1,
+          length: CW,
+          width: CD,
+          thickness: BT,
+          material: cab.materialFront || 'رخام / خشب معالج 25 مم',
+          edgeBanding: { top: true, bottom: true, left: true, right: true },
+        });
+
+        woodPanels.push({
+          id: `${cab.id}-RAILS`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'عوارض شاسيه تثبيت الأرجل (Subframe Rails)',
+          quantity: 2,
+          length: CW - 120,
+          width: 90,
+          thickness: BT,
+          material: cab.materialBody || 'ميلامين 18 مم',
+          edgeBanding: { top: false, bottom: false, left: false, right: false },
+        });
+
+        addHw('أرجل معدنية مدهونة إلكتروستاتيك أسود', 'legs', 4, 'قطعة', 85, 'أرجل الطاولة');
+      } else if (isTvWall) {
+        // 3. TV WALL & MEDIA CREDENZA
+        woodPanels.push({
+          id: `${cab.id}-BACKPANEL`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'لوح تجليد الجدار الحامل للشاشة (TV Wall Backing)',
+          quantity: 1,
+          length: CW,
+          width: CH,
+          thickness: BT,
+          material: cab.materialBody || 'ميلامين 18 مم',
+          edgeBanding: { top: true, bottom: true, left: true, right: true },
+        });
+
+        woodPanels.push({
+          id: `${cab.id}-CREDENZA-TOP`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: 'قرصة كونسول الشاشة السفلي المعلق',
+          quantity: 1,
+          length: Math.round(CW * 0.9),
+          width: CD,
+          thickness: BT,
+          material: cab.materialFront || 'خشب أرو 18 مم',
+          edgeBanding: { top: true, bottom: true, left: true, right: true },
+        });
+
+        addHw('حوامل تعليق كونسول مخفية ثقيلة (Camar Hanging Brackets)', 'hardware', 2, 'طقم', 65, 'تثبيت الوحدة المعلقة');
+      } else {
+        // 4. STANDARD CARCASE CABINET (KITCHEN / DRESSING / WARDROBE / NIGHTSTAND)
+        const isSidesOutside = activeTemplate.carcassConstruction === 'sides-outside';
+        const internalWidth = isSidesOutside ? CW - 2 * BT : CW;
+        const internalHeight = isSidesOutside ? CH : CH - 2 * BT;
+
+        // Side Left & Right Panels
+        woodPanels.push({
+          id: `${cab.id}-SIDE-L`,
+          cabinetId: cab.id,
+          cabinetName: cab.name,
+          partName: cab.category === 'wardrobe' ? 'قاطع دولاب رأسي يسار (Gable Left)' : 'جنب شاسيه يسار',
+          quantity: 1,
+          length: isSidesOutside ? CH : internalHeight,
+          width: CD,
           thickness: BT,
           material: cab.materialBody || 'ميلامين 18 مم',
           edgeBanding: { top: false, bottom: false, left: false, right: true },
         });
         woodPanels.push({
-          id: `${cab.id}-TOP-RAIL-B`,
+          id: `${cab.id}-SIDE-R`,
           cabinetId: cab.id,
           cabinetName: cab.name,
-          partName: 'عارضة تثبيت خلفية',
+          partName: cab.category === 'wardrobe' ? 'قاطع دولاب رأسي يمين (Gable Right)' : 'جنب شاسيه يمين',
           quantity: 1,
-          length: internalWidth,
-          width: 100,
+          length: isSidesOutside ? CH : internalHeight,
+          width: CD,
           thickness: BT,
           material: cab.materialBody || 'ميلامين 18 مم',
-          edgeBanding: { top: false, bottom: false, left: false, right: false },
+          edgeBanding: { top: false, bottom: false, left: false, right: true },
         });
-      } else {
+
+        // Bottom Panel
         woodPanels.push({
-          id: `${cab.id}-TOP`,
+          id: `${cab.id}-BOT`,
           cabinetId: cab.id,
           cabinetName: cab.name,
-          partName: 'سقف شاسيه علوي',
+          partName: cab.category === 'wardrobe' ? 'قاع دولاب سفلي' : 'قاع شاسيه سفلي',
           quantity: 1,
           length: internalWidth,
           width: CD,
@@ -252,63 +351,106 @@ export function calculateUnifiedManufacturingPackage(
           material: cab.materialBody || 'ميلامين 18 مم',
           edgeBanding: { top: false, bottom: false, left: false, right: true },
         });
+
+        // Top Panel / Stretchers
+        if (cab.category === 'base') {
+          woodPanels.push({
+            id: `${cab.id}-TOP-RAIL-F`,
+            cabinetId: cab.id,
+            cabinetName: cab.name,
+            partName: 'عارضة تثبيت أمامية',
+            quantity: 1,
+            length: internalWidth,
+            width: 100,
+            thickness: BT,
+            material: cab.materialBody || 'ميلامين 18 مم',
+            edgeBanding: { top: false, bottom: false, left: false, right: true },
+          });
+          woodPanels.push({
+            id: `${cab.id}-TOP-RAIL-B`,
+            cabinetId: cab.id,
+            cabinetName: cab.name,
+            partName: 'عارضة تثبيت خلفية',
+            quantity: 1,
+            length: internalWidth,
+            width: 100,
+            thickness: BT,
+            material: cab.materialBody || 'ميلامين 18 مم',
+            edgeBanding: { top: false, bottom: false, left: false, right: false },
+          });
+        } else {
+          woodPanels.push({
+            id: `${cab.id}-TOP`,
+            cabinetId: cab.id,
+            cabinetName: cab.name,
+            partName: cab.category === 'wardrobe' ? 'سقف دولاب علوي' : 'سقف شاسيه علوي',
+            quantity: 1,
+            length: internalWidth,
+            width: CD,
+            thickness: BT,
+            material: cab.materialBody || 'ميلامين 18 مم',
+            edgeBanding: { top: false, bottom: false, left: false, right: true },
+          });
+        }
       }
 
-      // Back Panel
-      const backW = internalWidth + (activeTemplate.backPanelMount === 'grooved' ? 16 : 0);
-      const backH = (isSidesOutside ? CH - 2 * BT : internalHeight) + (activeTemplate.backPanelMount === 'grooved' ? 16 : 0);
-      woodPanels.push({
-        id: `${cab.id}-BACK`,
-        cabinetId: cab.id,
-        cabinetName: cab.name,
-        partName: 'ظهر شاسيه (مفحور 6 مم)',
-        quantity: 1,
-        length: backH,
-        width: backW,
-        thickness: activeTemplate.backPanelThickness,
-        material: 'MDF ظهر 6 مم',
-        edgeBanding: { top: false, bottom: false, left: false, right: false },
-      });
-
-      // Shelves
-      if (cab.shelfCount > 0) {
+      // Back Panel, Shelves, and Doors (For standard storage units and wardrobes)
+      if (!isBed && !isTable) {
+        const backW = internalWidth + (activeTemplate.backPanelMount === 'grooved' ? 16 : 0);
+        const backH = (isSidesOutside ? CH - 2 * BT : internalHeight) + (activeTemplate.backPanelMount === 'grooved' ? 16 : 0);
         woodPanels.push({
-          id: `${cab.id}-SHELF`,
+          id: `${cab.id}-BACK`,
           cabinetId: cab.id,
           cabinetName: cab.name,
-          partName: 'رف داخلي متحرك',
-          quantity: cab.shelfCount,
-          length: internalWidth - 2,
-          width: CD - 40,
-          thickness: BT,
-          material: cab.materialBody || 'ميلامين 18 مم',
-          edgeBanding: { top: false, bottom: false, left: false, right: true },
+          partName: 'ظهر شاسيه (مفحور 6 مم)',
+          quantity: 1,
+          length: backH,
+          width: backW,
+          thickness: activeTemplate.backPanelThickness,
+          material: 'MDF ظهر 6 مم',
+          edgeBanding: { top: false, bottom: false, left: false, right: false },
         });
-        addHw('كوابيل رفوف نيكل 5 مم', 'shelf-pin', cab.shelfCount * 4, 'قطعة', 3, 'كوابيل تثبيت الرفوف');
-      }
 
-      // Door Fronts
-      if (cab.doorCount > 0 && cab.doorType !== 'open') {
-        const doorW = cab.doorCount === 1 ? CW - activeTemplate.doorReveal : Math.round((CW - (cab.doorCount + 1) * activeTemplate.doorReveal) / cab.doorCount);
-        woodPanels.push({
-          id: `${cab.id}-DOOR`,
-          cabinetId: cab.id,
-          cabinetName: cab.name,
-          partName: `ضلفة باب واجهة (${cab.doorCount} ضلف)`,
-          quantity: cab.doorCount,
-          length: CH - activeTemplate.doorReveal,
-          width: doorW,
-          thickness: BT,
-          material: cab.materialFront || 'خامة الواجهة',
-          edgeBanding: { top: true, bottom: true, left: true, right: true },
-        });
-        addHw('مفصلات باستم هيدروليك سوفت كلوز 110°', 'hinge', cab.doorCount * (CH > 1500 ? 4 : 2), 'قطعة', 25, 'مفصلات غلق ناعم');
-      }
+        // Shelves
+        if (cab.shelfCount > 0) {
+          woodPanels.push({
+            id: `${cab.id}-SHELF`,
+            cabinetId: cab.id,
+            cabinetName: cab.name,
+            partName: 'رف داخلي متحرك',
+            quantity: cab.shelfCount,
+            length: internalWidth - 2,
+            width: CD - 40,
+            thickness: BT,
+            material: cab.materialBody || 'ميلامين 18 مم',
+            edgeBanding: { top: false, bottom: false, left: false, right: true },
+          });
+          addHw('كوابيل رفوف نيكل 5 مم', 'shelf-pin', cab.shelfCount * 4, 'قطعة', 3, 'كوابيل تثبيت الرفوف');
+        }
 
-      // Screws & Confirmat
-      addHw('مسامير تجميع كونفرمات 7×50 مم', 'screw', 16, 'قطعة', 1.5, 'مسامير ربط الشاسيه');
-      if (cab.category === 'base' || cab.category === 'tall') {
-        addHw('أرجل مطبخ بلاستيك رجلاش 10 سم', 'leg', 4, 'قطعة', 15, 'أرجل تسوية وتثبيت الوزرة');
+        // Door Fronts
+        if (cab.doorCount > 0 && cab.doorType !== 'open') {
+          const doorW = cab.doorCount === 1 ? CW - activeTemplate.doorReveal : Math.round((CW - (cab.doorCount + 1) * activeTemplate.doorReveal) / cab.doorCount);
+          woodPanels.push({
+            id: `${cab.id}-DOOR`,
+            cabinetId: cab.id,
+            cabinetName: cab.name,
+            partName: `ضلفة باب واجهة (${cab.doorCount} ضلف)`,
+            quantity: cab.doorCount,
+            length: CH - activeTemplate.doorReveal,
+            width: doorW,
+            thickness: BT,
+            material: cab.materialFront || 'خامة الواجهة',
+            edgeBanding: { top: true, bottom: true, left: true, right: true },
+          });
+          addHw('مفصلات باستم هيدروليك سوفت كلوز 110°', 'hinge', cab.doorCount * (CH > 1500 ? 4 : 2), 'قطعة', 25, 'مفصلات غلق ناعم');
+        }
+
+        // Screws & Confirmat
+        addHw('مسامير تجميع كونفرمات 7×50 مم', 'screw', 16, 'قطعة', 1.5, 'مسامير ربط الشاسيه');
+        if (cab.category === 'base' || cab.category === 'tall') {
+          addHw('أرجل مطبخ بلاستيك رجلاش 10 سم', 'leg', 4, 'قطعة', 15, 'أرجل تسوية وتثبيت الوزرة');
+        }
       }
     }
 

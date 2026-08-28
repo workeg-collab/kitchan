@@ -39,6 +39,23 @@ export const CabinetSchedule: React.FC = () => {
     saveAs(blob, `${project.metadata.name}_Cabinet_Schedule.csv`);
   };
 
+  const projectType = project.metadata.projectType || 'kitchen';
+
+  const getScheduleDesc = () => {
+    switch (projectType) {
+      case 'bedroom':
+        return 'جدول مواصفات وتفاصيل قطع أثاث غرف النوم (السرائر، الكومودينو، التسريحات، والمرايا)';
+      case 'dressing':
+        return 'جدول مواصفات قواطع الدريسينج روم، الأرفف، وأدراج الإكسسوارات والمجوهرات';
+      case 'library':
+        return 'جدول مواصفات وحدات وتجاويف الشاشات الجدارية والمكتبات والبانوهات';
+      case 'living':
+        return 'جدول مواصفات أثاث الصالون وغرف المعيشة وطاولات السفرة والقهوة';
+      default:
+        return 'جدول كامل لجميع الكبائن والوحدات مع الأبعاد الدقيقة وملاحظات التصنيع والورشة';
+    }
+  };
+
   return (
     <div className="w-full h-full flex flex-col bg-slate-100 overflow-hidden">
       {/* Top Header & Search Bar (Light Theme) */}
@@ -49,7 +66,7 @@ export const CabinetSchedule: React.FC = () => {
             {t.schedule}
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            {language === 'ar' ? 'جدول كامل لجميع الكبائن والوحدات مع الأبعاد الدقيقة وملاحظات التصنيع' : 'Real-time schedule of all kitchen units with dimensional specs, hardware and workshop notes'}
+            {getScheduleDesc()}
           </p>
         </div>
 
@@ -71,10 +88,35 @@ export const CabinetSchedule: React.FC = () => {
             className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold focus:bg-white focus:outline-none focus:border-blue-500"
           >
             <option value="all">{t.all} ({cabinets.length})</option>
-            <option value="base">{t.base}</option>
-            <option value="wall">{t.wall_cat}</option>
-            <option value="tall">{t.tall}</option>
-            <option value="corner">{t.corner}</option>
+            {projectType === 'kitchen' && (
+              <>
+                <option value="base">{t.base}</option>
+                <option value="wall">{t.wall_cat}</option>
+                <option value="tall">{t.tall}</option>
+                <option value="corner">{t.corner}</option>
+              </>
+            )}
+            {projectType === 'dressing' && (
+              <>
+                <option value="wardrobe">دواليب وخزائن</option>
+                <option value="closet-internals">أرفف وقواطع داخلية</option>
+                <option value="accessories">أدراج إكسسوارات</option>
+              </>
+            )}
+            {projectType === 'bedroom' && (
+              <>
+                <option value="bed">سرائر وشاسيهات</option>
+                <option value="nightstand">كومودينو</option>
+                <option value="dresser">تسريحات ومرايا</option>
+                <option value="wardrobe">دواليب ملابس</option>
+              </>
+            )}
+            {projectType === 'library' && (
+              <>
+                <option value="tv-wall">وحدات وتجاويف الشاشات</option>
+                <option value="wall-panel">بانوهات خشب مضلعة</option>
+              </>
+            )}
             <option value="custom">{t.custom}</option>
           </select>
 
