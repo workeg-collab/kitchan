@@ -31,6 +31,7 @@ import { UserManagementModal } from './components/modals/UserManagementModal';
 import { ManufacturingSystemModal } from './components/modals/ManufacturingSystemModal';
 import { AdminSubscriptionDashboard } from './components/admin/AdminSubscriptionDashboard';
 import { SettingsModal } from './components/modals/SettingsModal';
+import { AppVideoTutorialModal } from './components/modals/AppVideoTutorialModal';
 import { liveTelemetry } from './services/liveTelemetryService';
 import { useProjectStore } from './store/useProjectStore';
 
@@ -182,6 +183,7 @@ export const App: React.FC = () => {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
+      <AppVideoTutorialModal />
       <Analytics />
     </div>
   );

@@ -30,7 +30,8 @@ import {
   Pencil,
   ChevronDown,
   Camera,
-  FolderOpen
+  FolderOpen,
+  Play
 } from 'lucide-react';
 import { dbService } from '../../services/dbService';
 
@@ -47,6 +48,7 @@ export const TopNavbar: React.FC = () => {
     toggleUnit,
     setIsExportModalOpen,
     setIsSettingsModalOpen,
+    setIsVideoTutorialOpen,
   } = useUIStore();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -335,6 +337,16 @@ export const TopNavbar: React.FC = () => {
         >
           <Download size={14} className="text-blue-600" />
           <span className="hidden sm:inline">تصدير</span>
+        </button>
+
+        {/* Video Tutorial Guide Trigger */}
+        <button
+          onClick={() => setIsVideoTutorialOpen(true)}
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition shadow-2xs"
+          title="فيديو ودليل الشرح الشامل لطرق الرسم والتعامل مع البلوكات والأدوات المخفية"
+        >
+          <Play size={13} fill="currentColor" />
+          <span className="hidden md:inline">شرح البرنامج</span>
         </button>
 
         {/* Project & Materials Settings Modal Trigger */}
