@@ -55,7 +55,12 @@ export const DEFAULT_MATERIAL_FINISHES: MaterialFinishes = {
 
 export const DEFAULT_PRICING_SETTINGS: PricingSettings = {
   currency: 'ج.م',
-  pricePerSquareMeterFronts: 1800,
+  pricingMethod: 'square-fronts',
+  pricePerSquareMeterFronts: 4200,
+  pricePerSquareMeterBaseFronts: 4200,
+  pricePerSquareMeterWallFronts: 3800,
+  pricePerSquareMeterTallFronts: 4500,
+  useDetailedSquareMeterPricing: false,
   pricePerSquareMeterCarcass: 850,
   pricePerLinearMeterBase: 3200,
   pricePerLinearMeterWall: 2600,

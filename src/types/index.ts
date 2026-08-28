@@ -424,13 +424,26 @@ export interface HardwareItem {
   description: string;
 }
 
+export type PricingMethod = 'linear' | 'square-fronts';
+
 export interface PricingSettings {
   currency: string;
-  pricePerSquareMeterFronts: number;
+  pricingMethod: PricingMethod; // 'linear' (بالمتر الطولي) أو 'square-fronts' (بالمتر المربع لوش الوحدات)
+  
+  // Square Meters (المتر المربع لوش الواجهات: العرض x الارتفاع)
+  pricePerSquareMeterFronts: number; // سعر المتر المربع الموحد لوش الوحدات
+  pricePerSquareMeterBaseFronts?: number; // سعر المتر المربع لوش الوحدات السفلية
+  pricePerSquareMeterWallFronts?: number; // سعر المتر المربع لوش الوحدات العلوية
+  pricePerSquareMeterTallFronts?: number; // سعر المتر المربع للدواليب الطولية
+  useDetailedSquareMeterPricing?: boolean; // تفعيل سعر مخصص لكل تصنيف
   pricePerSquareMeterCarcass: number;
+  
+  // Linear Meters (المتر الطولي: العرض)
   pricePerLinearMeterBase: number;
   pricePerLinearMeterWall: number;
   pricePerLinearMeterTall: number;
+  
+  // Additional Add-ons
   pricePerSquareMeterCountertop: number;
   accessoriesCost: number;
   installationCostPercentage: number;
