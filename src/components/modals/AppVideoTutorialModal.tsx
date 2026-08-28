@@ -31,9 +31,7 @@ import {
   Sliders,
   Grid,
   Maximize,
-  Tv,
-  Settings,
-  Mic
+  Tv
 } from 'lucide-react';
 
 interface TutorialChapter {
@@ -42,7 +40,7 @@ interface TutorialChapter {
   duration: string;
   icon: React.ReactNode;
   color: string;
-  spokenSentences: string[]; // جمل قصيرة منسابة لمنع أي تقطيع نهائياً
+  spokenSentences: string[];
   description: string;
   keyPoints: string[];
   proTips: string[];
@@ -55,14 +53,11 @@ export const AppVideoTutorialModal: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(true);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoiceURI, setSelectedVoiceURI] = useState<string>('');
-  const [voicePitch, setVoicePitch] = useState<number>(1.35); // نبرة نسائية ناعمة وعالية
 
   const activeUtterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
-  const isSpeakingRef = useRef<boolean>(false);
 
   const chapters: TutorialChapter[] = [
     {
@@ -72,11 +67,11 @@ export const AppVideoTutorialModal: React.FC = () => {
       icon: <Compass size={20} className="text-blue-500" />,
       color: 'blue',
       spokenSentences: [
-        'أهلاً بيك في فرنتشر كاد برو.',
-        'أول خطوة بنعملها، هي رسم أبعاد الغرفة ومقاسات الحوائط بدقة.',
-        'البرنامج فيه ميزة ذكية جداً، وهي المغناطيس التلقائي.',
-        'أول ما تقرب أي كابينة من الحيطة، بتثبت مكانها فوراً من غير أي تداخل.',
-        'وتقدر تتحكم في الزووم، وتشوف مقاسات المسافات والفرغات بين الوحدات بكل سهولة.'
+        'أهلاً بك في برنامج فرنتشر كاد برو.',
+        'أول خطوة هي رسم أبعاد الغرفة ومقاسات الحوائط بدقة.',
+        'البرنامج يتميز بنظام المغناطيس التلقائي الذكي.',
+        'بمجرد تقريب أي كابينة من الحائط تثبت مكانها فوراً دون أي تداخل.',
+        'ويمكنك التحكم في التقريب والتبعيد وإظهار مقاسات المسافات والفرغات بين الوحدات بكل سهولة.'
       ],
       description: 'طريقة رسم وتعديل أبعاد الغرفة، استخدام المغناطيس الذكي Snap to Grid & Wall، وإظهار خطوط الأبعاد والمسافات.',
       keyPoints: [
@@ -96,10 +91,10 @@ export const AppVideoTutorialModal: React.FC = () => {
       icon: <Box size={20} className="text-purple-500" />,
       color: 'purple',
       spokenSentences: [
-        'دلوقتي هنفتح الكتالوج من على الشمال ونختار الوحدات اللي محتاجينها.',
+        'افتح الكتالوج من الجانب الأيسر واختر الوحدات المناسبة.',
         'سواء وحدات سفلية، علوية، أو دواليب طولية.',
-        'بمجرد ما تضغط على أي كابينة، بتظهرلك لوحة الخصائص عشان تعدل العرض والارتفاع والعمق.',
-        'وتقدر تلف الكابينة تسعين درجة بحرف الآر، أو تكررها فوراً بكنترول مع دي.'
+        'بمجرد النقر على أي كابينة، تظهر لوحة الخصائص لتعديل العرض والارتفاع والعمق.',
+        'ويمكنك تدوير الكابينة تسعين درجة بالضغط على حرف آر، أو نسخها وتكرارها فوراً بكنترول مع دي.'
       ],
       description: 'سحب وإفلات الوحدات والدواليب، تعديل العرض والارتفاع والعمق، التدوير 90°، والتكرار السريع.',
       keyPoints: [
@@ -119,9 +114,9 @@ export const AppVideoTutorialModal: React.FC = () => {
       icon: <Eye size={20} className="text-amber-500" />,
       color: 'amber',
       spokenSentences: [
-        'عشان تشوف تصميمك كأنه حقيقة، اضغط على منظور ثري دي.',
-        'هتشوف الخامات والإضاءة وانعكاسات الرخام بجودة عالية جداً.',
-        'والأحلى من كده، زرار الباب اللي فوق بيفتحلك كل الضلف والأدراج والقلابات مع بعض، عشان تعاين التوزيع الداخلي والأرفف.'
+        'لمعاينة التصميم بواقعية، اضغط على منظور ثري دي.',
+        'حيث تظهر الخامات والإضاءة وانعكاسات الرخام بجودة عالية.',
+        'وزر الباب في الأعلى يفتح جميع الضلف والأدراج والقلابات معاً لمعاينة الأرفف والتوزيع الداخلي.'
       ],
       description: 'التجوال ثلاثي الأبعاد الواقعي، المساقط الهندسية (علوي / أمامي / أيزومترك)، ومعاينة فتح وإغلاق الأبواب.',
       keyPoints: [
@@ -141,8 +136,8 @@ export const AppVideoTutorialModal: React.FC = () => {
       icon: <Sparkles size={20} className="text-indigo-500" />,
       color: 'indigo',
       spokenSentences: [
-        'لو عايز شاشة كاملة مية في المية للرسم، اضغط على زرار التثبيت عشان تقفل درج الكتالوج وتستمتع بأكبر مساحة شغل.',
-        'وشريط الأدوات اللي عايم في نص الشاشة بيوفرلك كل أدوات الكاميرا والزووم في مكان واحد.'
+        'للحصول على مساحة كاملة مائة بالمائة للرسم، اضغط على زر التثبيت لإغلاق درج الكتالوج.',
+        'وشريط الأدوات العائم في منتصف الشاشة يوفر لك جميع أدوات الرؤية والزووم في مكان واحد.'
       ],
       description: 'كيف تخفي اللوحات الجانبية بضغطة زر وتستمتع بـ 100% من الشاشة للتصميم، وأهم الاختصارات.',
       keyPoints: [
@@ -162,10 +157,9 @@ export const AppVideoTutorialModal: React.FC = () => {
       icon: <Calculator size={20} className="text-emerald-500" />,
       color: 'emerald',
       spokenSentences: [
-        'نيجي بقى لحساب التكلفة وعرض السعر.',
-        'البرنامج بيحسبلك بالمتر المربع لوش الوحدات، يعني بنضرب العرض في الارتفاع لوش الكابينة وملناش دعوة بالعمق، أو الحساب بالمتر الطولي.',
-        'وكمان بتحدد خامتك المعتمدة سواء خشب إيجر، أكريليك، أو كلادينج ألوميتال مقاوم للمياه.',
-        'والبرنامج بيطلعلك عرض سعر رسمي معتمد جاهز للطباعة فوراً.'
+        'في قسم الأسعار وعرض السعر، يقوم البرنامج بحساب التكلفة بالمتر المربع لوش الوحدات بضرب العرض في الارتفاع بدون العمق، أو بالمتر الطولي.',
+        'كما يمكنك تحديد نوع الخامة المعتمدة سواء خشب إيجر، أكريليك، أو كلادينج ألوميتال مقاوم للمياه.',
+        'ويقوم البرنامج بتوليد عرض سعر رسمي معتمد جاهز للطباعة فوراً.'
       ],
       description: 'حساب التكلفة بالمتر المربع لوش الوحدات (W × H بدون العمق) أو بالمتر الطولي مع اختيار نوع الخامة وتوليد عرض السعر.',
       keyPoints: [
@@ -185,9 +179,9 @@ export const AppVideoTutorialModal: React.FC = () => {
       icon: <Scissors size={20} className="text-rose-500" />,
       color: 'rose',
       spokenSentences: [
-        'وأخيراً للتصنيع، محرك التقطيع بيحسبلك مقاسات كل جنب وقاع ورف وضلفة بعد خصم شريط الحرف والقشاط.',
-        'وبيرسملك خريطة توزيع الألواح عشان تقلل الهالك والفاقد في الورشة.',
-        'وتقدر تصدر ملفات الإكسل وملفات الدي إكس إف للسي إن سي بضغطة زرار.'
+        'وأخيراً لمرحلة التصنيع، محرك التقطيع يحسب مقاسات كل جنب وقاع ورف وضلفة بعد خصم شريط الحرف والقشاط.',
+        'ويرسم خريطة توزيع الألواح لتقليل الهالك والفاقد في الورشة.',
+        'ويمكنك تصدير كشوفات الإكسل وملفات الدي إكس إف للسي إن سي بضغطة زر واحدة.'
       ],
       description: 'استخراج تفصيل قص الألواح، أطوال القشاط، عدد الألواح المطلوبة، وتصدير ملفات PDF و Excel و DXF.',
       keyPoints: [
@@ -204,95 +198,54 @@ export const AppVideoTutorialModal: React.FC = () => {
 
   const currentChapter = chapters[activeChapterIndex];
 
-  // Load available system voices
-  useEffect(() => {
-    const updateVoices = () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        const vList = window.speechSynthesis.getVoices();
-        setAvailableVoices(vList);
-        
-        // Find best Arabic female voice
-        const bestFemale = vList.find(v => 
-          (v.lang.startsWith('ar')) && (
-            v.name.toLowerCase().includes('laila') ||
-            v.name.toLowerCase().includes('zeina') ||
-            v.name.toLowerCase().includes('hoda') ||
-            v.name.toLowerCase().includes('salma') ||
-            v.name.toLowerCase().includes('nour') ||
-            v.name.toLowerCase().includes('mariam') ||
-            v.name.toLowerCase().includes('female') ||
-            v.name.toLowerCase().includes('natural')
-          )
-        ) || vList.find(v => v.lang.includes('ar-EG')) || vList.find(v => v.lang.startsWith('ar'));
-
-        if (bestFemale) {
-          setSelectedVoiceURI(bestFemale.voiceURI);
-        }
-      }
-    };
-
-    updateVoices();
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = updateVoices;
-    }
-  }, []);
-
-  // Safe Non-Stuttering Sentence Queue Player
+  // Stop Speech Helper
   const stopSpeech = useCallback(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       activeUtterancesRef.current = [];
-      isSpeakingRef.current = false;
-      setIsSpeaking(false);
     }
   }, []);
 
+  // Safe Speech Engine
   const speakChapterSentences = useCallback((sentences: string[]) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window) || isMuted) return;
 
-    stopSpeech();
+    try {
+      window.speechSynthesis.cancel();
 
-    const selectedVoice = availableVoices.find(v => v.voiceURI === selectedVoiceURI) 
-      || availableVoices.find(v => v.lang.startsWith('ar'));
+      const voices = window.speechSynthesis.getVoices();
+      const bestFemaleVoice = voices.find(v => 
+        (v.lang.startsWith('ar')) && (
+          v.name.toLowerCase().includes('laila') ||
+          v.name.toLowerCase().includes('zeina') ||
+          v.name.toLowerCase().includes('hoda') ||
+          v.name.toLowerCase().includes('salma') ||
+          v.name.toLowerCase().includes('nour') ||
+          v.name.toLowerCase().includes('mariam') ||
+          v.name.toLowerCase().includes('female')
+        )
+      ) || voices.find(v => v.lang.includes('ar')) || voices[0];
 
-    setIsSpeaking(true);
-    isSpeakingRef.current = true;
+      const fullText = sentences.join(' . ');
+      const utterance = new SpeechSynthesisUtterance(fullText);
+      utterance.lang = 'ar-SA';
+      utterance.rate = 0.90;
+      utterance.pitch = 1.30;
 
-    // Join with natural pauses
-    const fullText = sentences.join(' .. ');
+      if (bestFemaleVoice) {
+        utterance.voice = bestFemaleVoice;
+      }
 
-    const utterance = new SpeechSynthesisUtterance(fullText);
-    utterance.lang = 'ar-EG';
-    utterance.rate = 0.88;       // Smooth, clear, conversational Egyptian cadence
-    utterance.pitch = voicePitch; // Elevated pitch for natural female tone
+      (window as any).__tutorialUtterance = utterance;
+      activeUtterancesRef.current = [utterance];
 
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn('Speech playback error:', e);
     }
+  }, [isMuted]);
 
-    // Preserve in ref to prevent Chrome Garbage Collection mid-sentence bug
-    (window as any).__speechUtteranceRef = utterance;
-    activeUtterancesRef.current = [utterance];
-
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-      isSpeakingRef.current = true;
-    };
-
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      isSpeakingRef.current = false;
-    };
-
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      isSpeakingRef.current = false;
-    };
-
-    window.speechSynthesis.speak(utterance);
-  }, [availableVoices, isMuted, selectedVoiceURI, stopSpeech, voicePitch]);
-
-  // Handle Chapter change speech
+  // Handle Chapter selection
   const handleChapterSelect = (index: number) => {
     setActiveChapterIndex(index);
     setProgress(0);
@@ -300,7 +253,7 @@ export const AppVideoTutorialModal: React.FC = () => {
     speakChapterSentences(chapters[index].spokenSentences);
   };
 
-  // Progress Bar update (independent from speech)
+  // Progress Bar timer
   useEffect(() => {
     let interval: any;
     if (isPlaying && isVideoTutorialOpen) {
@@ -332,50 +285,40 @@ export const AppVideoTutorialModal: React.FC = () => {
         {/* ========================================================================= */}
         <div className="px-6 py-3 border-b border-slate-800 bg-slate-950 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 via-pink-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-rose-600/30">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
               <Tv size={22} />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-white">
-                  فيديو الشرح الشامل لبرنامج فرنتشر كاد برو
-                </h2>
-                <span className="text-[11px] font-mono px-2.5 py-0.5 bg-rose-600 text-white rounded-full font-bold shadow-sm">
-                  صوت أنثى مصري انسيابي 🎙️🇪🇬
-                </span>
-              </div>
+              <h2 className="text-base sm:text-lg font-black text-white">
+                فيديو ودليل الشرح الشامل لبرنامج فرنتشر كاد برو
+              </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                شاشة عرض سينمائية كبيرة توضح كل خطوة عملياً من داخل التطبيق بدون أي تقطيع
+                شاشة عرض كبيرة توضح كل خطوة عملياً من داخل التطبيق
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Direct Female Voice Trigger CTA */}
+            {/* Toggle Audio Mute / Unmute */}
             <button
               onClick={() => {
-                setIsMuted(false);
-                setIsPlaying(true);
-                speakChapterSentences(currentChapter.spokenSentences);
+                const nextMuted = !isMuted;
+                setIsMuted(nextMuted);
+                if (nextMuted) {
+                  stopSpeech();
+                } else {
+                  speakChapterSentences(currentChapter.spokenSentences);
+                }
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-600/30 border border-rose-400/40"
-              title="تشغيل صوت المهندسة باللهجة المصرية فوراً"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+                !isMuted 
+                  ? 'bg-blue-600 hover:bg-blue-500 text-white border-blue-400/40 shadow-sm' 
+                  : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
+              }`}
+              title={isMuted ? 'تشغيل الصوت' : 'كتم الصوت'}
             >
-              <Volume2 size={15} />
-              <span>استمع لصوت المهندسة (مصري 🎙️)</span>
-            </button>
-
-            {/* Pitch / Tone Selector (نعومة الصوت) */}
-            <button
-              onClick={() => {
-                const nextPitch = voicePitch === 1.35 ? 1.5 : voicePitch === 1.5 ? 1.2 : 1.35;
-                setVoicePitch(nextPitch);
-                speakChapterSentences(currentChapter.spokenSentences);
-              }}
-              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-bold border border-slate-700 transition"
-              title="تغيير درجة نعومة الصوت النسائي"
-            >
-              <span>نبرة: {voicePitch >= 1.4 ? 'أنثوي ناعم جداً' : voicePitch >= 1.3 ? 'أنثوي هادئ' : 'طبيعي'}</span>
+              {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+              <span>{isMuted ? 'الصوت مكتوم' : 'الصوت مفعّل'}</span>
             </button>
 
             {/* Toggle Fullscreen Size */}
@@ -726,22 +669,12 @@ export const AppVideoTutorialModal: React.FC = () => {
               {/* =================================================================== */}
               <div className="relative z-10 p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/20 text-white text-xs font-black shadow-xl">
-                  <span className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
+                  <span className="w-3 h-3 rounded-full bg-blue-500 animate-ping" />
                   <span>{currentChapter.title}</span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {/* Female Voice Live Indicator */}
-                  {isSpeaking && !isMuted && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold animate-pulse border border-white/30 shadow-lg">
-                      <Radio size={14} className="animate-spin" />
-                      <span>صوت المهندسة يشرح الآن 🎙️🇪🇬</span>
-                    </div>
-                  )}
-
-                  <div className="text-xs font-mono font-bold text-slate-200 bg-black/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                    {currentChapter.duration}
-                  </div>
+                <div className="text-xs font-mono font-bold text-slate-200 bg-black/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                  {currentChapter.duration}
                 </div>
               </div>
 
@@ -760,7 +693,7 @@ export const AppVideoTutorialModal: React.FC = () => {
                   className="w-full h-2 bg-slate-700/80 hover:h-3 rounded-full overflow-hidden cursor-pointer transition-all"
                 >
                   <div 
-                    className="h-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 rounded-full transition-all"
+                    className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full transition-all"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -778,7 +711,7 @@ export const AppVideoTutorialModal: React.FC = () => {
                           speakChapterSentences(currentChapter.spokenSentences);
                         }
                       }}
-                      className="p-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl transition shadow-md shadow-rose-600/30 flex items-center gap-1 font-bold"
+                      className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-md shadow-blue-600/30 flex items-center gap-1 font-bold"
                     >
                       {isPlaying ? <Pause size={16} /> : <Play size={16} />}
                       <span>{isPlaying ? 'إيقاف' : 'تشغيل'}</span>
@@ -796,7 +729,7 @@ export const AppVideoTutorialModal: React.FC = () => {
                       <span className="hidden sm:inline">إعادة</span>
                     </button>
 
-                    {/* Mute / Unmute Female Voice */}
+                    {/* Mute / Unmute */}
                     <button
                       onClick={() => {
                         const nextMuted = !isMuted;
@@ -808,11 +741,11 @@ export const AppVideoTutorialModal: React.FC = () => {
                         }
                       }}
                       className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 text-xs font-bold ${
-                        !isMuted ? 'bg-pink-600/80 text-white' : 'text-slate-400 bg-white/10 hover:bg-white/20'
+                        !isMuted ? 'bg-blue-600/80 text-white' : 'text-slate-400 bg-white/10 hover:bg-white/20'
                       }`}
                     >
                       {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                      <span>{isMuted ? 'الصوت مكتوم' : 'صوت أنثى مصري مفعّل'}</span>
+                      <span>{isMuted ? 'الصوت مكتوم' : 'الصوت مفعّل'}</span>
                     </button>
                   </div>
 
@@ -854,14 +787,14 @@ export const AppVideoTutorialModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Subtitles & Egyptian Voice Narration Text Card */}
-            <div className="mt-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl text-xs text-amber-200 flex items-start gap-3 shadow-lg">
-              <div className="w-8 h-8 rounded-xl bg-rose-600/30 border border-rose-400/40 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
-                <Radio size={16} className="animate-pulse" />
+            {/* Subtitles Text Card */}
+            <div className="mt-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl text-xs text-slate-200 flex items-start gap-3 shadow-lg">
+              <div className="w-8 h-8 rounded-xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
+                <Video size={16} />
               </div>
               <div className="flex-1">
                 <strong className="text-white text-xs font-black block mb-1">
-                  نص التعليق الصوتي النسائي (باللهجة المصرية):
+                  نص الشرح التوضيحي:
                 </strong>
                 <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-sans font-medium">
                   "{currentChapter.spokenSentences.join(' ')}"
@@ -886,16 +819,16 @@ export const AppVideoTutorialModal: React.FC = () => {
                       onClick={() => handleChapterSelect(idx)}
                       className={`w-full p-3.5 rounded-2xl border text-right transition flex items-start justify-between group ${
                         isActive
-                          ? 'bg-slate-800 border-rose-500 shadow-xl shadow-rose-500/20'
+                          ? 'bg-slate-800 border-blue-500 shadow-xl shadow-blue-500/20'
                           : 'bg-slate-950/60 hover:bg-slate-800 border-slate-800 hover:border-slate-700'
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-xl shrink-0 ${isActive ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                        <div className={`p-2 rounded-xl shrink-0 ${isActive ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
                           {ch.icon}
                         </div>
                         <div>
-                          <h4 className={`text-xs font-black leading-snug ${isActive ? 'text-rose-400' : 'text-white'}`}>
+                          <h4 className={`text-xs font-black leading-snug ${isActive ? 'text-blue-400' : 'text-white'}`}>
                             {ch.title}
                           </h4>
                           <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5 font-sans">
@@ -947,7 +880,7 @@ export const AppVideoTutorialModal: React.FC = () => {
         {/* ========================================================================= */}
         <div className="px-6 py-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2 text-slate-400">
-            <HelpCircle size={15} className="text-rose-500" />
+            <HelpCircle size={15} className="text-blue-500" />
             <span>فريق الدعم الفني متاح دائماً عبر الإيميل: <strong className="text-white">sales@pom-agency.online</strong></span>
           </div>
 
@@ -956,7 +889,7 @@ export const AppVideoTutorialModal: React.FC = () => {
               stopSpeech();
               setIsVideoTutorialOpen(false);
             }}
-            className="px-6 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white rounded-xl text-xs font-black transition shadow-lg shadow-rose-600/30"
+            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black transition shadow-lg shadow-blue-600/30"
           >
             إغلاق والبدء في التصميم 🚀
           </button>

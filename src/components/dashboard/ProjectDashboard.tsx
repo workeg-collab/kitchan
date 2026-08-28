@@ -108,6 +108,16 @@ export const ProjectDashboard: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Video Tutorial Glowing Trigger Button */}
+          <button
+            onClick={() => setIsVideoTutorialOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-red-500/30 border border-white/30 backdrop-blur-md cursor-pointer transform hover:scale-105 active:scale-95"
+            title="فيديو ودليل الشرح الشامل لطرق الرسم والتعامل مع البلوكات والأدوات المخفية"
+          >
+            <Play size={13} fill="currentColor" />
+            <span>فيديو شرح البرنامج</span>
+          </button>
+
           {currentUser?.role === 'admin' && (
             <button
               onClick={() => setIsAdminModalOpen(true)}
@@ -200,7 +210,7 @@ export const ProjectDashboard: React.FC = () => {
       </div>
 
       {/* Absolute Bottom Clean Minimalist Footer */}
-      <div className="absolute bottom-3 inset-x-0 z-20 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-300/90 font-medium select-none pointer-events-auto text-center px-4">
+      <div className="absolute bottom-3 inset-x-0 z-20 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-300/90 font-medium select-none pointer-events-auto text-center px-4">
         <span>تطوير وبرمجة: <strong className="text-white font-mono font-bold">POM Agency</strong></span>
         <span className="text-slate-400/50">•</span>
         <span>للتواصل والاستفسارات:</span>
@@ -211,17 +221,6 @@ export const ProjectDashboard: React.FC = () => {
         >
           sales@pom-agency.online
         </a>
-        <span className="text-slate-400/50">•</span>
-
-        {/* Video Tutorial Glowing Trigger Button */}
-        <button
-          onClick={() => setIsVideoTutorialOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-full text-xs font-bold transition shadow-lg shadow-red-500/30 border border-white/30 backdrop-blur-md cursor-pointer transform hover:scale-105 active:scale-95"
-          title="شاهد فيديو ودليل الشرح الشامل لطرق الرسم والتعامل مع البلوكات والأدوات المخفية"
-        >
-          <Play size={12} fill="currentColor" />
-          <span>فيديو شرح البرنامج وطرق التصميم</span>
-        </button>
       </div>
 
       {/* Video Tutorial Modal */}
