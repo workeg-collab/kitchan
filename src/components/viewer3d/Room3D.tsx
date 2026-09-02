@@ -5,12 +5,14 @@ interface Room3DProps {
   room: RoomConfig;
   materials: MaterialFinishes;
   backsplash: BacksplashConfig;
+  isolatedWallId?: 'all' | 'wall-a' | 'wall-b' | 'wall-c' | 'wall-d' | null;
 }
 
 export const Room3D: React.FC<Room3DProps> = ({
   room,
   materials,
   backsplash,
+  isolatedWallId = 'all',
 }) => {
   const { width, length, ceilingHeight, wallThickness } = room;
 
@@ -22,6 +24,11 @@ export const Room3D: React.FC<Room3DProps> = ({
   const floorColor = materials.floorColor || '#8c6843';
   const wallColor = materials.wallColor || '#f1f5f9';
   const splashColor = materials.backsplashColor || '#e2e8f0';
+
+  const showWallA = !isolatedWallId || isolatedWallId === 'all' || isolatedWallId === 'wall-a';
+  const showWallB = !isolatedWallId || isolatedWallId === 'all' || isolatedWallId === 'wall-b';
+  const showWallC = isolatedWallId === 'wall-c' || isolatedWallId === 'all';
+  const showWallD = !isolatedWallId || isolatedWallId === 'all' || isolatedWallId === 'wall-d';
 
   return (
     <group>
@@ -36,43 +43,83 @@ export const Room3D: React.FC<Room3DProps> = ({
       </mesh>
 
       {/* --- WALL A (BACK WALL at Z = 0) --- */}
-      <mesh position={[W / 2, H / 2, -T / 2]} receiveShadow>
-        <boxGeometry args={[W + 2 * T, H, T]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} />
-      </mesh>
+      {showWallA && (
+        <mesh position={[W / 2, H / 2, -T / 2]} receiveShadow>
+          <boxGeometry args={[W + 2 * T, H, T]} />
+          <meshStandardMaterial color={wallColor} roughness={0.9} />
+        </mesh>
+      )}
 
       {/* --- WALL B (RIGHT WALL at X = W) --- */}
-      <mesh position={[W + T / 2, H / 2, L / 2]} receiveShadow>
-        <boxGeometry args={[T, H, L + 2 * T]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} />
-      </mesh>
+      {showWallB && (
+        <mesh position={[W + T / 2, H / 2, L / 2]} receiveShadow>
+          <boxGeometry args={[T, H, L + 2 * T]} />
+          <meshStandardMaterial color={wallColor} roughness={0.9} />
+        </mesh>
+      )}
+
+      {/* --- WALL C (FRONT WALL at Z = L) --- */}
+      {showWallC && (
+        <mesh position={[W / 2, H / 2, L + T / 2]} receiveShadow>
+          <boxGeometry args={[W + 2 * T, H, T]} />
+          <meshStandardMaterial color={wallColor} roughness={0.9} />
+        </mesh>
+      )}
 
       {/* --- WALL D (LEFT WALL at X = 0) --- */}
-      <mesh position={[-T / 2, H / 2, L / 2]} receiveShadow>
-        <boxGeometry args={[T, H, L + 2 * T]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} />
-      </mesh>
+      {showWallD && (
+        <mesh position={[-T / 2, H / 2, L / 2]} receiveShadow>
+          <boxGeometry args={[T, H, L + 2 * T]} />
+          <meshStandardMaterial color={wallColor} roughness={0.9} />
+        </mesh>
+      )}
 
-      {/* --- BACKSPLASH TILE STRIP ON WALL A & B --- */}
+      {/* --- BACKSPLASH TILE STRIPS --- */}
       {backsplash.enabled && (
         <>
           {/* Backsplash on Wall A */}
-          <mesh
-            position={[W / 2, (0.85 + backsplash.height / 2000), 0.008]}
-            receiveShadow
-          >
-            <boxGeometry args={[W, backsplash.height / 1000, 0.015]} />
-            <meshStandardMaterial color={splashColor} roughness={0.2} metalness={0.1} />
-          </mesh>
+          {showWallA && (
+            <mesh
+              position={[W / 2, (0.85 + backsplash.height / 2000), 0.008]}
+              receiveShadow
+            >
+              <boxGeometry args={[W, backsplash.height / 1000, 0.015]} />
+              <meshStandardMaterial color={splashColor} roughness={0.2} metalness={0.1} />
+            </mesh>
+          )}
           {/* Backsplash on Wall B */}
-          <mesh
-            position={[W - 0.008, (0.85 + backsplash.height / 2000), L / 2]}
-            rotation={[0, -Math.PI / 2, 0]}
-            receiveShadow
-          >
-            <boxGeometry args={[L, backsplash.height / 1000, 0.015]} />
-            <meshStandardMaterial color={splashColor} roughness={0.2} metalness={0.1} />
-          </mesh>
+          {showWallB && (
+            <mesh
+              position={[W - 0.008, (0.85 + backsplash.height / 2000), L / 2]}
+              rotation={[0, -Math.PI / 2, 0]}
+              receiveShadow
+            >
+              <boxGeometry args={[L, backsplash.height / 1000, 0.015]} />
+              <meshStandardMaterial color={splashColor} roughness={0.2} metalness={0.1} />
+            </mesh>
+          )}
+          {/* Backsplash on Wall C */}
+          {showWallC && (
+            <mesh
+              position={[W / 2, (0.85 + backsplash.height / 2000), L - 0.008]}
+              rotation={[0, Math.PI, 0]}
+              receiveShadow
+            >
+              <boxGeometry args={[W, backsplash.height / 1000, 0.015]} />
+              <meshStandardMaterial color={splashColor} roughness={0.2} metalness={0.1} />
+            </mesh>
+          )}
+          {/* Backsplash on Wall D */}
+          {showWallD && (
+            <mesh
+              position={[0.008, (0.85 + backsplash.height / 2000), L / 2]}
+              rotation={[0, Math.PI / 2, 0]}
+              receiveShadow
+            >
+              <boxGeometry args={[L, backsplash.height / 1000, 0.015]} />
+              <meshStandardMaterial color={splashColor} roughness={0.2} metalness={0.1} />
+            </mesh>
+          )}
         </>
       )}
 

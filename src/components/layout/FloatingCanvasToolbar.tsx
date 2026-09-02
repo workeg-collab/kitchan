@@ -152,16 +152,24 @@ export const FloatingCanvasToolbar: React.FC<FloatingCanvasToolbarProps> = ({ mo
           {/* Camera Angles Selector */}
           <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-bold">
             <button
-              onClick={() => setViewAngle3D('perspective')}
+              onClick={() => {
+                useUIStore.getState().setActiveElevationWall('all');
+                setViewAngle3D('perspective');
+              }}
               className={`px-2 py-1 rounded transition ${
-                viewAngle3D === 'perspective' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                viewAngle3D === 'perspective' && useUIStore.getState().activeElevationWall === 'all'
+                  ? 'bg-white text-blue-600 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
               title="منظور حر (Free Perspective)"
             >
               حر
             </button>
             <button
-              onClick={() => setViewAngle3D('top')}
+              onClick={() => {
+                useUIStore.getState().setActiveElevationWall('all');
+                setViewAngle3D('top');
+              }}
               className={`px-2 py-1 rounded transition ${
                 viewAngle3D === 'top' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
@@ -170,7 +178,10 @@ export const FloatingCanvasToolbar: React.FC<FloatingCanvasToolbarProps> = ({ mo
               علوي
             </button>
             <button
-              onClick={() => setViewAngle3D('front')}
+              onClick={() => {
+                useUIStore.getState().setActiveElevationWall('all');
+                setViewAngle3D('front');
+              }}
               className={`px-2 py-1 rounded transition ${
                 viewAngle3D === 'front' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
@@ -179,7 +190,10 @@ export const FloatingCanvasToolbar: React.FC<FloatingCanvasToolbarProps> = ({ mo
               أمامي
             </button>
             <button
-              onClick={() => setViewAngle3D('isometric')}
+              onClick={() => {
+                useUIStore.getState().setActiveElevationWall('all');
+                setViewAngle3D('isometric');
+              }}
               className={`px-2 py-1 rounded transition ${
                 viewAngle3D === 'isometric' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}

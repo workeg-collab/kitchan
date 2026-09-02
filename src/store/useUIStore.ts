@@ -50,9 +50,14 @@ interface UIState {
   showDimensions3D: boolean;
   setShowDimensions3D: (show: boolean) => void;
 
-  // Elevation View
+  // Elevation & Wall Projections (2D & 3D)
   selectedElevationWallId: string;
   setSelectedElevationWallId: (wallId: string) => void;
+  activeElevationWall: 'all' | 'wall-a' | 'wall-b' | 'wall-c' | 'wall-d';
+  setActiveElevationWall: (wall: 'all' | 'wall-a' | 'wall-b' | 'wall-c' | 'wall-d') => void;
+  isolateElevationWall: boolean;
+  setIsolateElevationWall: (isolate: boolean) => void;
+  toggleIsolateElevationWall: () => void;
 
   // Responsive Workspace & Collapsible Panels
   activeLeftCategory: 'cabinets' | 'appliances' | 'architecture' | 'finishes' | 'dimensions' | 'templates' | null;
@@ -165,6 +170,14 @@ export const useUIStore = create<UIState>((set) => ({
 
   selectedElevationWallId: 'wall-a',
   setSelectedElevationWallId: (selectedElevationWallId) => set({ selectedElevationWallId }),
+  activeElevationWall: 'all',
+  setActiveElevationWall: (activeElevationWall) => set({ 
+    activeElevationWall, 
+    selectedElevationWallId: activeElevationWall === 'all' ? 'wall-a' : activeElevationWall 
+  }),
+  isolateElevationWall: true,
+  setIsolateElevationWall: (isolateElevationWall) => set({ isolateElevationWall }),
+  toggleIsolateElevationWall: () => set((state) => ({ isolateElevationWall: !state.isolateElevationWall })),
 
   activeLeftCategory: 'cabinets',
   setActiveLeftCategory: (activeLeftCategory) => set({ activeLeftCategory }),

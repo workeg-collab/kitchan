@@ -32,8 +32,10 @@ import {
   Camera,
   FolderOpen,
   Play,
-  Menu
+  Menu,
+  Eye
 } from 'lucide-react';
+import { FileMenu } from './FileMenu';
 import { dbService } from '../../services/dbService';
 import { soundEffects } from '../../services/soundEffectsService';
 
@@ -113,6 +115,9 @@ export const TopNavbar: React.FC = () => {
           <LayoutDashboard size={14} className="text-blue-400" />
           <span className="hidden sm:inline">المشاريع</span>
         </button>
+
+        {/* Project File Menu */}
+        <FileMenu />
 
         {/* Category Pill Badge */}
         <div className={`hidden md:flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border ${moduleInfo.color}`}>
@@ -267,6 +272,20 @@ export const TopNavbar: React.FC = () => {
         >
           <Camera size={14} />
           <span>استوديو الرندر</span>
+        </button>
+
+        {/* Client Presentation / Showcase */}
+        <button
+          onClick={() => setActiveTab('presentation-mode')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'presentation-mode'
+              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/25'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+          }`}
+          title="معاينة العميل بعد الانتهاء، العرض النهائي، دوران 360، وتصدير التقارير"
+        >
+          <Eye size={14} className={activeTab === 'presentation-mode' ? 'text-amber-300' : 'text-blue-500'} />
+          <span>معاينة العميل</span>
         </button>
 
         {/* Engineering & Manufacturing Menu */}

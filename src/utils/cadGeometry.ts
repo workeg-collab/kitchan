@@ -293,3 +293,35 @@ export function calculateAisleClearance(
 
   return aisles;
 }
+
+/**
+ * Determines whether an object (cabinet, appliance, architectural element)
+ * belongs to a specific wall ('wall-a', 'wall-b', 'wall-c', 'wall-d')
+ * based on its wallId or spatial position and rotation in the room.
+ */
+export function isItemOnWall(
+  item: { x: number; y: number; width?: number; depth?: number; rotation: number; wallId?: string },
+  wallId: string,
+  roomWidth: number,
+  roomLength: number
+): boolean {
+  if (item.wallId === wallId) return true;
+
+  if (wallId === 'wall-a') {
+    // Back wall at Y = 0
+    return (item.y <= 350 || item.rotation === 0);
+  }
+  if (wallId === 'wall-b') {
+    // Right wall at X = roomWidth
+    return (item.x >= roomWidth - 950 || item.rotation === 90);
+  }
+  if (wallId === 'wall-c') {
+    // Front wall at Y = roomLength
+    return (item.y >= roomLength - 950 || item.rotation === 180);
+  }
+  if (wallId === 'wall-d') {
+    // Left wall at X = 0
+    return (item.x <= 350 || item.rotation === 270);
+  }
+  return false;
+}
