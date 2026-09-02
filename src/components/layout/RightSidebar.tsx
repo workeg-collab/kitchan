@@ -20,7 +20,8 @@ import {
   Ruler,
   ChevronDown,
   ChevronUp,
-  Maximize2
+  Maximize2,
+  Box
 } from 'lucide-react';
 
 export const RightSidebar: React.FC = () => {
@@ -412,6 +413,106 @@ export const RightSidebar: React.FC = () => {
                   }`}
                 >
                   حامل بناطيل {selectedCabinet.hasTrouserRack ? '✓' : ''}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* KITCHEN MAKER CARCASS & SPECS (شاسيه وتجميع كيتشن ميكر)                   */}
+          {/* ========================================================================= */}
+          <div className="bg-amber-50/60 p-2.5 rounded-xl border border-amber-200/80 space-y-2">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[11px] font-bold text-amber-900 flex items-center gap-1.5">
+                <Box size={13} className="text-amber-600" />
+                <span>تفصيل كيتشن ميكر (شاسيه العلبة)</span>
+              </h4>
+              <span className="text-[9px] bg-amber-200/70 text-amber-900 px-1.5 py-0.5 rounded font-bold font-mono">
+                KM PRO
+              </span>
+            </div>
+
+            {/* Back Panel Mount */}
+            <div>
+              <label className="text-[9px] text-amber-800 font-bold block mb-0.5">نوع ظهر العلبة:</label>
+              <select
+                value={selectedCabinet.backPanelType || 'groove-6mm'}
+                onChange={(e) => updateCabinet(selectedCabinet.id, { backPanelType: e.target.value as any })}
+                className="w-full px-1.5 py-1 bg-white border border-amber-200 rounded-lg text-xs font-bold text-slate-900"
+              >
+                <option value="groove-6mm">مفرز في الأجناب 6 مم (Grooved)</option>
+                <option value="rebate-18mm">لطش مسامير 18 مم (Rebated)</option>
+                <option value="flush-screwed">تجليد ظهر كامل 18 مم (Solid)</option>
+              </select>
+            </div>
+
+            {/* Top Stretchers & Waterproof Bottom Toggles */}
+            <div className="grid grid-cols-2 gap-1 text-[10px] font-bold pt-0.5">
+              <button
+                onClick={() => updateCabinet(selectedCabinet.id, { hasTopStretchers: !selectedCabinet.hasTopStretchers })}
+                className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                  selectedCabinet.hasTopStretchers
+                    ? 'bg-amber-600 text-white border-amber-600'
+                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                }`}
+                title="عوارض خشب أمامية وخلفية 10 سم للتهوية وحمل الرخام بدلاً من السقف المقفول"
+              >
+                عوارض سقف 10سم {selectedCabinet.hasTopStretchers ? '✓' : ''}
+              </button>
+
+              <button
+                onClick={() => updateCabinet(selectedCabinet.id, { hasAluminumWaterproofBottom: !selectedCabinet.hasAluminumWaterproofBottom })}
+                className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                  selectedCabinet.hasAluminumWaterproofBottom
+                    ? 'bg-cyan-600 text-white border-cyan-600'
+                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                }`}
+                title="قاع مصفح ألومنيوم معزول ومقاوم للمياه بنسبة 100% لوحدات الحوض"
+              >
+                قاع حوض ألومنيوم {selectedCabinet.hasAluminumWaterproofBottom ? '✓' : ''}
+              </button>
+            </div>
+
+            {/* Dish Rack & Gola Profile Toggles */}
+            <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
+              <button
+                onClick={() => updateCabinet(selectedCabinet.id, { hasDishRack: !selectedCabinet.hasDishRack })}
+                className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                  selectedCabinet.hasDishRack
+                    ? 'bg-emerald-600 text-white border-emerald-600'
+                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                }`}
+                title="مطبق تركي صفاية أطباق استانلس استيل مع صينية مياه"
+              >
+                مطبق تركي استانلس {selectedCabinet.hasDishRack ? '✓' : ''}
+              </button>
+
+              <button
+                onClick={() => updateCabinet(selectedCabinet.id, { hasGolaProfile: !selectedCabinet.hasGolaProfile })}
+                className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                  selectedCabinet.hasGolaProfile
+                    ? 'bg-purple-600 text-white border-purple-600'
+                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                }`}
+                title="تفريز بروفايل جولا ألومنيوم للمطابخ المودرن بدون مقابض"
+              >
+                بروفايل جولا (Gola) {selectedCabinet.hasGolaProfile ? '✓' : ''}
+              </button>
+            </div>
+
+            {/* Wall Infill Filler Toggle */}
+            <div className="pt-1 border-t border-amber-200/60">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-amber-900">فيلر تعويض جداري:</span>
+                <button
+                  onClick={() => updateCabinet(selectedCabinet.id, { hasFillerPanel: !selectedCabinet.hasFillerPanel })}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${
+                    selectedCabinet.hasFillerPanel
+                      ? 'bg-amber-700 text-white border-amber-700'
+                      : 'bg-white text-slate-700 border-amber-300'
+                  }`}
+                >
+                  {selectedCabinet.hasFillerPanel ? 'مفعّل (7 سم)' : 'إضافة فيلر'}
                 </button>
               </div>
             </div>

@@ -258,6 +258,39 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
         </g>
       )}
 
+      {/* 8b. KITCHEN MAKER: DISH RACK (مطبق تركي وصفاية) */}
+      {cabinet.hasDishRack && (
+        <g stroke="#10b981" fill="none" opacity="0.85">
+          <rect x={width * 0.08} y={depth * 0.15} width={width * 0.84} height={depth * 0.7} rx="4" strokeWidth="1" strokeDasharray="3,2" />
+          {/* Plate notches */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <line key={i} x1={width * 0.18 + i * (width * 0.14)} y1={depth * 0.25} x2={width * 0.18 + i * (width * 0.14)} y2={depth * 0.75} strokeWidth="1" />
+          ))}
+          <text x={width * 0.5} y={depth * 0.88} fill="#10b981" fontSize="7" fontWeight="bold" textAnchor="middle">
+            مطبق تركي
+          </text>
+        </g>
+      )}
+
+      {/* 8c. KITCHEN MAKER: TOP STRETCHERS (عوارض 10 سم) */}
+      {cabinet.hasTopStretchers && (
+        <g fill="#f59e0b" opacity="0.15">
+          <rect x="0" y="0" width={width} height={Math.min(depth * 0.2, 100)} />
+          <rect x="0" y={depth - Math.min(depth * 0.2, 100)} width={width} height={Math.min(depth * 0.2, 100)} />
+        </g>
+      )}
+
+      {/* 8d. KITCHEN MAKER: SIDE FILLER (فيلر تعويض) */}
+      {cabinet.hasFillerPanel && (
+        <g>
+          <rect x={width} y="0" width={70} height={depth} fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="1" />
+          <line x1={width} y1="0" x2={width + 70} y2={depth} stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="2,2" />
+          <text x={width + 35} y={depth / 2} fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="middle" transform={`rotate(-90, ${width + 35}, ${depth / 2})`}>
+            فيلر 7سم
+          </text>
+        </g>
+      )}
+
       {/* 9. APPLIANCE CAVITY (OVEN / MICROWAVE) */}
       {hasApplianceCavity && (
         <g stroke="#fb923c" fill="none" opacity="0.75">

@@ -1,6 +1,34 @@
 import { ManufacturingSystemTemplate } from '../types/manufacturingSystems';
 
 export const PRESET_MANUFACTURING_TEMPLATES: ManufacturingSystemTemplate[] = [
+  // 0. نظام كيتشن ميكر الاحترافي المتكامل (KITCHEN MAKER PRO ARABIC STANDARD)
+  {
+    id: 'sys-kitchen-maker-pro',
+    name: 'نظام كيتشن ميكر المتكامل (Kitchen Maker Pro)',
+    nameEn: 'KitchenMaker Arabic Industrial Standard',
+    systemType: 'wood',
+    supportedCategories: ['kitchen'],
+    description: 'المعيار الصناعي المعتمد في برنامج كيتشن ميكر: شاسيه كونتر/MDF ميلامين مع عوارض علوية 10 سم، قاع حوض مصفح ألومنيوم، ظهر مفحور 6 مم، وقشاط PVC 2 مم للواجهات مع مسامير كونفرمات وتجميع مينيفكس',
+    standardSheetWidth: 2800,
+    standardSheetLength: 2070,
+    primaryBoardThickness: 18,
+    backPanelThickness: 6,
+    sawKerf: 3.2,
+    edgeBandingFront: 2.0,
+    edgeBandingHidden: 0.4,
+    doorReveal: 2.5,
+    carcassConstruction: 'sides-outside',
+    backPanelMount: 'grooved',
+    grooveDepth: 8,
+    grooveOffset: 16,
+    standardBarLength: 6000,
+    cornerJointDeduction: 0,
+    pricePerSheet: 1750,
+    pricePerProfileBar: 0,
+    costLaborPerMeter: 380,
+    wasteFactorPercentage: 12,
+  },
+
   // 1. نظام الأخشاب والميلامين للمطابخ (KITCHEN WOOD / MFC 18MM)
   {
     id: 'sys-kitchen-wood-18',

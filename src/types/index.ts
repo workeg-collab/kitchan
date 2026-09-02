@@ -78,6 +78,14 @@ export type CabinetType =
   | 'tall-microwave-tower'
   | 'tall-fridge-housing'
   | 'tall-utility'
+  | 'tall-double-oven-microwave'
+  | 'wall-dish-rack'
+  | 'base-waterproof-sink'
+  | 'base-gola-c'
+  | 'base-filler-panel'
+  | 'wall-filler-panel'
+  | 'base-blind-magic-corner'
+  | 'wall-corner-bifold'
   | 'custom-box'
   // Wardrobe / Dressing types
   | 'wardrobe-hinged-2d'
@@ -234,7 +242,7 @@ export interface CabinetItem {
   doorHinge?: DoorHinge;
   doorType?: WardrobeDoorType;
 
-  // Kitchen Specific
+  // Kitchen Specific & Kitchen Maker
   hasSinkCutout?: boolean;
   hasCooktopCutout?: boolean;
   hasApplianceCavity?: boolean;
@@ -242,6 +250,17 @@ export interface CabinetItem {
   applianceCavityZ?: number;
   isCeilingUnit?: boolean;
   flipUpDoor?: boolean;
+  hasDishRack?: boolean; // صفاية أطباق ومطبق استانلس
+  hasTopStretchers?: boolean; // عوارض علوية 10 سم بدلاً من السقف
+  hasAluminumWaterproofBottom?: boolean; // قاع معزول ومصفح ألومنيوم للحوض
+  hasGolaProfile?: boolean; // تفريز بروفايل جولا L / C
+  golaType?: 'l-type' | 'c-type';
+  backPanelType?: 'groove-6mm' | 'rebate-18mm' | 'flush-screwed'; // نوع الظهر
+  hasCrownMolding?: boolean; // كورنيشة علوية
+  hasLightPelmet?: boolean; // بانو إضاءة سفلي
+  hasFillerPanel?: boolean; // فيلر تعويض جانبي
+  fillerWidth?: number; // مقاس الفيلر
+  assemblyType?: 'minifix' | 'confirmat' | 'brackets'; // نوع التجميع
 
   // Dressing Specific
   hasHangingRail?: boolean;

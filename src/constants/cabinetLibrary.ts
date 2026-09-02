@@ -24,10 +24,136 @@ export interface CabinetTemplate {
   verticalDividersCount?: number;
   isCeilingUnit?: boolean;
   flipUpDoor?: boolean;
+  hasDishRack?: boolean;
+  hasTopStretchers?: boolean;
+  hasAluminumWaterproofBottom?: boolean;
+  hasGolaProfile?: boolean;
+  hasCrownMolding?: boolean;
+  hasLightPelmet?: boolean;
+  hasFillerPanel?: boolean;
   tag?: string;
 }
 
 export const CABINET_LIBRARY: CabinetTemplate[] = [
+  // =========================================================================
+  // 0. وحدات كيتشن ميكر الاحترافية (KITCHEN MAKER SIGNATURE UNITS)
+  // =========================================================================
+  {
+    category: 'base',
+    type: 'base-waterproof-sink',
+    name: 'علبة حوض كيتشن ميكر (قاع ألومنيوم عازل + عوارض)',
+    nameEn: 'KitchenMaker Waterproof Sink Base Unit',
+    description: 'شاسيه حوض احترافي بعوارض علوية 10 سم للتهوية وتحمل الرخام مع قاع مصفح ألومنيوم معزول ضد تسريب المياه',
+    defaultWidth: 900,
+    defaultHeight: 720,
+    defaultDepth: 560,
+    defaultZ: 100,
+    doorCount: 2,
+    drawerCount: 0,
+    shelfCount: 0,
+    doorHinge: 'double',
+    hasSinkCutout: true,
+    hasTopStretchers: true,
+    hasAluminumWaterproofBottom: true,
+    standardWidths: [800, 900, 1000, 1200],
+    icon: 'Droplets',
+    tag: 'علبة حوض مصفحة',
+  },
+  {
+    category: 'wall',
+    type: 'wall-dish-rack',
+    name: 'علبة مطبق تركي وصفاية أطباق ستانلس (Turkish Dish Rack)',
+    nameEn: 'Wall Turkish Dish Rack Cabinet with Water Tray',
+    description: 'علبة علوية مجهزة بصفاية أطباق ومطبق تركي ستانلس استيل 304 مع صينية سحب لتصريف قطرات المياه وقاع مفتوح',
+    defaultWidth: 800,
+    defaultHeight: 720,
+    defaultDepth: 340,
+    defaultZ: 1420,
+    doorCount: 2,
+    drawerCount: 0,
+    shelfCount: 2,
+    doorHinge: 'double',
+    hasDishRack: true,
+    standardWidths: [600, 800, 900, 1000],
+    icon: 'PackageCheck',
+    tag: 'مطبق تركي',
+  },
+  {
+    category: 'base',
+    type: 'base-spice-pullout',
+    name: 'علبة ترولي توابل وزيوت سحاب (Spice Rack Pullout)',
+    nameEn: 'Pullout Spice & Oil Rack Base Unit',
+    description: 'علبة سفلية ضيقة مجهزة بميكانيزم ترولي استانلس استيل سحاب هيدروليك لحفظ التوابل وقزايز الزيوت',
+    defaultWidth: 200,
+    defaultHeight: 720,
+    defaultDepth: 560,
+    defaultZ: 100,
+    doorCount: 1,
+    drawerCount: 0,
+    shelfCount: 2,
+    doorHinge: 'right',
+    standardWidths: [150, 200, 250, 300],
+    icon: 'Sliders',
+    tag: 'ترولي توابل',
+  },
+  {
+    category: 'base',
+    type: 'base-blind-magic-corner',
+    name: 'علبة كورنر أعمى مع ماجيك كورنر (Blind Magic Corner)',
+    nameEn: 'Blind Corner with Magic Pullout Trays',
+    description: 'علبة ركنة عمياء تستغل زوايا المطبخ بالكامل مع سلال ماجيك كورنر معدنية تخرج بالكامل خارج العلبة',
+    defaultWidth: 1050,
+    defaultHeight: 720,
+    defaultDepth: 560,
+    defaultZ: 100,
+    doorCount: 1,
+    drawerCount: 0,
+    shelfCount: 2,
+    doorHinge: 'left',
+    standardWidths: [900, 1000, 1050, 1100, 1200],
+    icon: 'CornerDownRight',
+    tag: 'ماجيك كورنر',
+  },
+  {
+    category: 'tall',
+    type: 'tall-double-oven-microwave',
+    name: 'برج بلت إن مزدوج (فرن + ميكروويف + درجين حلل)',
+    nameEn: 'Tall Double Oven & Microwave Tower',
+    description: 'برج مطبخ متكامل كيتشن ميكر بفتحتين للأجهزة البلت إن (فرن وميكروويف) مع درجين سفليين عميقين ودولاب علوي',
+    defaultWidth: 600,
+    defaultHeight: 2160,
+    defaultDepth: 580,
+    defaultZ: 100,
+    doorCount: 1,
+    drawerCount: 2,
+    shelfCount: 2,
+    doorHinge: 'right',
+    hasApplianceCavity: true,
+    applianceCavityHeight: 600,
+    standardWidths: [600],
+    icon: 'Tv',
+    tag: 'برج فرن وميكروويف',
+  },
+  {
+    category: 'base',
+    type: 'base-filler-panel',
+    name: 'فيلر تعويض جداري سفلي (Wall Scribe Infill Filler)',
+    nameEn: 'Base Wall Scribe Filler Panel',
+    description: 'بانوه فيلر تعويض 5-10 سم لوزن مقاسات المطبخ مع الحوائط غير المنتظمة وضمان فتح الضلف والأدراج بسلاسة',
+    defaultWidth: 70,
+    defaultHeight: 720,
+    defaultDepth: 560,
+    defaultZ: 100,
+    doorCount: 0,
+    drawerCount: 0,
+    shelfCount: 0,
+    doorHinge: 'none',
+    hasFillerPanel: true,
+    standardWidths: [50, 70, 100],
+    icon: 'Square',
+    tag: 'فيلر تعويض',
+  },
+
   // =========================================================================
   // 1. وحدات سفلية أساسية (STANDARD BASE CABINETS)
   // =========================================================================

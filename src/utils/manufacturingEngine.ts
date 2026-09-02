@@ -451,6 +451,31 @@ export function calculateUnifiedManufacturingPackage(
         if (cab.category === 'base' || cab.category === 'tall') {
           addHw('أرجل مطبخ بلاستيك رجلاش 10 سم', 'leg', 4, 'قطعة', 15, 'أرجل تسوية وتثبيت الوزرة');
         }
+
+        // Kitchen Maker Specific Hardware Additions
+        if (cab.hasDishRack) {
+          addHw('مطبق تركي صفاية أطباق استانلس استيل 304 مع صينية مياه', 'accessories', 1, 'طقم', 450, 'صفاية أطباق ومطبق داخلي هيدروليك');
+        }
+        if (cab.hasAluminumWaterproofBottom) {
+          addHw('لوح ألومنيوم مصفح عازل للمياه 1 مم لقاع الحوض', 'hardware', 1, 'لوح', 120, 'حماية قاع الحوض من تسريب المياه');
+        }
+        if (cab.hasGolaProfile) {
+          addHw('بروفايل جولا ألومنيوم L/C شطف مخفي', 'handles', 1, 'متر', 180, 'مقبض بروفايل جولا للمطبخ المودرن');
+        }
+        if (cab.hasFillerPanel) {
+          woodPanels.push({
+            id: `${cab.id}-FILLER`,
+            cabinetId: cab.id,
+            cabinetName: cab.name,
+            partName: 'بانوه فيلر تعويض جداري 7 سم',
+            quantity: 1,
+            length: CH,
+            width: 70,
+            thickness: BT,
+            material: cab.materialFront || 'خامة الواجهة',
+            edgeBanding: { top: true, bottom: true, left: true, right: true },
+          });
+        }
       }
     }
 

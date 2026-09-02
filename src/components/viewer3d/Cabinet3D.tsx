@@ -205,17 +205,36 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             <meshStandardMaterial color={bodyColor} roughness={0.6} />
           </mesh>
 
-          {/* Bottom Panel */}
+          {/* Bottom Panel (with Waterproof Aluminum plate if sink unit) */}
           <mesh position={[0, -H / 2 + 0.009, 0]} castShadow receiveShadow>
             <boxGeometry args={[W - 0.036, 0.018, D]} />
-            <meshStandardMaterial color={bodyColor} roughness={0.6} />
+            <meshStandardMaterial 
+              color={cabinet.hasAluminumWaterproofBottom ? '#e2e8f0' : bodyColor} 
+              metalness={cabinet.hasAluminumWaterproofBottom ? 0.8 : 0} 
+              roughness={cabinet.hasAluminumWaterproofBottom ? 0.3 : 0.6} 
+            />
           </mesh>
 
-          {/* Top Panel */}
-          <mesh position={[0, H / 2 - 0.009, 0]} castShadow receiveShadow>
-            <boxGeometry args={[W - 0.036, 0.018, D]} />
-            <meshStandardMaterial color={bodyColor} roughness={0.6} />
-          </mesh>
+          {/* Top Panel or Kitchen Maker Front & Back Stretchers (10 cm) */}
+          {cabinet.hasTopStretchers ? (
+            <>
+              {/* Front Stretcher (عارضة أمامية 10 سم) */}
+              <mesh position={[0, H / 2 - 0.009, D / 2 - 0.05]} castShadow receiveShadow>
+                <boxGeometry args={[W - 0.036, 0.018, 0.1]} />
+                <meshStandardMaterial color={bodyColor} roughness={0.6} />
+              </mesh>
+              {/* Back Stretcher (عارضة خلفية 10 سم) */}
+              <mesh position={[0, H / 2 - 0.009, -D / 2 + 0.05]} castShadow receiveShadow>
+                <boxGeometry args={[W - 0.036, 0.018, 0.1]} />
+                <meshStandardMaterial color={bodyColor} roughness={0.6} />
+              </mesh>
+            </>
+          ) : (
+            <mesh position={[0, H / 2 - 0.009, 0]} castShadow receiveShadow>
+              <boxGeometry args={[W - 0.036, 0.018, D]} />
+              <meshStandardMaterial color={bodyColor} roughness={0.6} />
+            </mesh>
+          )}
 
           {/* Back Panel */}
           <mesh position={[0, 0, -D / 2 + 0.015]} receiveShadow>
@@ -224,7 +243,7 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
           </mesh>
 
           {/* Shelves */}
-          {cabinet.shelfCount > 0 &&
+          {cabinet.shelfCount > 0 && !cabinet.hasDishRack &&
             Array.from({ length: Math.min(cabinet.shelfCount, 6) }).map((_, idx) => {
               const sy = -H / 2 + ((idx + 1) * H) / (Math.min(cabinet.shelfCount, 6) + 1);
               return (
@@ -234,6 +253,35 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
                 </mesh>
               );
             })}
+
+          {/* Kitchen Maker: Turkish Dish Rack (مطبق تركي وصفاية ستانلس مع صينية مياه) */}
+          {cabinet.hasDishRack && (
+            <group position={[0, 0, 0]}>
+              {/* Bottom drip tray (صينية تجميع المياه استانلس) */}
+              <mesh position={[0, -H / 2 + 0.06, 0]} castShadow>
+                <boxGeometry args={[W - 0.06, 0.015, D - 0.04]} />
+                <meshStandardMaterial color="#cbd5e1" metalness={0.9} roughness={0.2} />
+              </mesh>
+              {/* Lower cup & mug wire rack */}
+              <mesh position={[0, -H / 2 + 0.12, 0]} castShadow>
+                <boxGeometry args={[W - 0.06, 0.02, D - 0.04]} />
+                <meshStandardMaterial color="#94a3b8" metalness={0.95} roughness={0.15} wireframe />
+              </mesh>
+              {/* Upper plate & dish organizer rack */}
+              <mesh position={[0, H * 0.1, 0]} castShadow>
+                <boxGeometry args={[W - 0.06, 0.08, D - 0.05]} />
+                <meshStandardMaterial color="#94a3b8" metalness={0.95} roughness={0.15} wireframe />
+              </mesh>
+            </group>
+          )}
+
+          {/* Kitchen Maker: Wall Infill Filler Panel (فيلر تعويض جداري 7 سم) */}
+          {cabinet.hasFillerPanel && (
+            <mesh position={[W / 2 + 0.035, 0, D / 2 - 0.009]} castShadow receiveShadow>
+              <boxGeometry args={[0.07, H, 0.018]} />
+              <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+            </mesh>
+          )}
 
           {/* Wardrobe Hanging Rails */}
           {cabinet.hasHangingRail && (
