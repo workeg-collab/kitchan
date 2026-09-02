@@ -21,6 +21,10 @@ interface UIState {
   setPan2D: (pan: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
   resetView2D: () => void;
 
+  // Manual CAD Drawing Tools (أداة الرسم اليدوي على المخطط)
+  drawingTool: 'none' | 'dressing' | 'shoe-cabinet';
+  setDrawingTool: (tool: 'none' | 'dressing' | 'shoe-cabinet') => void;
+
   // Snapping & Guides
   snapToGridEnabled: boolean;
   setSnapToGridEnabled: (enabled: boolean) => void;
@@ -141,6 +145,9 @@ export const useUIStore = create<UIState>((set) => ({
     pan2D: typeof pan === 'function' ? pan(state.pan2D) : pan,
   })),
   resetView2D: () => set({ zoom2D: 0.22, pan2D: { x: 140, y: 110 } }),
+
+  drawingTool: 'none',
+  setDrawingTool: (drawingTool) => set({ drawingTool }),
 
   snapToGridEnabled: true,
   setSnapToGridEnabled: (snapToGridEnabled) => set({ snapToGridEnabled }),

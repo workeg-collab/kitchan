@@ -22,7 +22,9 @@ import {
   ChevronUp,
   Box,
   Compass,
-  Move
+  Move,
+  PencilRuler,
+  Archive
 } from 'lucide-react';
 
 interface FloatingCanvasToolbarProps {
@@ -66,6 +68,8 @@ export const FloatingCanvasToolbar: React.FC<FloatingCanvasToolbarProps> = ({
     setActiveLeftCategory,
     isRightPanelCollapsed,
     toggleRightPanel,
+    drawingTool,
+    setDrawingTool,
   } = useUIStore();
 
   // Dragging state
@@ -296,6 +300,37 @@ export const FloatingCanvasToolbar: React.FC<FloatingCanvasToolbarProps> = ({
                 <Ruler size={14} className={showDimensions2D ? 'text-emerald-600' : 'text-slate-400'} />
                 <span className="hidden md:inline">الأبعاد</span>
               </button>
+
+              <div className="h-4 w-px bg-slate-200 mx-0.5" />
+
+              {/* Manual CAD Drawing Tools: Dressing & Shoe Cabinet */}
+              <div className="flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/80">
+                <button
+                  onClick={() => setDrawingTool(drawingTool === 'dressing' ? 'none' : 'dressing')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                    drawingTool === 'dressing'
+                      ? 'bg-purple-600 text-white shadow-xs animate-pulse ring-2 ring-purple-300'
+                      : 'text-purple-700 hover:bg-white hover:shadow-2xs'
+                  }`}
+                  title="رسم علبة دريسنج يدوياً: انقر واسحب المؤشر على المخطط لتحديد المقاس"
+                >
+                  <PencilRuler size={13} />
+                  <span>رسم دريسنج يدوي</span>
+                </button>
+
+                <button
+                  onClick={() => setDrawingTool(drawingTool === 'shoe-cabinet' ? 'none' : 'shoe-cabinet')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                    drawingTool === 'shoe-cabinet'
+                      ? 'bg-emerald-600 text-white shadow-xs animate-pulse ring-2 ring-emerald-300'
+                      : 'text-emerald-700 hover:bg-white hover:shadow-2xs'
+                  }`}
+                  title="رسم جزامة يدوياً: انقر واسحب المؤشر على المخطط لتحديد المقاس"
+                >
+                  <Archive size={13} />
+                  <span>رسم جزامة يدوي</span>
+                </button>
+              </div>
             </div>
           )}
 

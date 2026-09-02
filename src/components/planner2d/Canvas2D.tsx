@@ -20,6 +20,7 @@ import {
   Ruler, 
   Eye,
   PencilRuler,
+  Archive,
   X
 } from 'lucide-react';
 import { soundEffects } from '../../services/soundEffectsService';
@@ -69,10 +70,15 @@ export const Canvas2D: React.FC = () => {
     setShowAisleClearance,
     setIsRoomSketcherOpen,
     language,
+    drawingTool,
+    setDrawingTool,
   } = useUIStore();
 
   const t = TRANSLATIONS[language];
   const { room, cabinets, appliances, architecturalElements } = project;
+
+  // Manual CAD Interactive Drawing Box
+  const [drawBox, setDrawBox] = useState<{ startX: number; startY: number; currentX: number; currentY: number } | null>(null);
 
   // Dragging / Panning State
   const [isPanning, setIsPanning] = useState(false);
@@ -125,7 +131,16 @@ export const Canvas2D: React.FC = () => {
 
   // Canvas Mouse Down
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (e.target === svgRef.current || (e.target as HTMLElement).id === 'cad-canvas-bg') {
+    if (drawingTool !== 'none') {
+      const svgCoords = clientToSVG(e.clientX, e.clientY);
+      const snappedX = snapToGridEnabled ? Math.round(svgCoords.x / gridSize) * gridSize : Math.round(svgCoords.x);
+      const snappedY = snapToGridEnabled ? Math.round(svgCoords.y / gridSize) * gridSize : Math.round(svgCoords.y);
+      setDrawBox({ startX: snappedX, startY: snappedY, currentX: snappedX, currentY: snappedY });
+      clearSelection();
+      return;
+    }
+
+    if (e.target === svgRef.current || (e.target as HTMLElement).id === 'cad-canvas-bg' || (e.target as HTMLElement).id === 'room-floor-bg') {
       if (e.button === 0 || e.button === 1) {
         setIsPanning(true);
         setPanStart({ x: e.clientX - pan2D.x, y: e.clientY - pan2D.y });
@@ -146,6 +161,10 @@ export const Canvas2D: React.FC = () => {
     rot: number
   ) => {
     e.stopPropagation();
+    if (drawingTool !== 'none') {
+      handleCanvasMouseDown(e);
+      return;
+    }
     setSelected(id, type);
 
     const svgCoords = clientToSVG(e.clientX, e.clientY);
@@ -178,6 +197,14 @@ export const Canvas2D: React.FC = () => {
 
   // Mouse Move
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (drawBox) {
+      const svgCoords = clientToSVG(e.clientX, e.clientY);
+      const snappedX = snapToGridEnabled ? Math.round(svgCoords.x / gridSize) * gridSize : Math.round(svgCoords.x);
+      const snappedY = snapToGridEnabled ? Math.round(svgCoords.y / gridSize) * gridSize : Math.round(svgCoords.y);
+      setDrawBox((prev) => (prev ? { ...prev, currentX: snappedX, currentY: snappedY } : null));
+      return;
+    }
+
     if (isPanning) {
       setPan2D({
         x: e.clientX - panStart.x,
@@ -235,6 +262,80 @@ export const Canvas2D: React.FC = () => {
   };
 
   const handleMouseUp = () => {
+    if (drawBox) {
+      const minX = Math.min(drawBox.startX, drawBox.currentX);
+      const minY = Math.min(drawBox.startY, drawBox.currentY);
+      const rawW = Math.abs(drawBox.currentX - drawBox.startX);
+      const rawD = Math.abs(drawBox.currentY - drawBox.startY);
+
+      if (rawW >= 150 && rawD >= 150) {
+        const roundedW = Math.round(rawW / 10) * 10;
+        const roundedD = Math.round(rawD / 10) * 10;
+        const roundedX = Math.round(minX / 10) * 10;
+        const roundedY = Math.round(minY / 10) * 10;
+
+        if (drawingTool === 'dressing') {
+          const newCabinet: any = {
+            id: `dressing-custom-${Date.now().toString().slice(-4)}`,
+            name: `علبة دريسنج رسم يدوي (${formatDimension(roundedW, unit)} × ${formatDimension(roundedD, unit)})`,
+            type: 'dressing-carcass-custom',
+            category: 'wardrobe',
+            x: roundedX,
+            y: roundedY,
+            z: 0,
+            width: roundedW,
+            depth: roundedD,
+            height: 2400,
+            rotation: 0,
+            doorCount: 0,
+            doorType: 'open',
+            drawerCount: 2,
+            shelfCount: 3,
+            hasHangingRail: true,
+            isCustomDressingCarcass: true,
+            verticalDividersCount: roundedW > 1000 ? 1 : 0,
+            materialBody: 'كونتر ميلامين أبيض',
+            materialFront: 'MDF قشرة أرو طبيعي',
+          };
+          addCabinet(newCabinet);
+          setSelected(newCabinet.id, 'cabinet');
+          soundEffects.playDrop();
+        } else if (drawingTool === 'shoe-cabinet') {
+          const isSlim = roundedD <= 260;
+          const newCabinet: any = {
+            id: `shoe-custom-${Date.now().toString().slice(-4)}`,
+            name: `جزامة رسم يدوي (${formatDimension(roundedW, unit)} × ${formatDimension(roundedD, unit)})`,
+            type: isSlim ? 'shoe-cabinet-drop-down' : 'shoe-cabinet-custom',
+            category: 'shoe-cabinet',
+            x: roundedX,
+            y: roundedY,
+            z: 0,
+            width: roundedW,
+            depth: roundedD,
+            height: isSlim ? 1200 : (roundedW > 800 ? 2000 : 1100),
+            rotation: 0,
+            doorCount: isSlim ? 0 : 2,
+            doorType: isSlim ? 'open' : 'hinged',
+            drawerCount: isSlim ? 0 : 1,
+            shelfCount: isSlim ? 3 : 4,
+            isShoeCabinet: true,
+            shoeCabinetType: isSlim ? 'drop-down' : 'tall-shelves',
+            hasDropFlaps: isSlim,
+            shoeTiersCount: 3,
+            hasShoeShelves: true,
+            materialBody: 'كونتر ميلامين أبيض',
+            materialFront: 'MDF قشرة أرو طبيعي',
+          };
+          addCabinet(newCabinet);
+          setSelected(newCabinet.id, 'cabinet');
+          soundEffects.playDrop();
+        }
+      }
+      setDrawBox(null);
+      setDrawingTool('none');
+      return;
+    }
+
     if (draggingItem) {
       soundEffects.playDrop();
     }
@@ -259,6 +360,16 @@ export const Canvas2D: React.FC = () => {
   // Global Keyboard Shortcuts in 2D Planner
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (drawingTool !== 'none') {
+          setDrawingTool('none');
+          setDrawBox(null);
+          return;
+        }
+        clearSelection();
+        return;
+      }
+
       if (!selectedId) return;
 
       const step = e.shiftKey ? 100 : e.altKey ? 10 : 50;
@@ -291,14 +402,12 @@ export const Canvas2D: React.FC = () => {
         e.preventDefault();
         if (selectedType === 'cabinet') duplicateCabinet(selectedId);
         if (selectedType === 'appliance') duplicateAppliance(selectedId);
-      } else if (e.key === 'Escape') {
-        clearSelection();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId, selectedType, selectedCabinet, selectedAppliance, room.width, room.length]);
+  }, [selectedId, selectedType, selectedCabinet, selectedAppliance, room.width, room.length, drawingTool]);
 
   // Handle Drag & Drop from Catalog into 2D Canvas
   const handleDrop2D = (e: React.DragEvent) => {
@@ -445,6 +554,37 @@ export const Canvas2D: React.FC = () => {
             title="حذف القطعة (Del)"
           >
             <Trash2 size={15} />
+          </button>
+        </div>
+      )}
+
+      {/* Floating Active Drawing Mode Banner */}
+      {drawingTool !== 'none' && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 bg-slate-900/95 text-white px-5 py-2.5 rounded-2xl shadow-2xl border border-slate-700 backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200 select-none">
+          <div className={`p-1.5 rounded-xl text-white ${drawingTool === 'dressing' ? 'bg-purple-600 shadow-md shadow-purple-600/30' : 'bg-emerald-600 shadow-md shadow-emerald-600/30'}`}>
+            {drawingTool === 'dressing' ? <PencilRuler size={17} /> : <Archive size={17} />}
+          </div>
+          <div>
+            <p className="text-xs font-bold flex items-center gap-2">
+              <span>{drawingTool === 'dressing' ? 'وضع رسم الدريسينج اليدوي نشط' : 'وضع رسم الجزامة اليدوي نشط'}</span>
+              <span className="text-[10px] bg-white/20 text-slate-100 px-2 py-0.5 rounded-md font-mono">
+                اضغط واسحب المؤشر
+              </span>
+            </p>
+            <p className="text-[10px] text-slate-300 mt-0.5">
+              انقر في أي مكان داخل الغرفة واسحب الماوس لتحديد العرض والعمق المطلوب ثم ارفع يدك
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setDrawingTool('none');
+              setDrawBox(null);
+            }}
+            className="mr-2 p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition flex items-center gap-1 text-xs font-bold"
+            title="إلغاء وضع الرسم (Esc)"
+          >
+            <X size={15} />
+            <span>إلغاء</span>
           </button>
         </div>
       )}
@@ -687,6 +827,78 @@ export const Canvas2D: React.FC = () => {
                   prefix={`${t.aisles}: `}
                 />
               ))}
+            </g>
+          )}
+
+          {/* Live Manual CAD Drawing Box (مستطيل وأبعاد الرسم اليدوي المباشر) */}
+          {drawBox && (
+            <g className="pointer-events-none">
+              {(() => {
+                const minX = Math.min(drawBox.startX, drawBox.currentX);
+                const minY = Math.min(drawBox.startY, drawBox.currentY);
+                const w = Math.max(10, Math.abs(drawBox.currentX - drawBox.startX));
+                const d = Math.max(10, Math.abs(drawBox.currentY - drawBox.startY));
+                const isDressing = drawingTool === 'dressing';
+                const strokeColor = isDressing ? '#9333ea' : '#059669';
+                const fillColor = isDressing ? 'rgba(147, 51, 234, 0.22)' : 'rgba(5, 150, 105, 0.22)';
+
+                return (
+                  <>
+                    {/* Outer Drawn Box */}
+                    <rect
+                      x={minX}
+                      y={minY}
+                      width={w}
+                      height={d}
+                      fill={fillColor}
+                      stroke={strokeColor}
+                      strokeWidth="2.5"
+                      strokeDasharray="6,4"
+                      rx="4"
+                    />
+
+                    {/* Corner Guides / Crosslines */}
+                    <line x1={minX} y1={minY} x2={minX + w} y2={minY + d} stroke={strokeColor} strokeWidth="1" strokeDasharray="3,3" opacity="0.35" />
+                    <line x1={minX + w} y1={minY} x2={minX} y2={minY + d} stroke={strokeColor} strokeWidth="1" strokeDasharray="3,3" opacity="0.35" />
+
+                    {/* Live Dimension Badge at Center */}
+                    <g transform={`translate(${minX + w / 2}, ${minY + d / 2})`}>
+                      <rect
+                        x="-75"
+                        y="-16"
+                        width="150"
+                        height="32"
+                        rx="10"
+                        fill="#0f172a"
+                        opacity="0.92"
+                      />
+                      <text
+                        x="0"
+                        y="4"
+                        fill="#ffffff"
+                        fontSize="11"
+                        fontWeight="bold"
+                        textAnchor="middle"
+                        fontFamily="monospace"
+                      >
+                        {formatDimension(Math.round(w / 10) * 10, unit)} × {formatDimension(Math.round(d / 10) * 10, unit)}
+                      </text>
+                    </g>
+
+                    {/* Title Banner */}
+                    <text
+                      x={minX + w / 2}
+                      y={minY - 10}
+                      fill={strokeColor}
+                      fontSize="12"
+                      fontWeight="extrabold"
+                      textAnchor="middle"
+                    >
+                      {isDressing ? '✏️ علبة دريسنج يدوي' : '👟 جزامة يدوي'}
+                    </text>
+                  </>
+                );
+              })()}
             </g>
           )}
         </g>

@@ -29,7 +29,9 @@ import {
   Grid,
   Ruler,
   Sliders,
-  Maximize2
+  Maximize2,
+  PencilRuler,
+  Archive
 } from 'lucide-react';
 
 export const LeftSidebar: React.FC = () => {
@@ -41,10 +43,13 @@ export const LeftSidebar: React.FC = () => {
     setActiveLeftCategory, 
     toggleLeftCategory,
     isLeftPanelPinned,
+    setIsLeftPanelPinned,
     toggleLeftPanelPinned,
     setIsRoomSketcherOpen,
     setIsCustomKitchenModalOpen,
-    setActiveTab
+    setActiveTab,
+    drawingTool,
+    setDrawingTool
   } = useUIStore();
 
   const { materials } = useMaterialsStore();
@@ -343,6 +348,51 @@ export const LeftSidebar: React.FC = () => {
 
               {/* Items List */}
               <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2">
+                {/* Manual CAD Drawing Quick Action for Dressing & Shoe Cabinets */}
+                {(projectType === 'dressing' || selectedCategoryFilter === 'shoe-cabinet') && (
+                  <div className="bg-purple-50/80 border border-purple-200/90 rounded-2xl p-2.5 space-y-1.5 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-purple-900 flex items-center gap-1">
+                        <PencilRuler size={13} className="text-purple-600" />
+                        <span>الرسم اليدوي الحر على المخطط:</span>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5 text-[10.5px] font-bold">
+                      <button
+                        onClick={() => {
+                          setDrawingTool(drawingTool === 'dressing' ? 'none' : 'dressing');
+                          setIsLeftPanelPinned(false);
+                        }}
+                        className={`p-1.5 rounded-xl border transition flex items-center justify-center gap-1 ${
+                          drawingTool === 'dressing'
+                            ? 'bg-purple-600 text-white border-purple-600 shadow-xs animate-pulse'
+                            : 'bg-white text-purple-800 border-purple-200 hover:bg-purple-100/50'
+                        }`}
+                        title="انقر واسحب على المخطط لتحديد مقاس الدريسينج بحرية"
+                      >
+                        <PencilRuler size={13} />
+                        <span>ارسم دريسنج يدوي</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setDrawingTool(drawingTool === 'shoe-cabinet' ? 'none' : 'shoe-cabinet');
+                          setIsLeftPanelPinned(false);
+                        }}
+                        className={`p-1.5 rounded-xl border transition flex items-center justify-center gap-1 ${
+                          drawingTool === 'shoe-cabinet'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs animate-pulse'
+                            : 'bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-100/50'
+                        }`}
+                        title="انقر واسحب على المخطط لتحديد مقاس الجزامة بحرية"
+                      >
+                        <Archive size={13} />
+                        <span>ارسم جزامة يدوي</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {filteredItems.map((item: any) => (
                   <div
                     key={item.id}
