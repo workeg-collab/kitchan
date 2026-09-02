@@ -340,153 +340,20 @@ export const Canvas3D: React.FC = () => {
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop3D}
     >
-      {/* Sleek Floating Canvas Toolbar */}
-      <FloatingCanvasToolbar mode="3d" />
-
-      {/* Snapshot Toast Notification */}
-      {snapshotToast && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40 bg-emerald-600 text-white px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-bold animate-in fade-in slide-in-from-top-3">
-          <Check size={16} />
-          <span>{snapshotToast}</span>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 4-WALL ELEVATION & ISOLATION CONTROL BAR                                  */}
-      {/* ========================================================================= */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 flex flex-wrap items-center justify-center gap-2 p-1.5 bg-slate-900/90 text-white backdrop-blur-md border border-slate-700/80 rounded-2xl shadow-2xl text-xs select-none max-w-[95vw]">
-        {/* Wall Switcher Buttons */}
-        <div className="flex items-center bg-slate-800 p-0.5 rounded-xl border border-slate-700">
-          <button
-            onClick={() => setActiveElevationWall('all')}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-bold transition ${
-              activeElevationWall === 'all'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700'
-            }`}
-            title="منظور ثلاثي الأبعاد شامل (جميع الجدران)"
-          >
-            <Box size={13} />
-            <span>حر 3D</span>
-          </button>
-
-          <button
-            onClick={() => setActiveElevationWall('wall-a')}
-            className={`px-2.5 py-1.5 rounded-lg font-bold transition ${
-              activeElevationWall === 'wall-a'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700'
-            }`}
-            title="مسقط وواجهة الجدار أ (الخلفي)"
-          >
-            الجدار أ
-          </button>
-
-          <button
-            onClick={() => setActiveElevationWall('wall-b')}
-            className={`px-2.5 py-1.5 rounded-lg font-bold transition ${
-              activeElevationWall === 'wall-b'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700'
-            }`}
-            title="مسقط وواجهة الجدار ب (الأيمن)"
-          >
-            الجدار ب
-          </button>
-
-          <button
-            onClick={() => setActiveElevationWall('wall-c')}
-            className={`px-2.5 py-1.5 rounded-lg font-bold transition ${
-              activeElevationWall === 'wall-c'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700'
-            }`}
-            title="مسقط وواجهة الجدار ج (الأمامي المقابل للجدار أ)"
-          >
-            الجدار ج
-          </button>
-
-          <button
-            onClick={() => setActiveElevationWall('wall-d')}
-            className={`px-2.5 py-1.5 rounded-lg font-bold transition ${
-              activeElevationWall === 'wall-d'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-300 hover:text-white hover:bg-slate-700'
-            }`}
-            title="مسقط وواجهة الجدار د (الأيسر)"
-          >
-            الجدار د
-          </button>
-        </div>
-
-        {/* Isolate Wall Toggle (Hides other walls & opposite cabinets) */}
-        {activeElevationWall !== 'all' && (
-          <button
-            onClick={toggleIsolateElevationWall}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition border ${
-              isolateElevationWall
-                ? 'bg-purple-600 text-white border-purple-500 shadow-sm shadow-purple-600/30'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
-            }`}
-            title={isolateElevationWall ? 'إلغاء عزل الجدار وإظهار باقي الجوانب' : 'إخفاء باقي الجوانب والجدران للتركيز التام على هذا الجدار'}
-          >
-            {isolateElevationWall ? <EyeOff size={14} className="text-amber-300" /> : <Eye size={14} />}
-            <span>{isolateElevationWall ? 'إخفاء باقي الجوانب (مفعّل)' : 'عزل الجدار'}</span>
-          </button>
-        )}
-
-        {/* Interactive Zoom Controls */}
-        <div className="flex items-center bg-slate-800 p-0.5 rounded-xl border border-slate-700">
-          <button
-            onClick={() => setZoomAction({ type: 'in', id: Date.now() })}
-            className="p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition"
-            title="تكبير (Zoom In)"
-          >
-            <ZoomIn size={14} />
-          </button>
-          <button
-            onClick={() => setZoomAction({ type: 'out', id: Date.now() })}
-            className="p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition"
-            title="تصغير (Zoom Out)"
-          >
-            <ZoomOut size={14} />
-          </button>
-          <button
-            onClick={() => {
-              const cur = activeElevationWall;
-              setActiveElevationWall('all');
-              setTimeout(() => setActiveElevationWall(cur), 50);
-            }}
-            className="p-1.5 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition"
-            title="إعادة ضبط زاوية الرؤية (Reset)"
-          >
-            <RotateCcw size={13} />
-          </button>
-        </div>
-
-        {/* Snapshot / Capture Buttons */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => captureCurrentWallSnapshot()}
-            disabled={isCapturing || isBatchCapturing}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-bold transition shadow-md shadow-emerald-600/30"
-            title="التقاط صورة عالية الدقة لمسقط الجدار الحالي وحفظها على الكمبيوتر"
-          >
-            <Camera size={14} />
-            <span>التقاط المسقط (PNG)</span>
-          </button>
-
-          <button
-            onClick={captureAllFourWalls}
-            disabled={isCapturing || isBatchCapturing}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95 text-white rounded-xl font-bold transition shadow-md shadow-indigo-600/30"
-            title="التقاط مساقط الجدران الأربعة دفعة واحدة وتنزيل صورها"
-          >
-            <Layers size={14} />
-            <span className="hidden sm:inline">التقاط الـ 4 جدران</span>
-          </button>
-        </div>
-      </div>
+      {/* Sleek Draggable & Collapsible Canvas Toolbar */}
+      <FloatingCanvasToolbar 
+        mode="3d" 
+        onCaptureSnapshot={() => captureCurrentWallSnapshot()}
+        onCaptureAllWalls={captureAllFourWalls}
+        isCapturing={isCapturing || isBatchCapturing}
+        onZoomIn={() => setZoomAction({ type: 'in', id: Date.now() })}
+        onZoomOut={() => setZoomAction({ type: 'out', id: Date.now() })}
+        onResetZoom={() => {
+          const cur = activeElevationWall;
+          setActiveElevationWall('all');
+          setTimeout(() => setActiveElevationWall(cur), 50);
+        }}
+      />
 
       {/* 3D FLOATING INTERACTIVE GIZMO / CONTROL HUD (WHEN OBJECT IS SELECTED) */}
       {(selectedCabinet || selectedAppliance) && (

@@ -159,7 +159,7 @@ export const TopNavbar: React.FC = () => {
           )}
         </div>
 
-        {/* Undo / Redo Controls */}
+        {/* Undo / Redo / Quick Save Controls Pod */}
         <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
           <button
             onClick={undo}
@@ -181,21 +181,17 @@ export const TopNavbar: React.FC = () => {
           >
             <RotateCw size={14} />
           </button>
+          <div className="w-px h-3.5 bg-slate-200 mx-0.5" />
+          <button
+            onClick={handleQuickSave}
+            className={`p-1.5 rounded-lg transition ${
+              saveSuccess ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:bg-white hover:text-blue-600'
+            }`}
+            title={saveSuccess ? 'تم الحفظ بنجاح!' : 'حفظ فوري في السحابة (Ctrl+S)'}
+          >
+            {saveSuccess ? <Check size={14} /> : <Save size={14} className="text-blue-600" />}
+          </button>
         </div>
-
-        {/* Quick Cloud Save */}
-        <button
-          onClick={handleQuickSave}
-          className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition ${
-            saveSuccess
-              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
-              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-          }`}
-          title="حفظ التعديلات في السحابة"
-        >
-          {saveSuccess ? <Check size={14} /> : <Save size={14} className="text-blue-600" />}
-          <span className="hidden sm:inline">{saveSuccess ? 'تم الحفظ!' : 'حفظ'}</span>
-        </button>
       </div>
 
       {/* ========================================================================= */}
@@ -225,7 +221,7 @@ export const TopNavbar: React.FC = () => {
         {/* 2D Plan */}
         <button
           onClick={() => setActiveTab('2d-plan')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
             activeTab === '2d-plan'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -238,7 +234,7 @@ export const TopNavbar: React.FC = () => {
         {/* 3D Realistic */}
         <button
           onClick={() => setActiveTab('3d-view')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
             activeTab === '3d-view'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -248,25 +244,26 @@ export const TopNavbar: React.FC = () => {
           <span>منظور 3D</span>
         </button>
 
-        {/* VR Walkthrough */}
+        {/* Client Presentation / Showcase */}
         <button
-          onClick={() => setActiveTab('walkthrough-vr')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-            activeTab === 'walkthrough-vr'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
+          onClick={() => setActiveTab('presentation-mode')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'presentation-mode'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
           }`}
+          title="معاينة العميل بعد الانتهاء، العرض النهائي، دوران 360، وتصدير التقارير"
         >
-          <Sparkles size={14} className="text-amber-300" />
-          <span>جولة VR</span>
+          <Eye size={14} />
+          <span>معاينة العميل</span>
         </button>
 
         {/* Render Studio */}
         <button
           onClick={() => setActiveTab('visualization-studio')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
             activeTab === 'visualization-studio'
-              ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
           }`}
         >
@@ -274,18 +271,17 @@ export const TopNavbar: React.FC = () => {
           <span>استوديو الرندر</span>
         </button>
 
-        {/* Client Presentation / Showcase */}
+        {/* VR Walkthrough */}
         <button
-          onClick={() => setActiveTab('presentation-mode')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-            activeTab === 'presentation-mode'
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/25'
+          onClick={() => setActiveTab('walkthrough-vr')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'walkthrough-vr'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
           }`}
-          title="معاينة العميل بعد الانتهاء، العرض النهائي، دوران 360، وتصدير التقارير"
         >
-          <Eye size={14} className={activeTab === 'presentation-mode' ? 'text-amber-300' : 'text-blue-500'} />
-          <span>معاينة العميل</span>
+          <Sparkles size={14} />
+          <span>جولة VR</span>
         </button>
 
         {/* Engineering & Manufacturing Menu */}
@@ -299,7 +295,7 @@ export const TopNavbar: React.FC = () => {
             }`}
           >
             <Scissors size={14} />
-            <span>الهندسة والتقطيع ({projectType === 'kitchen' ? 'مطابخ' : projectType === 'dressing' ? 'دريسينج' : projectType === 'bedroom' ? 'غرف نوم' : 'مكتبات'})</span>
+            <span>الهندسة والتصنيع</span>
             <ChevronDown size={12} />
           </button>
 
@@ -362,61 +358,59 @@ export const TopNavbar: React.FC = () => {
       </nav>
 
       {/* ========================================================================= */}
-      {/* 3. RIGHT SECTION: UNIT, LANGUAGE, EXPORT & SETTINGS                       */}
+      {/* 3. RIGHT SECTION: HARMONIZED COMPACT TOOLS & ACCOUNT                      */}
       {/* ========================================================================= */}
-      {/* ========================================================================= */}
-      {/* 3. RIGHT SECTION: RESPONSIVE CONTROLS & MOBILE HAMBURGER MENU             */}
-      {/* ========================================================================= */}
-      {/* Desktop Controls (lg:flex) */}
-      <div className="hidden lg:flex items-center gap-2">
+      <div className="hidden lg:flex items-center gap-1.5">
         {/* Unit Toggle cm / mm */}
         <button
           onClick={toggleUnit}
-          className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-mono font-bold transition border border-slate-200"
-          title={`تغيير وحدة القياس (الحالية: ${unit})`}
+          className="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-mono font-bold transition border border-slate-200"
+          title={`تبديل وحدة القياس (الحالية: ${unit})`}
         >
-          {unit === 'cm' ? 'سم (cm)' : 'مم (mm)'}
+          {unit === 'cm' ? 'سم' : 'مم'}
         </button>
 
-        {/* Camera AI Room Scanner Trigger */}
-        <button
-          onClick={() => setIsCameraScannerOpen(true)}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition shadow-2xs"
-          title="مسح وتصوير المطبخ بالكاميرا واستخراج رسمة بالذكاء الاصطناعي"
-        >
-          <Camera size={14} className="text-emerald-600" />
-          <span>مسح بالكاميرا</span>
-        </button>
+        {/* Unified Tool Icons Group */}
+        <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 gap-0.5">
+          {/* Camera Scanner */}
+          <button
+            onClick={() => setIsCameraScannerOpen(true)}
+            className="flex items-center gap-1 px-2 py-1 text-slate-700 hover:text-emerald-700 hover:bg-white rounded-lg text-xs font-bold transition"
+            title="مسح المطبخ بالكاميرا واستخراج تصميم بالذكاء الاصطناعي"
+          >
+            <Camera size={14} className="text-emerald-600" />
+            <span className="hidden xl:inline text-[11px]">كاميرا AI</span>
+          </button>
 
-        {/* Export / PDF Modal */}
-        <button
-          onClick={() => setIsExportModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200 shadow-xs"
-          title="تصدير المخطط، تقرير الأسعار، أو ملفات PDF"
-        >
-          <Download size={14} className="text-blue-600" />
-          <span>تصدير</span>
-        </button>
+          {/* Export / PDF */}
+          <button
+            onClick={() => setIsExportModalOpen(true)}
+            className="flex items-center gap-1 px-2 py-1 text-slate-700 hover:text-blue-700 hover:bg-white rounded-lg text-xs font-bold transition"
+            title="تصدير المخطط أو ملفات PDF"
+          >
+            <Download size={14} className="text-blue-600" />
+            <span className="hidden xl:inline text-[11px]">تصدير</span>
+          </button>
 
-        {/* Video Tutorial Guide Trigger */}
-        <button
-          onClick={() => setIsVideoTutorialOpen(true)}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition shadow-2xs"
-          title="فيديو ودليل الشرح الشامل لطرق الرسم والتعامل مع البلوكات والأدوات المخفية"
-        >
-          <Play size={13} fill="currentColor" />
-          <span>شرح البرنامج</span>
-        </button>
+          {/* Settings Modal */}
+          <button
+            onClick={() => setIsSettingsModalOpen(true)}
+            className="flex items-center gap-1 px-2 py-1 text-slate-700 hover:text-purple-700 hover:bg-white rounded-lg text-xs font-bold transition"
+            title="إعدادات المشروع والخامات والأسعار"
+          >
+            <Settings size={14} className="text-purple-600" />
+            <span className="hidden xl:inline text-[11px]">الإعدادات</span>
+          </button>
 
-        {/* Project & Materials Settings Modal Trigger */}
-        <button
-          onClick={() => setIsSettingsModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-xs font-bold transition shadow-xs"
-          title="إعدادات المشروع، الخامات الجديدة، وتعديل أسعار الألواح"
-        >
-          <Settings size={14} className="text-purple-600" />
-          <span>الخامات والإعدادات</span>
-        </button>
+          {/* Tutorial */}
+          <button
+            onClick={() => setIsVideoTutorialOpen(true)}
+            className="p-1.5 text-slate-700 hover:text-rose-600 hover:bg-white rounded-lg transition"
+            title="فيديو شرح استخدام البرنامج"
+          >
+            <Play size={13} fill="currentColor" className="text-rose-500" />
+          </button>
+        </div>
 
         {/* User Account / Admin Badge */}
         {currentUser?.role === 'admin' && (
