@@ -21,7 +21,9 @@ import {
   ChevronDown,
   ChevronUp,
   Maximize2,
-  Box
+  Box,
+  Archive,
+  Armchair
 } from 'lucide-react';
 
 export const RightSidebar: React.FC = () => {
@@ -46,6 +48,7 @@ export const RightSidebar: React.FC = () => {
   const { unit, language, isRightPanelCollapsed, setIsRightPanelCollapsed } = useUIStore();
   const t = TRANSLATIONS[language];
   const { room, cabinets, appliances, architecturalElements } = project;
+  const projectType = project.metadata?.projectType || 'kitchen';
 
   const selectedCabinet = selectedType === 'cabinet' ? cabinets.find((c) => c.id === selectedId) : null;
   const selectedAppliance = selectedType === 'appliance' ? appliances.find((a) => a.id === selectedId) : null;
@@ -419,104 +422,422 @@ export const RightSidebar: React.FC = () => {
           </div>
 
           {/* ========================================================================= */}
-          {/* KITCHEN MAKER CARCASS & SPECS (شاسيه وتجميع كيتشن ميكر)                   */}
+          {/* KITCHAN CARCASS & SPECS (تفصيل وشاسيه علبة كيتشن)                         */}
           {/* ========================================================================= */}
-          <div className="bg-amber-50/60 p-2.5 rounded-xl border border-amber-200/80 space-y-2">
-            <div className="flex items-center justify-between">
-              <h4 className="text-[11px] font-bold text-amber-900 flex items-center gap-1.5">
-                <Box size={13} className="text-amber-600" />
-                <span>تفصيل كيتشن ميكر (شاسيه العلبة)</span>
-              </h4>
-              <span className="text-[9px] bg-amber-200/70 text-amber-900 px-1.5 py-0.5 rounded font-bold font-mono">
-                KM PRO
-              </span>
-            </div>
-
-            {/* Back Panel Mount */}
-            <div>
-              <label className="text-[9px] text-amber-800 font-bold block mb-0.5">نوع ظهر العلبة:</label>
-              <select
-                value={selectedCabinet.backPanelType || 'groove-6mm'}
-                onChange={(e) => updateCabinet(selectedCabinet.id, { backPanelType: e.target.value as any })}
-                className="w-full px-1.5 py-1 bg-white border border-amber-200 rounded-lg text-xs font-bold text-slate-900"
-              >
-                <option value="groove-6mm">مفرز في الأجناب 6 مم (Grooved)</option>
-                <option value="rebate-18mm">لطش مسامير 18 مم (Rebated)</option>
-                <option value="flush-screwed">تجليد ظهر كامل 18 مم (Solid)</option>
-              </select>
-            </div>
-
-            {/* Top Stretchers & Waterproof Bottom Toggles */}
-            <div className="grid grid-cols-2 gap-1 text-[10px] font-bold pt-0.5">
-              <button
-                onClick={() => updateCabinet(selectedCabinet.id, { hasTopStretchers: !selectedCabinet.hasTopStretchers })}
-                className={`p-1.5 rounded-lg border transition text-right px-2 ${
-                  selectedCabinet.hasTopStretchers
-                    ? 'bg-amber-600 text-white border-amber-600'
-                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
-                }`}
-                title="عوارض خشب أمامية وخلفية 10 سم للتهوية وحمل الرخام بدلاً من السقف المقفول"
-              >
-                عوارض سقف 10سم {selectedCabinet.hasTopStretchers ? '✓' : ''}
-              </button>
-
-              <button
-                onClick={() => updateCabinet(selectedCabinet.id, { hasAluminumWaterproofBottom: !selectedCabinet.hasAluminumWaterproofBottom })}
-                className={`p-1.5 rounded-lg border transition text-right px-2 ${
-                  selectedCabinet.hasAluminumWaterproofBottom
-                    ? 'bg-cyan-600 text-white border-cyan-600'
-                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
-                }`}
-                title="قاع مصفح ألومنيوم معزول ومقاوم للمياه بنسبة 100% لوحدات الحوض"
-              >
-                قاع حوض ألومنيوم {selectedCabinet.hasAluminumWaterproofBottom ? '✓' : ''}
-              </button>
-            </div>
-
-            {/* Dish Rack & Gola Profile Toggles */}
-            <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
-              <button
-                onClick={() => updateCabinet(selectedCabinet.id, { hasDishRack: !selectedCabinet.hasDishRack })}
-                className={`p-1.5 rounded-lg border transition text-right px-2 ${
-                  selectedCabinet.hasDishRack
-                    ? 'bg-emerald-600 text-white border-emerald-600'
-                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
-                }`}
-                title="مطبق تركي صفاية أطباق استانلس استيل مع صينية مياه"
-              >
-                مطبق تركي استانلس {selectedCabinet.hasDishRack ? '✓' : ''}
-              </button>
-
-              <button
-                onClick={() => updateCabinet(selectedCabinet.id, { hasGolaProfile: !selectedCabinet.hasGolaProfile })}
-                className={`p-1.5 rounded-lg border transition text-right px-2 ${
-                  selectedCabinet.hasGolaProfile
-                    ? 'bg-purple-600 text-white border-purple-600'
-                    : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
-                }`}
-                title="تفريز بروفايل جولا ألومنيوم للمطابخ المودرن بدون مقابض"
-              >
-                بروفايل جولا (Gola) {selectedCabinet.hasGolaProfile ? '✓' : ''}
-              </button>
-            </div>
-
-            {/* Wall Infill Filler Toggle */}
-            <div className="pt-1 border-t border-amber-200/60">
+          {(projectType === 'kitchen' || selectedCabinet.category === 'base' || selectedCabinet.category === 'wall' || selectedCabinet.category === 'tall') && 
+           selectedCabinet.category !== 'shoe-cabinet' && !selectedCabinet.type.startsWith('shoe-cabinet') && (
+            <div className="bg-amber-50/60 p-2.5 rounded-xl border border-amber-200/80 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-amber-900">فيلر تعويض جداري:</span>
-                <button
-                  onClick={() => updateCabinet(selectedCabinet.id, { hasFillerPanel: !selectedCabinet.hasFillerPanel })}
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${
-                    selectedCabinet.hasFillerPanel
-                      ? 'bg-amber-700 text-white border-amber-700'
-                      : 'bg-white text-slate-700 border-amber-300'
-                  }`}
+                <h4 className="text-[11px] font-bold text-amber-900 flex items-center gap-1.5">
+                  <Box size={13} className="text-amber-600" />
+                  <span>تفصيل وشاسيه علبة كيتشن</span>
+                </h4>
+                <span className="text-[9px] bg-amber-200/70 text-amber-900 px-1.5 py-0.5 rounded font-bold font-mono">
+                  KITCHAN PRO
+                </span>
+              </div>
+
+              {/* Back Panel Mount */}
+              <div>
+                <label className="text-[9px] text-amber-800 font-bold block mb-0.5">نوع ظهر العلبة:</label>
+                <select
+                  value={selectedCabinet.backPanelType || 'groove-6mm'}
+                  onChange={(e) => updateCabinet(selectedCabinet.id, { backPanelType: e.target.value as any })}
+                  className="w-full px-1.5 py-1 bg-white border border-amber-200 rounded-lg text-xs font-bold text-slate-900"
                 >
-                  {selectedCabinet.hasFillerPanel ? 'مفعّل (7 سم)' : 'إضافة فيلر'}
+                  <option value="groove-6mm">مفرز في الأجناب 6 مم (Grooved)</option>
+                  <option value="rebate-18mm">لطش مسامير 18 مم (Rebated)</option>
+                  <option value="flush-screwed">تجليد ظهر كامل 18 مم (Solid)</option>
+                </select>
+              </div>
+
+              {/* Top Stretchers & Waterproof Bottom Toggles */}
+              <div className="grid grid-cols-2 gap-1 text-[10px] font-bold pt-0.5">
+                <button
+                  onClick={() => updateCabinet(selectedCabinet.id, { hasTopStretchers: !selectedCabinet.hasTopStretchers })}
+                  className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                    selectedCabinet.hasTopStretchers
+                      ? 'bg-amber-600 text-white border-amber-600'
+                      : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                  }`}
+                  title="عوارض خشب أمامية وخلفية 10 سم للتهوية وحمل الرخام بدلاً من السقف المقفول"
+                >
+                  عوارض سقف 10سم {selectedCabinet.hasTopStretchers ? '✓' : ''}
+                </button>
+
+                <button
+                  onClick={() => updateCabinet(selectedCabinet.id, { hasAluminumWaterproofBottom: !selectedCabinet.hasAluminumWaterproofBottom })}
+                  className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                    selectedCabinet.hasAluminumWaterproofBottom
+                      ? 'bg-cyan-600 text-white border-cyan-600'
+                      : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                  }`}
+                  title="قاع مصفح ألومنيوم معزول ومقاوم للمياه بنسبة 100% لوحدات الحوض"
+                >
+                  قاع حوض ألومنيوم {selectedCabinet.hasAluminumWaterproofBottom ? '✓' : ''}
                 </button>
               </div>
+
+              {/* Dish Rack & Gola Profile Toggles */}
+              <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
+                <button
+                  onClick={() => updateCabinet(selectedCabinet.id, { hasDishRack: !selectedCabinet.hasDishRack })}
+                  className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                    selectedCabinet.hasDishRack
+                      ? 'bg-emerald-600 text-white border-emerald-600'
+                      : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                  }`}
+                  title="مطبق تركي صفاية أطباق استانلس استيل مع صينية مياه"
+                >
+                  مطبق تركي استانلس {selectedCabinet.hasDishRack ? '✓' : ''}
+                </button>
+
+                <button
+                  onClick={() => updateCabinet(selectedCabinet.id, { hasGolaProfile: !selectedCabinet.hasGolaProfile })}
+                  className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                    selectedCabinet.hasGolaProfile
+                      ? 'bg-purple-600 text-white border-purple-600'
+                      : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100/40'
+                  }`}
+                  title="تفريز بروفايل جولا ألومنيوم للمطابخ المودرن بدون مقابض"
+                >
+                  بروفايل جولا (Gola) {selectedCabinet.hasGolaProfile ? '✓' : ''}
+                </button>
+              </div>
+
+              {/* Wall Infill Filler Toggle */}
+              <div className="pt-1 border-t border-amber-200/60">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-amber-900">فيلر تعويض جداري:</span>
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasFillerPanel: !selectedCabinet.hasFillerPanel })}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${
+                      selectedCabinet.hasFillerPanel
+                        ? 'bg-amber-700 text-white border-amber-700'
+                        : 'bg-white text-slate-700 border-amber-300'
+                    }`}
+                  >
+                    {selectedCabinet.hasFillerPanel ? 'مفعّل (7 سم)' : 'إضافة فيلر'}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* SHOE CABINET SPECS & CUSTOMIZER (مواصفات وتفصيل الجزامة بمواصفات خاصة)     */}
+          {/* ========================================================================= */}
+          {(selectedCabinet.category === 'shoe-cabinet' || selectedCabinet.type.startsWith('shoe-cabinet') || selectedCabinet.isShoeCabinet) && (
+            <div className="bg-emerald-50/70 p-2.5 rounded-xl border border-emerald-200/90 space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[11px] font-bold text-emerald-900 flex items-center gap-1.5">
+                  <Archive size={13} className="text-emerald-600" />
+                  <span>مواصفات وتفصيل الجزامة</span>
+                </h4>
+                <span className="text-[9px] bg-emerald-200/70 text-emerald-900 px-1.5 py-0.5 rounded font-bold font-mono">
+                  SHOE PRO
+                </span>
+              </div>
+
+              {/* Shoe Cabinet Style Presets */}
+              <div>
+                <label className="text-[9px] text-emerald-800 font-bold block mb-1">نمط ونظام الجزامة:</label>
+                <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      shoeCabinetType: 'drop-down', 
+                      depth: Math.min(selectedCabinet.depth, 260),
+                      hasDropFlaps: true 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      selectedCabinet.shoeCabinetType === 'drop-down' || selectedCabinet.type === 'shoe-cabinet-drop-down'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-emerald-200 hover:bg-emerald-100/40'
+                    }`}
+                  >
+                    قلابات سريعة (24 سم)
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      shoeCabinetType: 'tall-shelves', 
+                      height: Math.max(selectedCabinet.height, 2000),
+                      hasShoeShelves: true 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      selectedCabinet.shoeCabinetType === 'tall-shelves' || selectedCabinet.type === 'shoe-cabinet-tall'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-emerald-200 hover:bg-emerald-100/40'
+                    }`}
+                  >
+                    دولاب رأسي كامل
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      shoeCabinetType: 'bench-seating', 
+                      height: 500,
+                      hasPaddedSeat: true 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      selectedCabinet.shoeCabinetType === 'bench-seating' || selectedCabinet.hasPaddedSeat || selectedCabinet.type === 'shoe-cabinet-bench'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-emerald-200 hover:bg-emerald-100/40'
+                    }`}
+                  >
+                    بف جلوس مبطن
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      shoeCabinetType: 'louvered-doors', 
+                      hasVentilationLouvers: true 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      selectedCabinet.shoeCabinetType === 'louvered-doors' || selectedCabinet.hasVentilationLouvers || selectedCabinet.type === 'shoe-cabinet-louvered'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-emerald-200 hover:bg-emerald-100/40'
+                    }`}
+                  >
+                    ضلف شيش مهواة
+                  </button>
+                </div>
+              </div>
+
+              {/* Number of Tiers / Flaps */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[9px] text-emerald-800 font-bold">عدد الأدوار والقلابات:</label>
+                  <span className="text-[9px] text-emerald-700 font-mono font-bold">
+                    {selectedCabinet.shoeTiersCount || selectedCabinet.shelfCount || 3} أدوار
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1 text-center font-bold text-xs">
+                  {[1, 2, 3, 4, 5].map((tier) => (
+                    <button
+                      key={tier}
+                      onClick={() => updateCabinet(selectedCabinet.id, { 
+                        shoeTiersCount: tier, 
+                        shelfCount: tier 
+                      })}
+                      className={`py-1 rounded-lg border transition ${
+                        (selectedCabinet.shoeTiersCount || selectedCabinet.shelfCount) === tier
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                          : 'bg-white text-slate-700 border-emerald-200 hover:bg-emerald-100'
+                      }`}
+                    >
+                      {tier}د
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Special Features Toggles */}
+              <div className="pt-1 border-t border-emerald-200/60 space-y-1">
+                <span className="text-[9px] font-bold text-emerald-800 block">إضافات الجزامة الخاصة:</span>
+                <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasPaddedSeat: !selectedCabinet.hasPaddedSeat })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.hasPaddedSeat ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-emerald-200'
+                    }`}
+                  >
+                    مقعد جلوس مبطن {selectedCabinet.hasPaddedSeat ? '✓' : ''}
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasVentilationLouvers: !selectedCabinet.hasVentilationLouvers })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.hasVentilationLouvers ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-emerald-200'
+                    }`}
+                  >
+                    فتحات تهوية شيش {selectedCabinet.hasVentilationLouvers ? '✓' : ''}
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      shoeShelfAngle: selectedCabinet.shoeShelfAngle === 25 ? 0 : 25 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.shoeShelfAngle === 25 ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-emerald-200'
+                    }`}
+                  >
+                    أرفف مائلة بمصد {selectedCabinet.shoeShelfAngle === 25 ? '✓' : ''}
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasJewelryDrawer: !selectedCabinet.hasJewelryDrawer })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.hasJewelryDrawer ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-emerald-200'
+                    }`}
+                  >
+                    درج ملمعات علوي {selectedCabinet.hasJewelryDrawer ? '✓' : ''}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* DRESSING CARCASS DETAILER (تفصيل علبة دريسنج بمواصفات خاصة)               */}
+          {/* ========================================================================= */}
+          {(projectType === 'dressing' || selectedCabinet.category === 'wardrobe' || selectedCabinet.type.startsWith('wardrobe-') || selectedCabinet.type.startsWith('dressing-')) && (
+            <div className="bg-purple-50/70 p-2.5 rounded-xl border border-purple-200/90 space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[11px] font-bold text-purple-900 flex items-center gap-1.5">
+                  <Sliders size={13} className="text-purple-600" />
+                  <span>تفصيل علبة الدريسينج المخصصة</span>
+                </h4>
+                <span className="text-[9px] bg-purple-200/70 text-purple-900 px-1.5 py-0.5 rounded font-bold font-mono">
+                  DRESSING PRO
+                </span>
+              </div>
+
+              {/* Vertical Partitions / Gables */}
+              <div>
+                <label className="text-[9px] text-purple-800 font-bold block mb-1">تقسيم العلبة (قواطع رأسية Gables):</label>
+                <div className="grid grid-cols-3 gap-1 text-center font-bold text-xs">
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { verticalDividersCount: 0 })}
+                    className={`py-1 rounded-lg border transition ${
+                      !selectedCabinet.verticalDividersCount || selectedCabinet.verticalDividersCount === 0
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-purple-200 hover:bg-purple-100'
+                    }`}
+                  >
+                    قسم واحد
+                  </button>
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { verticalDividersCount: 1 })}
+                    className={`py-1 rounded-lg border transition ${
+                      selectedCabinet.verticalDividersCount === 1
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-purple-200 hover:bg-purple-100'
+                    }`}
+                  >
+                    قسمين (قاطع)
+                  </button>
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { verticalDividersCount: 2 })}
+                    className={`py-1 rounded-lg border transition ${
+                      selectedCabinet.verticalDividersCount === 2
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-purple-200 hover:bg-purple-100'
+                    }`}
+                  >
+                    3 أقسام (قاطعين)
+                  </button>
+                </div>
+              </div>
+
+              {/* Hanging Rails Configuration */}
+              <div>
+                <label className="text-[9px] text-purple-800 font-bold block mb-1">نظام تعليق الملابس:</label>
+                <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      hasHangingRail: true, 
+                      hangingRailCount: 1,
+                      dressingHangingConfig: 'long' 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      selectedCabinet.hasHangingRail && selectedCabinet.dressingHangingConfig === 'long'
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-purple-200 hover:bg-purple-100/50'
+                    }`}
+                  >
+                    ماسورة طويلة (فساتين)
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      hasHangingRail: true, 
+                      hangingRailCount: 2,
+                      dressingHangingConfig: 'double' 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      selectedCabinet.hasHangingRail && selectedCabinet.dressingHangingConfig === 'double'
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-purple-200 hover:bg-purple-100/50'
+                    }`}
+                  >
+                    مستويين (بدل وقمصان)
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      hasHangingRail: true, 
+                      hasHydraulicStorage: true,
+                      dressingHangingConfig: 'hydraulic' 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      selectedCabinet.dressingHangingConfig === 'hydraulic'
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-purple-200 hover:bg-purple-100/50'
+                    }`}
+                  >
+                    ماسورة سحاب هيدروليك
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { 
+                      hasHangingRail: false, 
+                      dressingHangingConfig: 'none' 
+                    })}
+                    className={`p-1.5 rounded-lg border transition text-center ${
+                      !selectedCabinet.hasHangingRail
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                        : 'bg-white text-slate-700 border-purple-200 hover:bg-purple-100/50'
+                    }`}
+                  >
+                    بدون تعليق (أرفف كاملة)
+                  </button>
+                </div>
+              </div>
+
+              {/* Internal Drawers & Accessories */}
+              <div className="pt-1 border-t border-purple-200/60 space-y-1">
+                <span className="text-[9px] font-bold text-purple-800 block">إكسسوارات العلبة الإضافية:</span>
+                <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasJewelryDrawer: !selectedCabinet.hasJewelryDrawer })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.hasJewelryDrawer ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-slate-700 border-purple-200'
+                    }`}
+                  >
+                    درج مجوهرات مقسم {selectedCabinet.hasJewelryDrawer ? '✓' : ''}
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasShoeShelves: !selectedCabinet.hasShoeShelves })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.hasShoeShelves ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-slate-700 border-purple-200'
+                    }`}
+                  >
+                    أرفف أحذية سفلية {selectedCabinet.hasShoeShelves ? '✓' : ''}
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasTrouserRack: !selectedCabinet.hasTrouserRack })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.hasTrouserRack ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-slate-700 border-purple-200'
+                    }`}
+                  >
+                    حامل بناطيل سحاب {selectedCabinet.hasTrouserRack ? '✓' : ''}
+                  </button>
+
+                  <button
+                    onClick={() => updateCabinet(selectedCabinet.id, { hasIntegratedLed: !selectedCabinet.hasIntegratedLed })}
+                    className={`p-1.5 rounded-lg border transition text-right px-2 ${
+                      selectedCabinet.hasIntegratedLed ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-slate-700 border-purple-200'
+                    }`}
+                  >
+                    ليد بروفايل رأسي {selectedCabinet.hasIntegratedLed ? '✓' : ''}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

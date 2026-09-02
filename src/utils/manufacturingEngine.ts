@@ -452,7 +452,7 @@ export function calculateUnifiedManufacturingPackage(
           addHw('أرجل مطبخ بلاستيك رجلاش 10 سم', 'leg', 4, 'قطعة', 15, 'أرجل تسوية وتثبيت الوزرة');
         }
 
-        // Kitchen Maker Specific Hardware Additions
+        // Carcass & Signature Hardware Additions
         if (cab.hasDishRack) {
           addHw('مطبق تركي صفاية أطباق استانلس استيل 304 مع صينية مياه', 'accessories', 1, 'طقم', 450, 'صفاية أطباق ومطبق داخلي هيدروليك');
         }
@@ -475,6 +475,39 @@ export function calculateUnifiedManufacturingPackage(
             material: cab.materialFront || 'خامة الواجهة',
             edgeBanding: { top: true, bottom: true, left: true, right: true },
           });
+        }
+
+        // Shoe Cabinet (الجزامات) Specific Hardware & Panels
+        if (cab.hasDropFlaps || cab.shoeCabinetType === 'drop-down' || cab.type === 'shoe-cabinet-drop-down') {
+          const flaps = cab.shoeTiersCount || cab.shelfCount || 3;
+          addHw('ميكانيزم قلاب جزامة هيدروليك متعدد الأدوار', 'accessories', flaps, 'طقم', 85, 'حوامل وقلابات بلاستيك/معدن للأحذية');
+        }
+        if (cab.hasPaddedSeat || cab.shoeCabinetType === 'bench-seating' || cab.type === 'shoe-cabinet-bench') {
+          addHw('مقعد جلوس بف مبطن إسفنج عالي الكثافة مع تنجيد جلد', 'accessories', 1, 'قطعة', 350, 'وسادة مقعد جزامة كونسول مريحة');
+        }
+        if (cab.hasVentilationLouvers || cab.shoeCabinetType === 'louvered-doors') {
+          addHw('هوايات تهوية دائرية ألومنيوم للأحذية', 'accessories', 4, 'قطعة', 15, 'فتحات تهوية صحية لمنع الروائح الكريهة');
+        }
+
+        // Dressing Vertical Partitions (قواطع رأسية للدريسينج)
+        if (cab.verticalDividersCount && cab.verticalDividersCount > 0) {
+          woodPanels.push({
+            id: `${cab.id}-GABLES`,
+            cabinetId: cab.id,
+            cabinetName: cab.name,
+            partName: 'قاطع رأسي داخلي (Gable Divider)',
+            quantity: cab.verticalDividersCount,
+            length: CH - 2 * BT,
+            width: CD - 20,
+            thickness: BT,
+            material: cab.materialBody || 'خامة الشاسيه',
+            edgeBanding: { top: false, bottom: false, left: false, right: true },
+          });
+        }
+
+        // Hydraulic Pull-down rail
+        if (cab.dressingHangingConfig === 'hydraulic') {
+          addHw('ماسورة تعليق هيدروليك سحاب نزول (Servetto)', 'accessories', 1, 'طقم', 420, 'ماسورة سحاب للملابس العالية');
         }
       }
     }

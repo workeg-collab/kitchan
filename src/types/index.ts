@@ -18,7 +18,7 @@ export type ProjectType = 'kitchen' | 'dressing' | 'bedroom' | 'library' | 'livi
 export type CabinetCategory = 'base' | 'wall' | 'tall' | 'corner' | 'island' | 'custom';
 
 // Dressing / Wardrobe Types
-export type WardrobeCategory = 'wardrobe' | 'closet-internals' | 'accessories' | 'custom';
+export type WardrobeCategory = 'wardrobe' | 'closet-internals' | 'shoe-cabinet' | 'accessories' | 'custom';
 export type WardrobeDoorType = 'hinged' | 'sliding' | 'folding' | 'open' | 'glass-frame' | 'fixed';
 
 // Bedroom Types
@@ -112,6 +112,13 @@ export type CabinetType =
   | 'wardrobe-glass-doors'
   | 'wardrobe-island-accessories'
   | 'dressing-jewelry-island'
+  | 'dressing-carcass-custom'
+  // Shoe Cabinet Types (الجزامات)
+  | 'shoe-cabinet-drop-down'
+  | 'shoe-cabinet-tall'
+  | 'shoe-cabinet-bench'
+  | 'shoe-cabinet-louvered'
+  | 'shoe-cabinet-custom'
   // Bedroom types
   | 'bed-single'
   | 'bed-double'
@@ -242,7 +249,7 @@ export interface CabinetItem {
   doorHinge?: DoorHinge;
   doorType?: WardrobeDoorType;
 
-  // Kitchen Specific & Kitchen Maker
+  // Kitchen Carcass Detailing
   hasSinkCutout?: boolean;
   hasCooktopCutout?: boolean;
   hasApplianceCavity?: boolean;
@@ -262,7 +269,7 @@ export interface CabinetItem {
   fillerWidth?: number; // مقاس الفيلر
   assemblyType?: 'minifix' | 'confirmat' | 'brackets'; // نوع التجميع
 
-  // Dressing Specific
+  // Dressing Specific & Custom Carcass Detailing
   hasHangingRail?: boolean;
   hangingRailCount?: number;
   hasShoeShelves?: boolean;
@@ -270,6 +277,21 @@ export interface CabinetItem {
   hasTrouserRack?: boolean;
   hasLaundryBasket?: boolean;
   slidingTracksCount?: number;
+  isCustomDressingCarcass?: boolean;
+  verticalPartitionsCount?: number; // عدد القواطع الرأسية (Gables) 1, 2, 3
+  dressingHangingConfig?: 'long' | 'double' | 'hydraulic' | 'none';
+  dressingDrawersCount?: number;
+  hasVerticalLedProfile?: boolean;
+
+  // Shoe Cabinet Specific Attributes (الجزامات وتفصيلها)
+  isShoeCabinet?: boolean;
+  shoeCabinetType?: 'drop-down' | 'tall-shelves' | 'bench-seating' | 'louvered-doors' | 'custom';
+  shoeTiersCount?: number; // عدد الأدوار والقلابات (1, 2, 3, 4, 5)
+  shoeShelfAngle?: number; // زاوية ميل الرف (0, 15, 30, 45)
+  hasPaddedSeat?: boolean; // مقعد جلوس بف مبطن
+  paddedSeatColor?: string; // لون قماش / جلد المقعد
+  hasVentilationLouvers?: boolean; // فتحات تهوية أو ضلف شيش
+  hasDropFlaps?: boolean; // قلابات أحذية هيدروليك
 
   // Bedroom Specific
   bedSize?: 'single' | 'double' | 'queen' | 'king';

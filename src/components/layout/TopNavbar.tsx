@@ -364,7 +364,7 @@ export const TopNavbar: React.FC = () => {
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-right text-purple-700 hover:bg-purple-50 transition"
               >
                 <Settings size={14} className="text-purple-600" />
-                <span>أنظمة وتفصيل كيتشن ميكر (KM)</span>
+                <span>أنظمة وتفصيل كيتشن (Kitchan)</span>
               </button>
             </div>
           )}

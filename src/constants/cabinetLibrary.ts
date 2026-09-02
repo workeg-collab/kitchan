@@ -36,13 +36,13 @@ export interface CabinetTemplate {
 
 export const CABINET_LIBRARY: CabinetTemplate[] = [
   // =========================================================================
-  // 0. وحدات كيتشن ميكر الاحترافية (KITCHEN MAKER SIGNATURE UNITS)
+  // 0. وحدات كيتشن الاحترافية الموديلار (KITCHAN SIGNATURE UNITS)
   // =========================================================================
   {
     category: 'base',
     type: 'base-waterproof-sink',
-    name: 'علبة حوض كيتشن ميكر (قاع ألومنيوم عازل + عوارض)',
-    nameEn: 'KitchenMaker Waterproof Sink Base Unit',
+    name: 'علبة حوض كيتشن مصفحة (قاع ألومنيوم عازل + عوارض)',
+    nameEn: 'Kitchan Waterproof Sink Base Unit',
     description: 'شاسيه حوض احترافي بعوارض علوية 10 سم للتهوية وتحمل الرخام مع قاع مصفح ألومنيوم معزول ضد تسريب المياه',
     defaultWidth: 900,
     defaultHeight: 720,
@@ -119,7 +119,7 @@ export const CABINET_LIBRARY: CabinetTemplate[] = [
     type: 'tall-double-oven-microwave',
     name: 'برج بلت إن مزدوج (فرن + ميكروويف + درجين حلل)',
     nameEn: 'Tall Double Oven & Microwave Tower',
-    description: 'برج مطبخ متكامل كيتشن ميكر بفتحتين للأجهزة البلت إن (فرن وميكروويف) مع درجين سفليين عميقين ودولاب علوي',
+    description: 'برج مطبخ متكامل للأجهزة البلت إن (فرن وميكروويف) مع درجين سفليين عميقين ودولاب علوي',
     defaultWidth: 600,
     defaultHeight: 2160,
     defaultDepth: 580,

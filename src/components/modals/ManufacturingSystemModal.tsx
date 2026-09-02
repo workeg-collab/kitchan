@@ -27,6 +27,17 @@ export const ManufacturingSystemModal: React.FC<Props> = ({ isOpen, onClose }) =
 
   if (!isOpen) return null;
 
+  const handleApplySystem = (tmpl: ManufacturingSystemTemplate) => {
+    updateManufacturing({
+      systemType: tmpl.systemType,
+      boardThickness: tmpl.primaryBoardThickness,
+      backPanelThickness: tmpl.backPanelThickness,
+      constructionMethod: tmpl.carcassConstruction as any,
+      backPanelMount: tmpl.backPanelMount as any,
+    });
+    onClose();
+  };
+
   const handleSaveCustomSystem = () => {
     if (!systemName.trim()) return;
 
@@ -36,7 +47,6 @@ export const ManufacturingSystemModal: React.FC<Props> = ({ isOpen, onClose }) =
       constructionMethod: systemType === 'wood' ? 'sides-full-height' : 'aluminium-box-frame',
     });
 
-    alert(`تم حفظ وتفعيل نظام التصنيع: "${systemName}" بنجاح!`);
     onClose();
   };
 
@@ -51,10 +61,10 @@ export const ManufacturingSystemModal: React.FC<Props> = ({ isOpen, onClose }) =
             </div>
             <div>
               <h3 className="text-base font-extrabold text-slate-900">
-                إدارة وبناء أنظمة التصنيع وقواعد القطاعات (Manufacturing Engine Builder)
+                أنظمة تصنيع كيتشن وتفصيل الألواح والقطاعات
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                تكوين معايير الأخشاب، الألوميتال، الكلادينج، الخشمونيوم، وبناء أنظمة تصنيع مخصصة
+                اختر نظام التصنيع المطلوب وسيتم تطبيقه مباشرة على كافة المقاسات وقوائم التقطيع
               </p>
             </div>
           </div>
@@ -91,7 +101,7 @@ export const ManufacturingSystemModal: React.FC<Props> = ({ isOpen, onClose }) =
             }`}
           >
             <Plus size={14} />
-            <span>بناء نظام تصنيع مخصص جديد</span>
+            <span>بناء نظام تصنيع مخصص</span>
           </button>
         </div>
 
@@ -100,28 +110,52 @@ export const ManufacturingSystemModal: React.FC<Props> = ({ isOpen, onClose }) =
           {/* TAB 1: PRESET TEMPLATES */}
           {activeTab === 'templates' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {PRESET_MANUFACTURING_TEMPLATES.map((tmpl) => (
-                <div
-                  key={tmpl.id}
-                  className="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-blue-500 transition space-y-3"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">{tmpl.name}</h4>
-                      <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md mt-1 inline-block">
-                        {tmpl.systemType}
-                      </span>
+              {PRESET_MANUFACTURING_TEMPLATES.map((tmpl) => {
+                const isActive = project.manufacturing.systemType === tmpl.systemType;
+                return (
+                  <div
+                    key={tmpl.id}
+                    onClick={() => handleApplySystem(tmpl)}
+                    className={`p-4 rounded-2xl cursor-pointer transition space-y-2.5 ${
+                      isActive
+                        ? 'bg-blue-50/70 border-2 border-blue-600 shadow-md ring-2 ring-blue-500/20'
+                        : 'bg-white border border-slate-200 hover:border-blue-400 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">{tmpl.name}</h4>
+                        <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md mt-1 inline-block">
+                          {tmpl.systemType}
+                        </span>
+                      </div>
+                      {isActive ? (
+                        <span className="flex items-center gap-1 text-xs font-bold text-blue-600 bg-white px-2.5 py-1 rounded-full border border-blue-200 shadow-2xs">
+                          <Check size={14} />
+                          <span>مفعّل حالياً</span>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleApplySystem(tmpl);
+                          }}
+                          className="text-xs font-bold text-slate-700 bg-slate-100 hover:bg-blue-600 hover:text-white px-3 py-1 rounded-xl transition"
+                        >
+                          اختيار وتطبيق
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">{tmpl.description}</p>
+                    <div className="grid grid-cols-2 gap-2 text-[10.5px] font-mono bg-white/80 p-2 rounded-xl border border-slate-200/60">
+                      <div>طول العود: <strong className="text-slate-800">{tmpl.standardBarLength} مم</strong></div>
+                      <div>سماكة اللوح: <strong className="text-slate-800">{tmpl.primaryBoardThickness} مم</strong></div>
+                      <div>تخصيم الزوايا: <strong className="text-slate-800">{tmpl.cornerJointDeduction} مم</strong></div>
+                      <div>سلاح المنشار: <strong className="text-slate-800">{tmpl.sawKerf} مم</strong></div>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-500 leading-relaxed">{tmpl.description}</p>
-                  <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                    <div>طول العود: <strong className="text-slate-800">{tmpl.standardBarLength} مم</strong></div>
-                    <div>سماكة اللوح: <strong className="text-slate-800">{tmpl.primaryBoardThickness} مم</strong></div>
-                    <div>تخصيم الزوايا: <strong className="text-slate-800">{tmpl.cornerJointDeduction} مم</strong></div>
-                    <div>سماكة سلاح المنشار: <strong className="text-slate-800">{tmpl.sawKerf} مم</strong></div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

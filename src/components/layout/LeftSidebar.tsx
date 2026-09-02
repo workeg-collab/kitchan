@@ -304,6 +304,12 @@ export const LeftSidebar: React.FC = () => {
                       دواليب
                     </button>
                     <button
+                      onClick={() => setSelectedCategoryFilter('shoe-cabinet')}
+                      className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'shoe-cabinet' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    >
+                      جزامات
+                    </button>
+                    <button
                       onClick={() => setSelectedCategoryFilter('accessories')}
                       className={`px-2.5 py-1 rounded-lg shrink-0 transition ${selectedCategoryFilter === 'accessories' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                     >

@@ -258,7 +258,7 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
         </g>
       )}
 
-      {/* 8b. KITCHEN MAKER: DISH RACK (مطبق تركي وصفاية) */}
+      {/* 8b. KITCHAN: DISH RACK (مطبق تركي وصفاية) */}
       {cabinet.hasDishRack && (
         <g stroke="#10b981" fill="none" opacity="0.85">
           <rect x={width * 0.08} y={depth * 0.15} width={width * 0.84} height={depth * 0.7} rx="4" strokeWidth="1" strokeDasharray="3,2" />
@@ -272,7 +272,7 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
         </g>
       )}
 
-      {/* 8c. KITCHEN MAKER: TOP STRETCHERS (عوارض 10 سم) */}
+      {/* 8c. KITCHAN: TOP STRETCHERS (عوارض 10 سم) */}
       {cabinet.hasTopStretchers && (
         <g fill="#f59e0b" opacity="0.15">
           <rect x="0" y="0" width={width} height={Math.min(depth * 0.2, 100)} />
@@ -280,7 +280,7 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
         </g>
       )}
 
-      {/* 8d. KITCHEN MAKER: SIDE FILLER (فيلر تعويض) */}
+      {/* 8d. KITCHAN: SIDE FILLER (فيلر تعويض) */}
       {cabinet.hasFillerPanel && (
         <g>
           <rect x={width} y="0" width={70} height={depth} fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="1" />
@@ -288,6 +288,26 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
           <text x={width + 35} y={depth / 2} fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="middle" transform={`rotate(-90, ${width + 35}, ${depth / 2})`}>
             فيلر 7سم
           </text>
+        </g>
+      )}
+
+      {/* 8e. SHOE CABINET INDICATOR (جزامة) */}
+      {(cabinet.category === 'shoe-cabinet' || cabinet.type.startsWith('shoe-cabinet') || cabinet.isShoeCabinet) && (
+        <g stroke="#059669" fill="none" opacity="0.85">
+          <rect x={width * 0.08} y={depth * 0.15} width={width * 0.84} height={depth * 0.7} rx="4" strokeWidth="1" strokeDasharray="3,2" />
+          <text x={width * 0.5} y={depth * 0.5} fill="#059669" fontSize="8" fontWeight="bold" textAnchor="middle">
+            👟 جزامة ({cabinet.shoeTiersCount || cabinet.shelfCount || 3} أدوار)
+          </text>
+        </g>
+      )}
+
+      {/* 8f. DRESSING VERTICAL PARTITIONS (قواطع رأسية) */}
+      {cabinet.verticalDividersCount && cabinet.verticalDividersCount > 0 && (
+        <g stroke="#9333ea" strokeWidth="1.5" strokeDasharray="3,2">
+          {Array.from({ length: cabinet.verticalDividersCount }).map((_, i) => {
+            const partX = ((i + 1) * width) / (cabinet.verticalDividersCount! + 1);
+            return <line key={i} x1={partX} y1="0" x2={partX} y2={depth} />;
+          })}
         </g>
       )}
 

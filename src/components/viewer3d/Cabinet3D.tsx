@@ -283,6 +283,55 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             </mesh>
           )}
 
+          {/* Dressing Vertical Partition Gables (قواطع رأسية للتقسيم) */}
+          {cabinet.verticalDividersCount && cabinet.verticalDividersCount > 0 &&
+            Array.from({ length: cabinet.verticalDividersCount }).map((_, idx) => {
+              const partX = -W / 2 + ((idx + 1) * W) / (cabinet.verticalDividersCount! + 1);
+              return (
+                <mesh key={idx} position={[partX, 0, 0]} castShadow receiveShadow>
+                  <boxGeometry args={[0.018, H - 0.036, D - 0.02]} />
+                  <meshStandardMaterial color={bodyColor} roughness={0.6} />
+                </mesh>
+              );
+            })}
+
+          {/* Shoe Bench: Padded Seating Cushion (مقعد جلوس بف مبطن للجزامة) */}
+          {(cabinet.hasPaddedSeat || cabinet.shoeCabinetType === 'bench-seating' || cabinet.type === 'shoe-cabinet-bench') && (
+            <group position={[0, H / 2 + 0.03, 0]}>
+              <mesh castShadow receiveShadow>
+                <boxGeometry args={[W, 0.06, D + 0.02]} />
+                <meshStandardMaterial color={cabinet.paddedSeatColor || '#334155'} roughness={0.85} />
+              </mesh>
+              {/* Cushion trim seam */}
+              <mesh position={[0, 0.031, 0]}>
+                <boxGeometry args={[W - 0.03, 0.002, D - 0.02]} />
+                <meshStandardMaterial color="#1e293b" roughness={0.9} />
+              </mesh>
+            </group>
+          )}
+
+          {/* Slanted Shoe Shelves with Chrome Stop Lip (أرفف أحذية مائلة بمصد) */}
+          {cabinet.hasShoeShelves && (cabinet.shoeShelfAngle || cabinet.type === 'shoe-cabinet-tall') && (
+            <group position={[0, 0, 0]}>
+              {Array.from({ length: Math.min(cabinet.shelfCount || 4, 8) }).map((_, idx) => {
+                const sy = -H / 2 + ((idx + 1) * H) / ((cabinet.shelfCount || 4) + 1);
+                return (
+                  <group key={idx} position={[0, sy, 0]} rotation={[0.2, 0, 0]}>
+                    <mesh castShadow receiveShadow>
+                      <boxGeometry args={[W - 0.036, 0.018, D - 0.04]} />
+                      <meshStandardMaterial color={bodyColor} roughness={0.6} />
+                    </mesh>
+                    {/* Front chrome barrier lip */}
+                    <mesh position={[0, 0.02, D / 2 - 0.03]} castShadow>
+                      <boxGeometry args={[W - 0.05, 0.022, 0.006]} />
+                      <meshStandardMaterial color="#cbd5e1" metalness={0.9} roughness={0.15} />
+                    </mesh>
+                  </group>
+                );
+              })}
+            </group>
+          )}
+
           {/* Wardrobe Hanging Rails */}
           {cabinet.hasHangingRail && (
             <mesh position={[0, H / 2 - 0.25, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>

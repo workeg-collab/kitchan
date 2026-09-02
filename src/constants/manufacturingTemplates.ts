@@ -1,14 +1,14 @@
 import { ManufacturingSystemTemplate } from '../types/manufacturingSystems';
 
 export const PRESET_MANUFACTURING_TEMPLATES: ManufacturingSystemTemplate[] = [
-  // 0. نظام كيتشن ميكر الاحترافي المتكامل (KITCHEN MAKER PRO ARABIC STANDARD)
+  // 0. نظام كيتشن الاحترافي المتكامل (KITCHAN PRO INDUSTRIAL STANDARD)
   {
-    id: 'sys-kitchen-maker-pro',
-    name: 'نظام كيتشن ميكر المتكامل (Kitchen Maker Pro)',
-    nameEn: 'KitchenMaker Arabic Industrial Standard',
+    id: 'sys-kitchan-pro',
+    name: 'نظام كيتشن الاحترافي المتكامل (Kitchan Pro)',
+    nameEn: 'Kitchan Arabic Industrial Standard',
     systemType: 'wood',
     supportedCategories: ['kitchen'],
-    description: 'المعيار الصناعي المعتمد في برنامج كيتشن ميكر: شاسيه كونتر/MDF ميلامين مع عوارض علوية 10 سم، قاع حوض مصفح ألومنيوم، ظهر مفحور 6 مم، وقشاط PVC 2 مم للواجهات مع مسامير كونفرمات وتجميع مينيفكس',
+    description: 'المعيار الصناعي المتطور في نظام كيتشن: شاسيه كونتر/MDF ميلامين مع عوارض علوية 10 سم، قاع حوض مصفح ألومنيوم، ظهر مفحور 6 مم، وقشاط PVC 2 مم للواجهات مع مسامير كونفرمات وتجميع مينيفكس',
     standardSheetWidth: 2800,
     standardSheetLength: 2070,
     primaryBoardThickness: 18,
