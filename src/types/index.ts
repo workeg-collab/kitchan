@@ -19,7 +19,7 @@ export type CabinetCategory = 'base' | 'wall' | 'tall' | 'corner' | 'island' | '
 
 // Dressing / Wardrobe Types
 export type WardrobeCategory = 'wardrobe' | 'closet-internals' | 'accessories' | 'custom';
-export type WardrobeDoorType = 'hinged' | 'sliding' | 'folding' | 'open' | 'glass-frame';
+export type WardrobeDoorType = 'hinged' | 'sliding' | 'folding' | 'open' | 'glass-frame' | 'fixed';
 
 // Bedroom Types
 export type BedroomCategory = 'bed' | 'nightstand' | 'dresser' | 'tv-unit' | 'bench' | 'custom';

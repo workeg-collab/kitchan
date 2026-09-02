@@ -181,8 +181,27 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
         </g>
       )}
 
-      {/* 5. SINGLE DOOR SWING ARC & HANDLE */}
-      {doorCount === 1 && drawerCount === 0 && !isFlap && (
+      {/* 5. FIXED DOOR / PANEL INDICATOR (ضلفة ثابتة) */}
+      {cabinet.doorType === 'fixed' && (
+        <g>
+          <line x1="0" y1={depth - 8} x2={width} y2={depth - 8} stroke="#a855f7" strokeWidth="2" strokeDasharray="4,2" />
+          <text x={width / 2} y={depth - 3} fill="#a855f7" fontSize="8" fontWeight="bold" textAnchor="middle">
+            ثابت FIX
+          </text>
+        </g>
+      )}
+
+      {/* 5b. OPEN DRESSING / HANGING RAIL INDICATOR */}
+      {(cabinet.doorType === 'open' || doorCount === 0) && cabinet.hasHangingRail && (
+        <g stroke="#94a3b8" strokeWidth="2" opacity="0.6">
+          <line x1={width * 0.1} y1={depth * 0.5} x2={width * 0.9} y2={depth * 0.5} />
+          <circle cx={width * 0.1} cy={depth * 0.5} r="3" fill="#94a3b8" />
+          <circle cx={width * 0.9} cy={depth * 0.5} r="3" fill="#94a3b8" />
+        </g>
+      )}
+
+      {/* 5c. SINGLE DOOR SWING ARC & HANDLE */}
+      {doorCount === 1 && drawerCount === 0 && !isFlap && cabinet.doorType !== 'fixed' && cabinet.doorType !== 'open' && (
         <g stroke="#64748b" strokeWidth="1" strokeDasharray="2,2" fill="none">
           {doorHinge === 'left' ? (
             <path d={`M 0,${depth} A ${width} ${width} 0 0 1 ${width},${depth + width * 0.4}`} opacity="0.35" />
@@ -202,7 +221,7 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
       )}
 
       {/* 6. DOUBLE DOOR SWING INDICATOR & DUAL HANDLES */}
-      {doorCount === 2 && drawerCount === 0 && !isFlap && (
+      {doorCount === 2 && drawerCount === 0 && !isFlap && cabinet.doorType !== 'fixed' && cabinet.doorType !== 'open' && (
         <g stroke="#64748b" strokeWidth="1">
           <line x1={width / 2} y1="0" x2={width / 2} y2={depth} strokeDasharray="3,3" />
           {/* Left Handle */}
@@ -212,8 +231,18 @@ export const CabinetNode2D: React.FC<CabinetNode2DProps> = ({
         </g>
       )}
 
+      {/* 6b. MULTI-DOOR (3 OR 4 DOORS) */}
+      {doorCount >= 3 && drawerCount === 0 && !isFlap && cabinet.doorType !== 'fixed' && cabinet.doorType !== 'open' && (
+        <g stroke="#64748b" strokeWidth="1">
+          {Array.from({ length: doorCount - 1 }).map((_, i) => {
+            const dx = ((i + 1) * width) / doorCount;
+            return <line key={i} x1={dx} y1="0" x2={dx} y2={depth} strokeDasharray="3,3" />;
+          })}
+        </g>
+      )}
+
       {/* 7. GLASS VITRINE CROSS HATCH (فيترينة زجاج) */}
-      {(hasGlassDoors || type === 'wall-glass-vitrine') && (
+      {(hasGlassDoors || cabinet.doorType === 'glass-frame' || type === 'wall-glass-vitrine') && (
         <g stroke="#38bdf8" strokeWidth="0.8" opacity="0.35" strokeDasharray="2,3">
           <line x1="15" y1="15" x2={width - 15} y2={depth - 15} />
           <line x1={width - 15} y1="15" x2="15" y2={depth - 15} />

@@ -123,21 +123,21 @@ export const LeftSidebar: React.FC = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 1. SLIM ICON TOOL RAIL (54px width) - Professional CAD Look               */}
+      {/* 1. SLIM ICON TOOL RAIL (48px width) - Professional CAD Look               */}
       {/* ========================================================================= */}
-      <aside className="hidden lg:flex w-14 bg-white border-r border-slate-200/90 flex-col items-center py-3 gap-2 z-20 shadow-xs">
+      <aside className="hidden lg:flex w-12 bg-white border-r border-slate-200/90 flex-col items-center py-2.5 gap-1.5 z-20 shadow-xs">
         {/* Main Furniture / Cabinets Category */}
         <button
           onClick={() => toggleLeftCategory('cabinets')}
-          className={`w-10 h-10 rounded-2xl flex flex-col items-center justify-center transition group relative ${
+          className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center transition group relative ${
             activeLeftCategory === 'cabinets'
               ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
               : 'text-slate-600 hover:text-purple-600 hover:bg-purple-50'
           }`}
           title={projectType === 'dressing' ? 'دواليب وخزائن الدريسينج' : projectType === 'bedroom' ? 'السرائر والكومود والتسريحة' : projectType === 'library' ? 'المكتبات وحوائط الشاشات' : 'وحدات ودواليب المطبخ'}
         >
-          {projectType === 'dressing' ? <Shirt size={19} /> : projectType === 'bedroom' ? <BedDouble size={19} /> : projectType === 'library' ? <BookOpen size={19} /> : <Box size={19} />}
-          <span className="text-[8px] font-bold mt-0.5 leading-none">
+          {projectType === 'dressing' ? <Shirt size={17} /> : projectType === 'bedroom' ? <BedDouble size={17} /> : projectType === 'library' ? <BookOpen size={17} /> : <Box size={17} />}
+          <span className="text-[7.5px] font-bold mt-0.5 leading-none">
             {projectType === 'dressing' ? 'خزائن' : projectType === 'bedroom' ? 'سرائر' : projectType === 'library' ? 'مكتبات' : 'وحدات'}
           </span>
         </button>
@@ -146,78 +146,78 @@ export const LeftSidebar: React.FC = () => {
         {projectType === 'kitchen' && (
           <button
             onClick={() => toggleLeftCategory('appliances')}
-            className={`w-10 h-10 rounded-2xl flex flex-col items-center justify-center transition group relative ${
+            className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center transition group relative ${
               activeLeftCategory === 'appliances'
                 ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
                 : 'text-slate-600 hover:text-amber-600 hover:bg-amber-50'
             }`}
             title="الأجهزة الكهربائية والبيلت إن (Appliances)"
           >
-            <Tv size={19} />
-            <span className="text-[8px] font-bold mt-0.5 leading-none">أجهزة</span>
+            <Tv size={17} />
+            <span className="text-[7.5px] font-bold mt-0.5 leading-none">أجهزة</span>
           </button>
         )}
 
         {/* Openings & Architecture */}
         <button
           onClick={() => toggleLeftCategory('architecture')}
-          className={`w-10 h-10 rounded-2xl flex flex-col items-center justify-center transition group relative ${
+          className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center transition group relative ${
             activeLeftCategory === 'architecture'
               ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
               : 'text-slate-600 hover:text-emerald-600 hover:bg-emerald-50'
           }`}
           title="الأبواب، النوافذ، والأعمدة المعمارية"
         >
-          <DoorClosed size={19} />
-          <span className="text-[8px] font-bold mt-0.5 leading-none">فتحات</span>
+          <DoorClosed size={17} />
+          <span className="text-[7.5px] font-bold mt-0.5 leading-none">فتحات</span>
         </button>
 
         {/* Materials & Colors */}
         <button
           onClick={() => toggleLeftCategory('finishes')}
-          className={`w-10 h-10 rounded-2xl flex flex-col items-center justify-center transition group relative ${
+          className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center transition group relative ${
             activeLeftCategory === 'finishes'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
               : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
           }`}
-          title="الخامات، الألوان، والألواح المخصصة"
+          title="تخصيص الخامات والألوان للوحدات والأسطح"
         >
-          <Palette size={19} />
-          <span className="text-[8px] font-bold mt-0.5 leading-none">خامات</span>
-        </button>
-
-        {/* Ready-made Templates Quick Access */}
-        <button
-          onClick={() => setActiveTab('templates-catalog')}
-          className="w-10 h-10 rounded-2xl flex flex-col items-center justify-center text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition group"
-          title="كتالوج التصاميم الجاهزة والمواءمة الذكية"
-        >
-          <Sparkles size={19} />
-          <span className="text-[8px] font-bold mt-0.5 leading-none">تصاميم</span>
+          <Palette size={17} />
+          <span className="text-[7.5px] font-bold mt-0.5 leading-none">خامات</span>
         </button>
 
         <div className="w-6 h-px bg-slate-200 my-1" />
 
-        {/* Room Shape & Dimension Sketcher */}
+        {/* Custom Room Sketcher */}
         <button
           onClick={() => setIsRoomSketcherOpen(true)}
-          className="w-10 h-10 rounded-2xl flex flex-col items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition group"
-          title="تعديل مقاسات الغرفة وتخطيط الجدران"
+          className="w-9 h-9 rounded-xl flex flex-col items-center justify-center text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition"
+          title="رسم وتعديل أبعاد وحوائط الغرفة"
         >
-          <Ruler size={19} />
-          <span className="text-[8px] font-bold mt-0.5 leading-none">الغرفة</span>
+          <Ruler size={17} />
+          <span className="text-[7.5px] font-bold mt-0.5 leading-none">غرفة</span>
+        </button>
+
+        {/* Visual Studio shortcut */}
+        <button
+          onClick={() => setActiveTab('visualization-studio')}
+          className="w-9 h-9 rounded-xl flex flex-col items-center justify-center text-slate-600 hover:text-amber-600 hover:bg-amber-50 transition"
+          title="استوديو الإضاءة والرندر الواقعي"
+        >
+          <Sparkles size={17} />
+          <span className="text-[7.5px] font-bold mt-0.5 leading-none">رندر</span>
         </button>
       </aside>
 
       {/* ========================================================================= */}
-      {/* 2. FLYOUT DRAWER PANEL (310px width) - Slides out seamlessly             */}
+      {/* 2. FLYOUT DRAWER PANEL (272px width) - Slimmer to expand canvas           */}
       {/* ========================================================================= */}
       {activeLeftCategory && (
-        <div className="fixed inset-y-0 right-0 max-w-[85vw] w-80 bg-white border-l border-slate-200 z-40 shadow-2xl flex flex-col h-full lg:relative lg:border-r lg:border-l-0 lg:z-10 animate-in slide-in-from-right lg:slide-in-from-left duration-200">
+        <div className="fixed inset-y-0 right-0 max-w-[85vw] w-68 bg-white border-l border-slate-200 z-40 shadow-2xl flex flex-col h-full lg:relative lg:border-r lg:border-l-0 lg:z-10 animate-in slide-in-from-right lg:slide-in-from-left duration-200">
           {/* Drawer Header */}
-          <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xs font-black text-slate-900">
+          <div className="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h3 className="text-xs font-black text-slate-900 truncate">
                 {activeLeftCategory === 'cabinets' && (projectType === 'dressing' ? 'خزائن ودواليب الدريسينج' : projectType === 'bedroom' ? 'السرائر والكومود والتسريحة' : projectType === 'library' ? 'المكتبات وحوائط الشاشات' : 'وحدات ودواليب المطبخ')}
                 {activeLeftCategory === 'appliances' && 'الأجهزة الكهربائية والبيلت إن'}
                 {activeLeftCategory === 'architecture' && 'الفتحات والأبواب المعمارية'}
@@ -225,7 +225,7 @@ export const LeftSidebar: React.FC = () => {
               </h3>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 shrink-0">
               <button
                 onClick={toggleLeftPanelPinned}
                 className={`p-1.5 rounded-lg transition ${

@@ -44,13 +44,14 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
   const isTvSlatWall = cabinet.type === 'living-tv-slat-wall' || cabinet.category === 'tv-wall';
   const isPlant = cabinet.category === 'accent' || cabinet.type === 'accent-indoor-plant';
   const isKitchenBase = cabinet.category === 'base' || cabinet.category === 'island';
-  const isFlapDoor = cabinet.flipUpDoor || cabinet.doorHinge === 'top' || cabinet.type.includes('loft') || cabinet.type.includes('lift-up') || cabinet.type.includes('aventos');
-  const isGlassVitrine = cabinet.hasGlassDoors || cabinet.type === 'wall-glass-vitrine' || cabinet.type.includes('glass');
+  const isFixedDoor = cabinet.doorType === 'fixed';
+  const isFlapDoor = !isFixedDoor && (cabinet.flipUpDoor || cabinet.doorHinge === 'top' || cabinet.type.includes('loft') || cabinet.type.includes('lift-up') || cabinet.type.includes('aventos'));
+  const isGlassVitrine = cabinet.hasGlassDoors || cabinet.doorType === 'glass-frame' || cabinet.type === 'wall-glass-vitrine' || cabinet.type.includes('glass');
 
   // Smooth Door Opening Animation
   useFrame((_, delta) => {
-    const targetAngle = isOpenDoors ? Math.PI / 2.2 : 0;
-    const targetFlapAngle = isOpenDoors ? -Math.PI / 2.5 : 0;
+    const targetAngle = (isOpenDoors && !isFixedDoor) ? Math.PI / 2.2 : 0;
+    const targetFlapAngle = (isOpenDoors && !isFixedDoor) ? -Math.PI / 2.5 : 0;
 
     if (leftDoorRef.current) {
       leftDoorRef.current.rotation.y = THREE.MathUtils.damp(leftDoorRef.current.rotation.y, -targetAngle, 6, delta);
@@ -288,12 +289,39 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             </group>
           )}
 
-          {/* --- C) SINGLE HINGED DOOR --- */}
-          {cabinet.doorCount === 1 && cabinet.drawerCount === 0 && !isFlapDoor && (
+          {/* --- C) FIXED FRONT DOOR / ARCHITECTURAL PANEL (ضلفة ثابتة لا تفتح) --- */}
+          {isFixedDoor && cabinet.doorCount > 0 && cabinet.drawerCount === 0 && (
+            <group position={[0, 0, D / 2 + 0.009]}>
+              {cabinet.doorCount === 1 ? (
+                <mesh castShadow receiveShadow>
+                  <boxGeometry args={[W - 0.004, H - 0.004, 0.018]} />
+                  <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                </mesh>
+              ) : (
+                Array.from({ length: cabinet.doorCount }).map((_, i) => {
+                  const dW = (W - 0.004 * cabinet.doorCount) / cabinet.doorCount;
+                  const dX = -W / 2 + dW / 2 + i * (dW + 0.004);
+                  return (
+                    <mesh key={i} position={[dX, 0, 0]} castShadow receiveShadow>
+                      <boxGeometry args={[dW - 0.002, H - 0.004, 0.018]} />
+                      <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                    </mesh>
+                  );
+                })
+              )}
+            </group>
+          )}
+
+          {/* --- D) SINGLE HINGED DOOR (ضلفة مفردة) --- */}
+          {!isFixedDoor && cabinet.doorCount === 1 && cabinet.drawerCount === 0 && !isFlapDoor && cabinet.doorType !== 'open' && (
             <group ref={leftDoorRef} position={[-W / 2 + 0.009, 0, D / 2 + 0.009]}>
               <mesh position={[W / 2 - 0.009, 0, 0]} castShadow receiveShadow>
                 <boxGeometry args={[W - 0.004, H - 0.004, 0.018]} />
-                <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                {isGlassVitrine ? (
+                  <meshPhysicalMaterial color="#94a3b8" transmission={0.7} opacity={0.6} transparent roughness={0.1} />
+                ) : (
+                  <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                )}
               </mesh>
               {/* Handle */}
               <mesh position={[W - 0.05, 0, 0.012]} castShadow>
@@ -303,8 +331,8 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
             </group>
           )}
 
-          {/* --- D) DOUBLE HINGED DOORS / GLASS VITRINE --- */}
-          {cabinet.doorCount >= 2 && cabinet.drawerCount === 0 && !isFlapDoor && cabinet.doorType !== 'open' && (
+          {/* --- E) DOUBLE HINGED DOORS / GLASS VITRINE (ضلفتين) --- */}
+          {!isFixedDoor && cabinet.doorCount === 2 && cabinet.drawerCount === 0 && !isFlapDoor && cabinet.doorType !== 'open' && (
             <>
               {/* Left Door */}
               <group ref={leftDoorRef} position={[-W / 2 + 0.009, 0, D / 2 + 0.009]}>
@@ -340,6 +368,33 @@ export const Cabinet3D: React.FC<Cabinet3DProps> = ({
                 </mesh>
               </group>
             </>
+          )}
+
+          {/* --- F) 3 OR 4 DOORS (3 أو 4 ضلف) --- */}
+          {!isFixedDoor && cabinet.doorCount >= 3 && cabinet.drawerCount === 0 && !isFlapDoor && cabinet.doorType !== 'open' && (
+            <group position={[0, 0, D / 2 + 0.009]}>
+              {Array.from({ length: cabinet.doorCount }).map((_, i) => {
+                const dW = (W - 0.004 * cabinet.doorCount) / cabinet.doorCount;
+                const dX = -W / 2 + dW / 2 + i * (dW + 0.004);
+                return (
+                  <group key={i} position={[dX, 0, 0]}>
+                    <mesh castShadow receiveShadow>
+                      <boxGeometry args={[dW - 0.003, H - 0.004, 0.018]} />
+                      {isGlassVitrine ? (
+                        <meshPhysicalMaterial color="#94a3b8" transmission={0.7} opacity={0.6} transparent roughness={0.1} />
+                      ) : (
+                        <meshStandardMaterial color={selectionHighlight || frontColor} roughness={0.5} />
+                      )}
+                    </mesh>
+                    {/* Handle */}
+                    <mesh position={[i % 2 === 0 ? dW / 2 - 0.025 : -dW / 2 + 0.025, 0, 0.012]} castShadow>
+                      <boxGeometry args={[0.012, 0.16, 0.018]} />
+                      <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
+                    </mesh>
+                  </group>
+                );
+              })}
+            </group>
           )}
         </group>
       )}
